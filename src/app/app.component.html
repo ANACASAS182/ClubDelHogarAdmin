@@ -1,0 +1,29 @@
+<div class="flex h-screen">
+  <!-- Master / Sidebar -->
+  <aside class="w-1/3 max-w-sm bg-gray-100 border-r border-gray-300 p-4 overflow-y-auto">
+    <h2 class="text-xl font-semibold mb-4">Listado</h2>
+    <ul class="space-y-2">
+      <li class="p-3 bg-white rounded shadow hover:bg-blue-50 cursor-pointer">
+        Usuario 1
+      </li>
+      <li class="p-3 bg-white rounded shadow hover:bg-blue-50 cursor-pointer">
+        Usuario 2
+      </li>
+      <li class="p-3 bg-white rounded shadow hover:bg-blue-50 cursor-pointer">
+        Usuario 3
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Detail / Main Content -->
+  <main class="flex-1 p-6 overflow-y-auto">
+    <h1 class="text-2xl font-bold mb-4">Detalle</h1>
+    <div class="bg-white shadow rounded p-4">
+      <p class="text-gray-700">
+        Aquí se mostrarán los detalles del elemento seleccionado. Puedes conectar esta sección con rutas o un servicio de datos.
+      </p>
+    </div>
+  </main>
+</div>
+
+<router-outlet></router-outlet>
