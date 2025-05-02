@@ -123,5 +123,7 @@
       }
     }
   },
-  "defaultProject": "EBGAdmin"
+  "cli": {
+    "analytics": "9a79860a-8ea5-44b0-a845-b1afbeba4580"
+  }
 }

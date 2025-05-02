@@ -1,0 +1,21 @@
+<h1 class="text-2xl font-bold mb-4">Células</h1>
+    <div class="bg-white shadow rounded p-4">
+      <div class="text-gray-700">
+
+        <div *ngIf="celula_actual">
+            
+            <div class = "NodoCelula">{{ celula_actual.padre?.nombre }}</div>
+            <div class = "NodoCelula">{{ celula_actual.yo.nombre }}</div>
+           
+           <ul>
+              <ng-container *ngFor="let hijo of celula_actual.hijos">
+                <li>
+                  <div class = "NodoCelula">{{ hijo.nombre }}</div>
+                  <app-nodo-celula [nodo]="hijo"></app-nodo-celula>
+                </li>
+              </ng-container>
+            </ul>
+          </div>
+
+      </div>
+    </div>

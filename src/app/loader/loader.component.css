@@ -1,0 +1,53 @@
+.loader {
+    width: 128px;
+    margin: auto;
+    
+    
+    transform: skewY(-10deg); /* inclinación */
+  }
+
+  .bar {
+    width: 128px;
+    height: 24px;
+    border-radius:4px;
+    border: 1px solid #001744;
+    background: white;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .bar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background-color: #001744;
+    animation: fillDrain 3s infinite;
+  }
+
+  .bar:nth-child(1)::before {
+    animation-delay: 0s;
+  }
+
+  .bar:nth-child(2)::before {
+    animation-delay: 0.5s;
+  }
+
+  .bar:nth-child(3)::before {
+    animation-delay: 1s;
+  }
+
+  @keyframes fillDrain {
+    0%, 10% {
+      width: 0%;
+    }
+    30%, 40% {
+      width: 100%;
+    }
+    60%, 100% {
+      width: 0%;
+    }
+  }
