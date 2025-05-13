@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
+
 @Component({
   selector: 'app-celulas',
   templateUrl: './celulas.component.html',
@@ -41,6 +42,11 @@ export class CelulasComponent {
     };
   }
   
+  onFabClick() {
+    console.log('FAB clickeado');
+    // Puedes poner aquí la lógica que desees
+  }
+
 
 }
 

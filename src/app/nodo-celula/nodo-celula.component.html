@@ -1,9 +1,8 @@
-<ul style="margin-left: 24px;"  *ngIf="nodo.hijos!.length > 0">
+<ul style="margin-left: 24px;" *ngIf="nodo.hijos!.length > 0">
     <ng-container *ngFor="let hijo of nodo.hijos">
-      <li>
-        <div class = "NodoCelula">{{ hijo.nombre }}</div>
-        <app-nodo-celula [nodo]="hijo"></app-nodo-celula>
-      </li>
+        <li>
+            <div class="NodoCelula">{{ hijo.nombre }}</div>
+            <app-nodo-celula [nodo]="hijo"></app-nodo-celula>
+        </li>
     </ng-container>
-  </ul>
-  
+</ul>
