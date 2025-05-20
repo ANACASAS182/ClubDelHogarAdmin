@@ -94,6 +94,7 @@
             "development": {
               "browserTarget": "EBGAdmin:build:development"
             }
+            
           },
           "defaultConfiguration": "development"
         },

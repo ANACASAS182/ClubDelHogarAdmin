@@ -1,0 +1,26 @@
+<h1>Grupos</h1>
+
+<form [formGroup]="grupoForm" (ngSubmit)="onSubmit()" class="max-w-lg mx-auto p-6 bg-white space-y-4">
+  
+  <div class="space-y-2">
+    <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+    <input
+      id="nombre"
+      type="text"
+      formControlName="nombre"
+      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    />
+    <div *ngIf="grupoForm.get('nombre')?.invalid && grupoForm.get('nombre')?.touched" class="text-red-600 text-sm mt-1">
+      Nombre es requerido y debe tener al menos 3 caracteres.
+    </div>
+  </div>
+
+  <button
+    type="submit"
+    [disabled]="grupoForm.invalid"
+    class="w-full py-2 bg-blue-600 text-white font-semibold rounded-lg focus:outline-none hover:bg-blue-700 disabled:bg-gray-300"
+  >
+    <span *ngIf="nuevo">Agregar Grupo</span>
+    <span *ngIf="!nuevo">Guardar cambios</span>
+  </button>
+</form>

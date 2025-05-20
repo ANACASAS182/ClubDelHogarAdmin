@@ -1,9 +1,11 @@
 export interface EmpresaDTO
 {
     id:number;
+    rfc:string;
     razonSocial:string;
     nombreComercial:string;
     logoBase64:string;
+    grupoId:number;
 }
 
 export interface GrupoDTO{

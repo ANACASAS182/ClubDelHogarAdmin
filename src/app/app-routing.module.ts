@@ -5,13 +5,14 @@ import { EmbajadoresComponent } from './embajadores/embajadores.component';
 import { EmpresasComponent } from './empresas/empresas.component';
 import { GruposComponent } from './grupos/grupos.component';
 
-const routes: Routes  = [
-  { path: 'celulas', component: CelulasComponent },
-  { path: 'embajadores', component: EmbajadoresComponent },
-  { path: 'empresas', component: EmpresasComponent },
-  { path: 'grupos', component: GruposComponent },
-  { path: '', redirectTo: '/empresas', pathMatch: 'full' }, // ruta por defecto
-  { path: '**', redirectTo: '/empresas' } // ruta para no encontrados
+
+const routes: Routes = [
+  { path: 'celulas', component: CelulasComponent }, // Ruta protegida
+  { path: 'embajadores', component: EmbajadoresComponent}, // Ruta protegida
+  { path: 'empresas', component: EmpresasComponent }, // Ruta protegida
+  { path: 'grupos', component: GruposComponent}, // Ruta protegida
+  { path: '', redirectTo: '/empresas', pathMatch: 'full' }, // Ruta por defecto
+  { path: '**', redirectTo: '/empresas' } // Ruta para no encontrados
 ];
 
 @NgModule({

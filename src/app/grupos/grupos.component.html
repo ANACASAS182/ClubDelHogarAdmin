@@ -1,25 +1,21 @@
-<h1 class="text-2xl font-bold mb-4">Grupos de empresas</h1>
-<div class="bg-white shadow rounded p-4">
-    <div class="text-gray-700">
-       
-        <div *ngFor="let grupo of grupos">
-            <div class="flex border rounded-lg p-4 my-4  w-full">
-                <!-- Imagen cuadrada -->
-                <div class="w-24 h-24 bg-gray-300 rounded-lg mr-4">
-                  
-                </div>
-              
-                <!-- Contenedor de texto y botones -->
-                <div class="flex-1 flex flex-col justify-between">
-                  <div class="flex justify-between items-start">
-                    <!-- Nombre comercial -->
-                    <h2 class="text-xl font-semibold">{{grupo.nombre}}</h2>
-                  </div>
-              
-                  <!-- Botón "ir" -->
-                  <button class="mt-4 py-2 px-4 bg-blue-500 text-white rounded-md self-end">Ir</button>
-                </div>
-              </div>
-        </div> 
-    </div>
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Grupos de empresas</h1>
+  <button (click)="AgregarGrupo()" class="bg-blue-500 text-white px-4 py-2 rounded">
+    Agregar
+  </button>
+</div>
+
+<div class="bg-white shadow rounded p-2">
+  <div class="text-gray-700">
+
+    <div *ngFor="let grupo of grupos">
+  <div 
+    class="flex border rounded-lg p-2 my-2 w-full cursor-pointer transition-colors duration-200 hover:bg-gray-100"
+    (click)="EditarGrupo(grupo)"
+  >
+    <span>{{ grupo.nombre }}</span>
+  </div>
+</div>
+
+  </div>
 </div>

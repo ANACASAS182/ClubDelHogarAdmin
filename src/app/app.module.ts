@@ -12,6 +12,11 @@ import { SafeUrl64Pipe } from './sanitizer.pipe';
 import { GruposComponent } from './grupos/grupos.component';
 import { LoaderComponent } from './loader/loader.component';
 import { NodoCelulaComponent } from './nodo-celula/nodo-celula.component';
+import { ModalComponent } from './shared/modal/modal.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // 👈 IMPORTAR AQUÍ
+import { AgregarEditarGrupoComponent } from './modales/agregar-editar-grupo/agregar-editar-grupo.component';
+import { AgregarEditarEmpresaComponent } from './modales/agregar-editar-empresa/agregar-editar-empresa.component';
+
 
 @NgModule({
   declarations: [
@@ -22,12 +27,17 @@ import { NodoCelulaComponent } from './nodo-celula/nodo-celula.component';
     SafeUrl64Pipe,
     GruposComponent,
     LoaderComponent,
-    NodoCelulaComponent
+    NodoCelulaComponent,
+    ModalComponent,
+    AgregarEditarGrupoComponent,
+    AgregarEditarEmpresaComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule 
+    HttpClientModule ,
+    ReactiveFormsModule ,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

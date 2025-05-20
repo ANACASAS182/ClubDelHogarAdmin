@@ -7,7 +7,7 @@
   <!-- Header Sticky -->
   <header class="sticky top-0 bg-white z-20 shadow p-4 w-full">
     <h1 class="text-2xl font-bold">
-      <img src="assets/logo.png" class = "inline-block" />
+      <img src="assets/logo.png" class="inline-block" />
       Panel de administración - Versión 1
     </h1>
   </header>
@@ -15,7 +15,7 @@
   <!-- Flex Layout -->
   <div class="flex h-full">
     <!-- Sidebar -->
-    <aside class="w-1/3 max-w-sm bg-gray-100 border-r border-gray-300 p-4 overflow-y-auto">
+    <aside class="w-[300px] bg-gray-100 border-r border-gray-300 p-4 fixed top-24 left-0 bottom-0">
       <ul class="space-y-2">
         <li class="p-3 bg-white rounded shadow hover:bg-blue-50 cursor-pointer" routerLink="/grupos" routerLinkActive="bg-blue-100">
           Grupos
@@ -33,7 +33,8 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-6 overflow-y-auto"> <!-- mt-16 para dejar espacio debajo del header -->
+    <main class="flex-1 p-6 ml-[300px] overflow-y-auto h-full">
+      <app-modal></app-modal>
       <router-outlet></router-outlet>
     </main>
   </div>

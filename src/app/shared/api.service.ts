@@ -12,15 +12,25 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
+  //GRUPOS -----------------------------
+  GetGrupos(): Observable<GrupoDTO[]> {
+    return this.http.get<GrupoDTO[]>(`${this.apiUrl}Admin/GetGrupos`);
+  }
 
-  // Ejemplo: obtener lista de items
+  AgregarEditarGrupo(grupo:GrupoDTO): Observable<GrupoDTO[]> {
+    return this.http.post<GrupoDTO[]>(`${this.apiUrl}Admin/AgregarEditarGrupo`, grupo);
+  }
+
+  //EMPRESAS -----------------------------
   GetEmpresas(): Observable<EmpresaDTO[]> {
     return this.http.get<EmpresaDTO[]>(`${this.apiUrl}Admin/GetEmpresas`);
   }
 
-  GetGrupos(): Observable<GrupoDTO[]> {
-    return this.http.get<GrupoDTO[]>(`${this.apiUrl}Admin/GetGrupos`);
+  AgregarEditarEmpresa(empresa:EmpresaDTO): Observable<EmpresaDTO[]> {
+    return this.http.post<EmpresaDTO[]>(`${this.apiUrl}Admin/AgregarEditarEmpresa`, empresa);
   }
+
+  // EMBAJADORES  -----------------------------
 
   GetEmbajadores(): Observable<EmbajadorDTO[]> {
     return this.http.get<EmbajadorDTO[]>(`${this.apiUrl}Admin/GetEmbajadores`);
