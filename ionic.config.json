@@ -1,0 +1,7 @@
+{
+  "name": "EmbassyAdminFront",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

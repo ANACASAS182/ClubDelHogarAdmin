@@ -1,0 +1,188 @@
+<ion-header class="pagesHeader">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <h1><ion-icon name="star" color="white"></ion-icon> Referidos</h1>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content class="pagesContent">
+
+  <div>
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+
+        <ion-col size="12" size-md="9" class="ion-text-center">
+          <ion-input class="inputBusqueda" autocomplete="off" (ionInput)="inputBuscar.next($event.detail.value || '')"
+            [placeholder]="inputBusquedaText">
+            <ion-icon slot="end" name="search" aria-hidden="true"></ion-icon>
+          </ion-input>
+        </ion-col>
+      </ion-row>
+
+      <ion-row class="ion-align-items-center">
+        <ion-col size="12" size-md="3" class="ion-text-center" *ngIf="rolUsuario === RolesEnum.Admin">
+          <ion-item class="inputBusqueda">
+            <ion-label position="floating">Filtro por grupo</ion-label>
+            <ionic-selectable item-content [items]="grupos" itemValueField="id" closeButtonSlot="end"
+              itemTextField="nombre" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
+              clearButtonText="Limpiar" (onChange)="onGrupoSelect($event)" (onClear)="onGrupoClear($event)">
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-md="3" class="ion-text-center" *ngIf="rolUsuario === RolesEnum.Admin">
+          <ion-item class="inputBusqueda">
+            <ion-label position="floating">Filtro por embajador</ion-label>
+            <ionic-selectable #selectableComponent item-content [items]="usuarios" itemValueField="id"
+              closeButtonSlot="end" [searchFailText]="'No se encontraron usuarios.'" itemTextField="nombreCompleto"
+              closeButtonText="Cancelar" [canSearch]="true" searchPlaceholder="Buscar usuario..." [canClear]="true"
+              clearButtonText="Limpiar" (onSearch)="onSearchChange($event)" (onOpen)="onOpen($event)"
+              (onChange)="onUsuarioSelect($event)" (onClear)="onUsuarioClear($event)">
+              <ng-template ionicSelectableMessageTemplate>
+                <ion-item text-wrap>
+                  <p style="color: grey; font-size: small;">
+                    Solo se muestran los primeros 30 usuarios encontrados.
+                    Si no encuentra el deseado, utilice el buscador para obtener un resultado más preciso.
+                  </p>
+                </ion-item>
+              </ng-template>
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-md="3" class="ion-text-center" *ngIf="rolUsuario === RolesEnum.Admin">
+          <ion-item class="inputBusqueda">
+            <ion-label position="floating">Filtro por empresa</ion-label>
+            <ionic-selectable item-content [items]="empresas" itemValueField="id" closeButtonSlot="end"
+              itemTextField="razonSocial" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
+              clearButtonText="Limpiar" (onChange)="onEmpresaSelect($event)" (onClear)="onEmpresaClear($event)">
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-md="3" class="ion-text-center">
+          <ion-item class="inputBusqueda">
+            <ion-label position="floating">Filtro por estatus</ion-label>
+            <ionic-selectable item-content [items]="estatus" itemValueField="valor" closeButtonSlot="end"
+              itemTextField="nombre" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
+              clearButtonText="Limpiar" (onChange)="onEstatusSelect($event)" (onClear)="onEstatusClear($event)">
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+  <!-- Panel inferior con tabla básica -->
+  <ion-card>
+    <ion-card-header class="referidosHeader">
+      <ion-card-title class="title">Productos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+
+      <div style="overflow-x: auto;">
+        <table mat-table [dataSource]="dataSourceTable" matSort>
+
+          <ng-container matColumnDef="Nombre">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Nombre
+            </th>
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.nombre }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Email">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Email
+            </th>
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.email }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Celular">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Celular
+            </th>
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.celular }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Producto">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Producto
+            </th>
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.producto }}
+              <div *ngIf="element.vigente !== null">
+                <small [ngClass]="element.productoVigente ? 'text-success' : 'text-danger'">
+                  {{ element.productoVigente ? 'Vigente' : 'No vigente' }}
+                </small>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Embajador">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Embajador
+            </th>
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.embajador }} </td>
+          </ng-container>
+
+
+          <ng-container matColumnDef="Empresa">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Empresa
+            </th>
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.empresa }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Grupo">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Grupo </th>
+            <td mat-cell *matCellDef="let element">
+              <span *ngFor="let grupo of element.grupos; let last = last">
+                {{ grupo.nombre }}<span *ngIf="!last">, </span>
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="EstatusReferencia">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Estatus Referencia
+            </th>
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.estatusRerefencia }} </td>
+          </ng-container>
+
+
+          <ng-container matColumnDef="QR">
+            <th mat-header-cell *matHeaderCellDef> Cupon </th>
+            <td mat-cell *matCellDef="let element">
+              @if(element.codigoCupon != "" && element.codigoCupon != undefined && element.codigoCupon != null){
+              <ion-button shape="round" fill="clear" (click)="viewQR(element.codigoCupon)">
+                <ion-icon slot="icon-only" name="qr-code"></ion-icon><small>QR</small>
+              </ion-button>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Visualizar">
+            <th mat-header-cell *matHeaderCellDef> Opciones </th>
+            <td mat-cell *matCellDef="let element">
+              <ion-button shape="round" fill="clear" (click)="seguimientoModal(element.id)">
+                <ion-icon slot="icon-only" name="eye"></ion-icon><small>Seguimiento</small>
+              </ion-button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon">
+          </tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 1rem;">
+              No se encontraron registros disponibles.
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-paginator [length]="total" [pageSizeOptions]="[20, 50, 100]" showFirstLastButtons [pageSize]="50">
+      </mat-paginator>
+
+    </ion-card-content>
+  </ion-card>
+</ion-content>

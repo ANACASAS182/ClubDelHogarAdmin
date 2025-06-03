@@ -1,0 +1,54 @@
+<ion-content>
+  <ion-split-pane contentId="main-content">
+    <!---->
+    <ion-menu class="custom-menu" contentId="main-content" type="overlay">
+      <ion-content>
+        <ion-list id="inbox-list">
+
+          <ion-menu-toggle auto-hide="false">
+            <img src="../../../assets/logo.PNG" alt="Logo" class="logo" />
+          </ion-menu-toggle>
+
+
+          @for (p of appPages; track p; let i = $index) {
+          <ion-menu-toggle auto-hide="false">
+            @if(p.visible){
+            <ion-item routerDirection="root" [routerLink]="p.url" lines="none" detail="false"
+              routerLinkActive="selected">
+              <ion-icon color="white" aria-hidden="true" slot="start" [ios]="p.icon + '-outline'"
+                [md]="p.icon + '-sharp'"></ion-icon>
+              <ion-label>{{ p.title }}</ion-label>
+            </ion-item>
+            }
+          </ion-menu-toggle>
+          }
+
+          <div class="menu-separator"></div>
+
+          <ion-menu-toggle auto-hide="false" style="margin-bottom: 100px;">
+            <span class="name-text">{{userName}}</span>
+          </ion-menu-toggle>
+
+          <div style="height: 10px;"></div>
+
+          <ion-menu-toggle auto-hide="false">
+            <div class="logout-button-container">
+              <ion-button expand="block" color="light" size="small" (click)="logout()">
+                <ion-icon slot="start" name="power"></ion-icon>
+                Cerrar Sesión
+              </ion-button>
+            </div>
+          </ion-menu-toggle>
+        </ion-list>
+
+      </ion-content>
+    </ion-menu>
+
+    <!--Panel derecho contenido-->
+    <div class="ion-page" id="main-content">
+      <ion-content>
+        <ion-router-outlet></ion-router-outlet>
+      </ion-content>
+    </div>
+  </ion-split-pane>
+</ion-content>

@@ -1,0 +1,16 @@
+<ion-header class="modalHeader">
+  <ion-buttons slot="end">
+    <ion-button (click)="close()">
+      <ion-icon name="close"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-header>
+
+<ion-content class="ion-padding" [fullscreen]="false">
+  <h2 class="modalform-title ion-text-center"> QR</h2>
+  <ion-item>
+    <ion-card  class="upload-card">
+      <img *ngIf="imagenBase64" [src]="imagenBase64" />
+    </ion-card>
+  </ion-item>
+</ion-content>

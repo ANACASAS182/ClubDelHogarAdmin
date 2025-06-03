@@ -1,0 +1,161 @@
+<ion-header class="pagesHeader">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title><h1><ion-icon name="archive" color="white"></ion-icon> Productos a promocionar</h1></ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content class="pagesContent">
+
+  <div>
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+
+        <ion-col size="12" size-md="9" class="ion-text-center">
+          <ion-input class="inputBusqueda" (ionInput)="inputBuscar.next($event.detail.value || '')"
+            [placeholder]="inputBusquedaText">
+            <ion-icon slot="end" name="search" aria-hidden="true"></ion-icon>
+          </ion-input>
+        </ion-col>
+
+        <!-- Botón a la derecha -->
+        <ion-col size="12" size-md="2" class="ion-text-center">
+          <ion-button expand="block" shape="round" class="customGreenButton" (click)="addModal()"><ion-icon name="add"
+              color="white"></ion-icon> AGREGAR</ion-button>
+        </ion-col>
+      </ion-row>
+
+
+
+      <ion-row class="ion-align-items-center">
+
+        <ion-col size="12" size-md="4" class="ion-text-center">
+          <ion-item class="inputBusqueda">
+            <ion-label position="floating">Filtro por vigencia</ion-label>
+            <ionic-selectable item-content [items]="vigencia" itemValueField="valor" closeButtonSlot="end"
+              itemTextField="nombre" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
+              clearButtonText="Limpiar" (onChange)="onVigenciaSelect($event)" (onClear)="onVigenciaClear($event)">
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-md="4" class="ion-text-center" *ngIf="rolUsuario == RolesEnum.Admin">
+          <ion-item class="inputBusqueda">
+            <ion-label position="floating">Filtro por grupo</ion-label>
+            <ionic-selectable item-content [items]="grupos" itemValueField="id" closeButtonSlot="end"
+              itemTextField="nombre" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
+              clearButtonText="Limpiar" (onChange)="onGrupoSelect($event)" (onClear)="onGrupoClear($event)">
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+        <ion-col size="12" size-md="4" class="ion-text-center" *ngIf="rolUsuario == RolesEnum.Admin">
+          <ion-item class="inputBusqueda">
+            <ion-label position="floating">Filtro por empresa</ion-label>
+            <ionic-selectable item-content [items]="empresas" itemValueField="id" closeButtonSlot="end"
+              itemTextField="razonSocial" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
+              clearButtonText="Limpiar" (onChange)="onEmpresaSelect($event)" (onClear)="onEmpresaClear($event)">
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+
+      </ion-row>
+
+    </ion-grid>
+  </div>
+
+  <!-- Panel inferior con tabla básica -->
+  <ion-card>
+    <ion-card-header class="referidosHeader">
+      <ion-card-title class="title">Productos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+
+      <div style="overflow-x: auto;">
+        <table mat-table [dataSource]="dataSourceTable" matSort>
+
+          <ng-container matColumnDef="Nombre">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Nombre/Descripción
+            </th>
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.nombre }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Empresa">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Empresa
+            </th>
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.empresaRazonSocial }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Grupo">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Grupo </th>
+            <td mat-cell *matCellDef="let element">
+              <span *ngFor="let grupo of element.grupos; let last = last">
+                {{ grupo.nombre }}<span *ngIf="!last">, </span>
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="ComisionCantidad">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Comision $ </th>
+            <td mat-cell *matCellDef="let element">
+              {{ (element.comisionCantidad === 0 || element.comisionCantidad == undefined)
+              ? 'No aplica'
+              : (element.comisionCantidad | currency:'MXN':'symbol':'1.2-2') + ' MXN'
+              }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="ComisionPorcentaje">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Comision % </th>
+            <td mat-cell *matCellDef="let element">
+              {{ (element.comisionPorcentaje === 0 || element.comisionPorcentaje == undefined)
+              ? 'No aplica'
+              : (element.comisionPorcentaje | currency:'MXN':'symbol':'1.2-2') + ' %'
+              }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="ComisionPorcentajeCantidad">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Valor del % </th>
+            <td mat-cell *matCellDef="let element">
+              {{ (element.comisionPorcentajeCantidad === 0 || element.comisionPorcentajeCantidad == undefined)
+              ? 'No aplica'
+              : (element.comisionPorcentajeCantidad | currency:'MXN':'symbol':'1.2-2')
+              }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="FechaCaducidad">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Caducidad </th>
+            <td mat-cell *matCellDef="let element"> {{ formatFecha(element.fechaCaducidad) }}
+              <div>
+                <small [ngClass]="getVigencia(element.fechaCaducidad) ? 'text-success' : 'text-danger'">
+                  {{ getVigencia(element.fechaCaducidad) ? 'Vigente' : 'No vigente' }}
+                </small>
+              </div>
+
+            </td>
+          </ng-container>
+
+
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon">
+          </tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 1rem;">
+              No se encontraron registros disponibles.
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-paginator [length]="total" [pageSizeOptions]="[20, 50, 100]" showFirstLastButtons [pageSize]="50">
+      </mat-paginator>
+
+    </ion-card-content>
+  </ion-card>
+</ion-content>

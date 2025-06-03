@@ -1,0 +1,31 @@
+.userLabel {
+    color: #001744;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+
+.buttonHeader {
+    --color: #001744;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.menu-separator {
+    height: 1px;
+    background-color: white;
+    margin: 10px 10px;
+}
+
+.logout-button-container {
+    justify-content: center;
+    margin: 0 10px;
+}
+
+.name-text{
+  color: white !important;
+  font-weight: bold;
+  font-size: 14px;
+  margin: 0 10px;
+  justify-content: center;
+}

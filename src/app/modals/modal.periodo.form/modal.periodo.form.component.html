@@ -1,0 +1,74 @@
+<ion-header class="modalHeader">
+  <ion-buttons slot="end">
+    <ion-button (click)="close()">
+      <ion-icon name="close"></ion-icon>
+    </ion-button>
+  </ion-buttons>
+</ion-header>
+
+<ion-content class="ion-padding" [fullscreen]="false">
+  <form [formGroup]="formulario" class="modalform">
+    <h2 class="modalform-title ion-text-center">{{title}} PERIODO</h2>
+
+    <app-mes-anio-picker [control]="mesAnioControl" label="Periodo (Mes/Año)"></app-mes-anio-picker>
+    <ion-text color="danger" *ngIf="getControl('mesAnio')?.invalid && getControl('mesAnio')?.touched">
+      Campo requerido
+    </ion-text>
+
+    <mat-form-field appearance="fill" class="custom-datepicker" *ngIf="mesAnioSelected">
+      <mat-label>Fecha de incio</mat-label>
+      <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="picker" formControlName="fechaInicio" />
+      <mat-hint>DD/MM/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker touchUi #picker></mat-datepicker>
+    </mat-form-field>
+    <ion-text  color="danger" *ngIf="getControl('fechaInicio')?.invalid && getControl('fechaInicio')?.touched && mesAnioSelected">
+      Campo requerido
+    </ion-text>
+
+
+    <mat-form-field appearance="fill" class="custom-datepicker" *ngIf="mesAnioSelected">
+      <mat-label>Fecha final</mat-label>
+      <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="picker" formControlName="fechaFin" />
+      <mat-hint>DD/MM/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker touchUi #picker></mat-datepicker>
+    </mat-form-field>
+    <ion-text color="danger" *ngIf="getControl('fechaFin')?.invalid && getControl('fechaFin')?.touched && mesAnioSelected">
+      Campo requerido
+    </ion-text>
+
+    <mat-form-field appearance="fill" class="custom-datepicker" *ngIf="mesAnioSelected">
+      <mat-label>Fecha pago de empresa</mat-label>
+      <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="picker" formControlName="fechaPagoEmpresas" />
+      <mat-hint>DD/MM/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker touchUi #picker></mat-datepicker>
+    </mat-form-field>
+    <ion-text color="danger" *ngIf="getControl('fechaPagoEmpresas')?.invalid && getControl('fechaPagoEmpresas')?.touched && mesAnioSelected">
+      Campo requerido
+    </ion-text>
+
+    <mat-form-field appearance="fill" class="custom-datepicker" *ngIf="mesAnioSelected">
+      <mat-label>Fecha pago de embajador</mat-label>
+      <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="picker" formControlName="fechaPagoEmbajadores" />
+      <mat-hint>DD/MM/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker touchUi #picker></mat-datepicker>
+    </mat-form-field>
+    <ion-text color="danger" *ngIf="getControl('fechaPagoEmbajadores')?.invalid && getControl('fechaPagoEmbajadores')?.touched && mesAnioSelected">
+      Campo requerido
+    </ion-text>
+
+  </form>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <div style="width: 100%; text-align: center;">
+      <ion-button class="customButton" shape="round" [disabled]="formEnviado" (click)="enviarFormulario()">
+        {{btnName}}
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

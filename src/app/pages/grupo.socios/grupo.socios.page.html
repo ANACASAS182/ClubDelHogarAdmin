@@ -1,0 +1,74 @@
+<ion-header class="pagesHeader">
+  <ion-toolbar >
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+     <ion-title><h1><ion-icon name="people" color="white"></ion-icon> Grupo de socios</h1></ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content class="pagesContent">
+
+  <div>
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+
+        <ion-col size="12" size-md="9"  class="ion-text-center">
+          <ion-input class="inputBusqueda"
+          (ionInput)="inputBuscar.next($event.detail.value || '')"
+          placeholder="Buscar por Nombre">
+          <ion-icon slot="end" name="search" aria-hidden="true"></ion-icon>
+          </ion-input>
+        </ion-col>
+
+        <!-- Botón a la derecha -->
+        <ion-col size="12" size-md="2" class="ion-text-center">
+          <ion-button expand="block" shape="round" class="customGreenButton" (click)="addModal()"><ion-icon name="add" color="white"></ion-icon> AGREGAR</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- Panel inferior con tabla básica -->
+  <ion-card>
+    <ion-card-header class="referidosHeader">
+      <ion-card-title class="title">Grupos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+
+      <div style="overflow-x: auto;">
+        <table mat-table [dataSource]="dataSourceTable" matSort>
+
+          <ng-container matColumnDef="Nombre">
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Nombre </th>
+            <td mat-cell *matCellDef="let element"> {{ element.nombre }} </td>
+          </ng-container>
+      
+          <ng-container matColumnDef="Visualizar">
+            <th mat-header-cell *matHeaderCellDef> Opciones </th>
+            <td mat-cell *matCellDef="let element">
+              <ion-button shape="round" fill="clear" (click)="editModal(element.id)">
+                <ion-icon slot="icon-only" name="create" ></ion-icon> <small>Editar</small>
+              </ion-button>
+            </td>
+          </ng-container>
+  
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon">
+          </tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 1rem;">
+              No se encontraron registros disponibles.
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-paginator [length]="total" [pageSizeOptions]="[20, 50, 100]" showFirstLastButtons
+        [pageSize]="50">
+      </mat-paginator>
+      
+    </ion-card-content>
+  </ion-card>
+</ion-content>

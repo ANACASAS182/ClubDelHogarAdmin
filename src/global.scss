@@ -1,0 +1,246 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+// @import "@ionic/angular/css/palettes/dark.system.css";
+
+//Global
+.text-white {
+  color: white !important;
+}
+
+ion-content.pagesContent {
+  --background: #dedede !important;
+}
+
+ion-header.pagesHeader ion-toolbar {
+  --background: #333740 !important;
+  --color: #ffffff;
+  height: 8cap;
+}
+
+.inputBusqueda {
+  margin: 12px 0;
+  --background: #f1f1f1;
+  --border-radius: 30px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  width: 80%;
+  color: #2c3e50 !important;
+
+  border: 1px solid transparent;
+  border-radius: 30px;
+  border-color: black;
+  transition: border-color 0.3s ease;
+  text-align: left;
+}
+
+.inputForm {
+  --background: #f1f1f1;
+  --border-radius: 30px;
+  --padding-start: 16px;
+  --padding-end: 5px;
+  width: 100%;
+  color: #2c3e50 !important;
+
+  border: 1px solid transparent;
+  border-radius: 30px;
+  border-color: black;
+  transition: border-color 0.3s ease;
+}
+
+.inputForm.invalid {
+  border-color: var(--ion-color-danger, red);
+}
+
+
+.modalform-title {
+  color: #2c3e50;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.modalform {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+ion-header.modalHeader {
+  --padding-start: 0;
+  --padding-end: 0;
+
+  ion-buttons[slot="end"] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 10px;
+    margin-right: 2px;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  ion-modal.modal-grupo {
+    --border-radius: 12px;
+    --height: 350px;
+  }
+
+  ion-modal.modal-empresa {
+    --border-radius: 12px;
+    --height: 900px;
+    --width: 800px;
+  }
+  ion-modal.modal-usuario {
+    --border-radius: 12px;
+    --height: 900px;
+    --width: 950px;
+  }
+  ion-modal.modal-periodo {
+    --border-radius: 12px;
+    --height: 700px;
+  }
+}
+
+ion-modal.modal-default.show-modal ~ ion-modal.modal-default {
+  --backdrop-opacity: 0.4 !important; 
+  --box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3) !important;
+}
+
+.customButton {
+  --background: #0d3b66;
+  font-weight: bold;
+  color:white;
+  width: 50%;
+}
+
+
+.customGreenButton {
+  --background: #4a9a09;
+  font-weight: bold;
+  color: white;
+}
+
+.custom-alert {
+  border-radius: 8px;
+  font-weight: bold;
+  margin: 10px 0;
+  width: 100%;
+
+  &.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  &.danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+
+  &.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+  }
+
+  &.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+  }
+}
+
+
+/**Menu*/
+ion-menu.custom-menu {
+  --ion-background-color: #111822;
+}
+
+.custom-menu ion-item {
+  --color: white !important;
+}
+
+.custom-menu ion-item.selected {
+  --background: #272727 !important;
+  --color: white !important;
+}
+
+@media screen and (min-width: 992px) {
+  ion-menu.custom-menu {
+    --width: 300px !important;
+    width: 300px !important;
+    max-width: 300px !important;
+  }
+}
+
+/***/
+
+.custom-datepicker .mdc-text-field--filled {
+  background-color: transparent !important;
+  border-radius: 30px !important;
+}
+
+.custom-datepicker .mat-mdc-text-field-wrapper,
+.custom-datepicker .mat-mdc-text-field-wrapper:hover,
+.custom-datepicker .mat-mdc-text-field-wrapper.mdc-text-field--focused,
+.custom-datepicker .mat-mdc-text-field-wrapper.mdc-text-field--filled {
+  background-color: #f1f1f1 !important;
+  border-radius: 30px !important;
+  border: 1px solid black !important;
+  padding-left: 16px !important;
+  padding-right: 5px !important;
+}
+
+.custom-datepicker {
+  --mat-sys-hover-state-layer-opacity: 0 !important;
+  --mat-sys-focus-state-layer-opacity: 0 !important;
+  --mat-sys-pressed-state-layer-opacity: 0 !important;
+
+  width: 100% !important;
+}
+
+.custom-datepicker .mat-mdc-input-element {
+  color: #2c3e50 !important;
+}
+
+.custom-datepicker .mat-mdc-text-field-wrapper {
+  width: 100% !important;
+}
+
+.custom-datepicker .mat-mdc-form-field-infix {
+  width: 100% !important;
+}
