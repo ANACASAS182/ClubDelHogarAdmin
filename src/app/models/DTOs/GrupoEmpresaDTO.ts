@@ -4,3 +4,4 @@ export interface GrupoEmpresaDTO {
     nombreGrupo?: string;
     deleted: boolean;
 }
+

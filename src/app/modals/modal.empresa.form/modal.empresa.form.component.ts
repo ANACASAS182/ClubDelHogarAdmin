@@ -8,7 +8,7 @@ import { cleanString } from 'src/app/classes/string-utils';
 import { EmpresaCreateDTO } from 'src/app/models/DTOs/EmpresaCreateDTO';
 import { EmpresaGrupoDTO } from 'src/app/models/DTOs/EmpresaGrupoDTO';
 import { GenericResponseDTO } from 'src/app/models/DTOs/GenericResponseDTO';
-import { GrupoDTO } from 'src/app/models/DTOs/GrupoDTO';
+import { GiroDTO, GrupoDTO } from 'src/app/models/DTOs/GrupoDTO';
 import { GrupoEmpresaDTO } from 'src/app/models/DTOs/GrupoEmpresaDTO';
 import { Empresa } from 'src/app/models/Empresa';
 import { EmpresaGrupoService } from 'src/app/services/api.back.services/empresa.grupo.service';
@@ -31,24 +31,40 @@ export class ModalEmpresaFormComponent implements OnInit {
   imagenBase64: string | undefined = undefined;
 
   grupos: GrupoDTO[] = []
-  gruposSelected: GrupoEmpresaDTO[] = [];
+  giros: GiroDTO[] = []
+  grupo?: GrupoEmpresaDTO;
 
   @Input() id?: number = undefined;
 
   constructor(private fb: FormBuilder,
     private empresaService: EmpresaService,
-    private empresaGrupoService: EmpresaGrupoService,
     private grupoService: GrupoService,
     private toastController: ToastController,
     private loadingCtrl: LoadingController,
     private modalCtrl: ModalController) {
+
+    this.giros = [
+      { id: 1, nombre: 'Alimentos y Bebidas' },
+      { id: 2, nombre: 'Bienes Raíces' },
+      { id: 3, nombre: 'Comercio' },
+      { id: 4, nombre: 'Construcción' },
+      { id: 5, nombre: 'Educación' },
+      { id: 6, nombre: 'Finanzas' },
+      { id: 7, nombre: 'Manufactura' },
+      { id: 8, nombre: 'Salud' },
+      { id: 9, nombre: 'Tecnología' },
+      { id: 10, nombre: 'Transporte y Logística' }
+    ];
+
 
     this.formulario = this.fb.group({
       rfc: ["", [Validators.required, Validators.pattern(/^([A-ZÑ&]{3,4}) ?-? ?(\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])) ?-? ?([A-Z\d]{2})([A\d])$/)]],
       razonSocial: ["", [Validators.required, sinEspaciosValidator()]],
       nombreComercial: ["", [Validators.required, sinEspaciosValidator()]],
       descripcion: [""],
-      itemSeleccionado: [""]
+      grupo: [""],
+      giro: [""],
+
     });
   }
 
@@ -74,25 +90,14 @@ export class ModalEmpresaFormComponent implements OnInit {
               rfc: response.data.rfc,
               razonSocial: response.data.razonSocial,
               nombreComercial: response.data.nombreComercial,
-              descripcion: response.data.descripcion
+              descripcion: response.data.descripcion,
+              grupo: response.data.grupo,
+              giro: response.data.giro,
             });
             this.imagenBase64 = response.data.logotipoBase64;
           }
         });
 
-        this.empresaGrupoService.getAllGruposByEmpresa(this.id).subscribe({
-          next: (response: GenericResponseDTO<EmpresaGrupoDTO[]>) => {
-            response.data.forEach(element => {
-              var model: GrupoEmpresaDTO = {
-              id: element.id,
-              grupoID: element.grupoID,
-              nombreGrupo: element.nombreGrupo,
-              deleted: false
-            };
-            this.gruposSelected.push(model);
-            });
-          }
-        });
       }
 
     } catch (error) {
@@ -102,6 +107,8 @@ export class ModalEmpresaFormComponent implements OnInit {
     }
 
   }
+
+
 
   enviarFormulario() {
     if (this.formEnviado) return;
@@ -123,14 +130,17 @@ export class ModalEmpresaFormComponent implements OnInit {
       }).then(toast => toast.present());
       // return;
     }
-    
+
+    let grupo: GrupoEmpresaDTO[] = [];
+
     var model: EmpresaCreateDTO = {
       rfc: cleanString(this.formulario.controls["rfc"].value.trim())!.toUpperCase(),
       razonSocial: cleanString(this.formulario.controls["razonSocial"].value)!,
       nombreComercial: cleanString(this.formulario.controls["nombreComercial"].value)!,
       descripcion: cleanString(this.formulario.controls["descripcion"].value),
       logotipoBase64: this.imagenBase64 ?? "",
-      grupos: this.gruposSelected
+      giro:this.formulario.controls["giro"].value,
+      grupo:this.formulario.controls["grupo"].value
     };
 
     if (this.id != undefined) {
@@ -176,37 +186,4 @@ export class ModalEmpresaFormComponent implements OnInit {
     }
   }
 
-  onSelectChange(event: CustomEvent) {
-    const selectedItem: GrupoDTO = event.detail.value;
-    const exists = this.gruposSelected.find(x => x.grupoID === selectedItem.id);
-
-    if (!exists) {
-
-      var model: GrupoEmpresaDTO = {
-        id: 0,
-        grupoID: selectedItem.id,
-        nombreGrupo: selectedItem.nombre,
-        deleted: false
-      };
-
-      this.gruposSelected.push(model);
-    }
-    this.formulario.get('itemSeleccionado')?.reset();
-
-  }
-
-  removeItem(item: GrupoEmpresaDTO) {
-    const index = this.gruposSelected.indexOf(item);
-    const groupDeleted = this.gruposSelected[index];
-
-    if (groupDeleted && typeof groupDeleted.id === 'number' && groupDeleted.id > 0) {
-      groupDeleted.deleted = true;
-    } else {
-      this.gruposSelected.splice(index, 1);
-    }
-  }
-
-  get visibleItems() {
-    return this.gruposSelected.filter(x => !x.deleted);
-  }
 }

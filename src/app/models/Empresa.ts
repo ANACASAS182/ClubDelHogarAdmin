@@ -6,4 +6,6 @@ export interface Empresa{
     descripcion?:string;
     logotipoPath?:string; 
     logotipoBase64?:string;
+    giro?:number;
+    grupo?:number;
 }

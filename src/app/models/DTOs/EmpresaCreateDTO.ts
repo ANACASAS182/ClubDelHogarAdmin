@@ -7,5 +7,6 @@ export interface EmpresaCreateDTO {
     nombreComercial: string;
     descripcion?:string;
     logotipoBase64: string;
-    grupos?: GrupoEmpresaDTO[];
+    giro:number;
+    grupo:number;
 }

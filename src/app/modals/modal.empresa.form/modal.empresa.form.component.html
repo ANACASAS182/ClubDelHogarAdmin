@@ -8,90 +8,88 @@
 
 <ion-content class="ion-padding" [fullscreen]="false">
   <form [formGroup]="formulario" class="modalform">
-    <h2 class="modalform-title ion-text-center">{{title}} EMPRESA</h2>
+    <h2 class="modalform-title ion-text-center">{{ title }} EMPRESA</h2>
 
-    <ion-text class="ion-text-center">Logotipo</ion-text>
-    <ion-item>
-      <ion-card (click)="fileInput.click()" class="upload-card">
-        <img *ngIf="imagenBase64" [src]="imagenBase64" />
-        <ion-card-content *ngIf="!imagenBase64" class="placeholder">
-          <ion-icon name="image-outline" size="large"></ion-icon>
-          <p>Haz clic para seleccionar una imagen..</p>
-          <p style="font-size: 11px;">Tamaño recomendado:</p>
-          <p style="font-size: 11px;">230 x 230 pixeles</p>
-        </ion-card-content>
-        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" hidden />
-      </ion-card>
-    </ion-item>
+    <!-- Contenedor principal en flex -->
+    <div class="form-layout">
+      <!-- Formulario principal -->
+      <div class="form-left">
+        <!-- Aquí van todos los campos -->
+        <ion-input class="inputForm" label-placement="floating" label="RFC"
+          [class.invalid]="getControl('rfc')?.invalid && getControl('rfc')?.touched" formControlName="rfc"
+          placeholder="RFC*" type="text" (ionBlur)="getControl('rfc')?.markAsTouched()">
+        </ion-input>
+        <div *ngIf="getControl('rfc')?.invalid && getControl('rfc')?.touched">
+          <ion-text color="danger" *ngIf="getControl('rfc')?.errors?.['required']">Campo obligatorio*</ion-text>
+          <ion-text color="danger" *ngIf="getControl('rfc')?.errors?.['pattern']">El RFC no es válido.</ion-text>
+        </div>
 
-    <ion-input class="inputForm" label-placement="floating" label="RFC"
-      [class.invalid]="getControl('rfc')?.invalid && getControl('rfc')?.touched" formControlName="rfc"
-      placeholder="RFC*" type="text" (ionBlur)="getControl('rfc')?.markAsTouched()"></ion-input>
+        <ion-input class="inputForm" label-placement="floating" label="Razón social"
+          [class.invalid]="getControl('razonSocial')?.invalid && getControl('razonSocial')?.touched"
+          formControlName="razonSocial" placeholder="Razón social*" type="text"
+          (ionBlur)="getControl('razonSocial')?.markAsTouched()">
+        </ion-input>
+        <ion-text color="danger" *ngIf="getControl('razonSocial')?.invalid && getControl('razonSocial')?.touched">
+          Campo obligatorio*
+        </ion-text>
 
-    <div *ngIf="getControl('rfc')?.invalid && getControl('rfc')?.touched">
-      <ion-text color="danger" *ngIf="getControl('rfc')?.errors?.['required']">Campo obligatorio*</ion-text>
-      <ion-text color="danger" *ngIf="getControl('rfc')?.errors?.['pattern']">El RFC no es válido.</ion-text>
-    </div>
+        <ion-input class="inputForm" label-placement="floating" label="Nombre comercial"
+          [class.invalid]="getControl('nombreComercial')?.invalid && getControl('nombreComercial')?.touched"
+          formControlName="nombreComercial" placeholder="Nombre comercial*" type="text"
+          (ionBlur)="getControl('nombreComercial')?.markAsTouched()">
+        </ion-input>
+        <ion-text color="danger"
+          *ngIf="getControl('nombreComercial')?.invalid && getControl('nombreComercial')?.touched">
+        </ion-text>
 
-    <ion-input class="inputForm" label-placement="floating" label="Razón social"
-      [class.invalid]="getControl('razonSocial')?.invalid && getControl('razonSocial')?.touched"
-      formControlName="razonSocial" placeholder="Razón social*" type="text"
-      (ionBlur)="getControl('razonSocial')?.markAsTouched()"></ion-input>
-    <ion-text color="danger" *ngIf="getControl('razonSocial')?.invalid && getControl('razonSocial')?.touched">
-      Campo obligatorio*
-    </ion-text>
+        <ion-textarea formControlName="descripcion" label-placement="floating" label="Descripción" class="inputForm"
+          autoGrow="true" rows="4" maxlength="500" placeholder="Descripción">
+        </ion-textarea>
 
-    <ion-input class="inputForm" label-placement="floating" label="Nombre comercial"
-      [class.invalid]="getControl('nombreComercial')?.invalid && getControl('nombreComercial')?.touched"
-      formControlName="nombreComercial" placeholder="Nombre comercial*" type="text"
-      (ionBlur)="getControl('nombreComercial')?.markAsTouched()"></ion-input>
-    <ion-text color="danger" *ngIf="getControl('nombreComercial')?.invalid && getControl('nombreComercial')?.touched">
-    </ion-text>
-
-    <ion-textarea formControlName="descripcion" label-placement="floating" label="Descripción" class="inputForm"
-      autoGrow="true" rows="4" maxlength="500" placeholder="Descripcion">
-    </ion-textarea>
-
-
-    <h3>Grupos de empresa</h3>
-
-    <ion-card color="light" style="margin-top: 0px;">
-      <ion-card-content>
-        <ion-select fill="outline" [interfaceOptions]="{ header: 'Seleccione grupo'}" okText="Ok" formControlName="itemSeleccionado"
-          cancelText="Cancelar" placeholder="Seleccione grupo a agregar" (ionChange)="onSelectChange($event)">
-          <ion-select-option *ngFor="let item of grupos" [value]="item">
-            {{ item.nombre }}
+        <ion-select class="inputForm" [interfaceOptions]="{ header: 'Grupo de empresa'}" okText="Ok"
+          label-placement="floating" label="Grupo de empresa" cancelText="Cancelar"
+          [class.invalid]="getControl('grupo')?.invalid && getControl('grupo')?.touched"
+          formControlName="grupo" (ionBlur)="getControl('grupo')?.markAsTouched()">
+          <ion-select-option *ngFor="let grupo of grupos" [value]="grupo.id">
+            {{ grupo.nombre }}
           </ion-select-option>
         </ion-select>
-        <br>
 
-        <ion-list>
-          <ion-item>
-            <ion-label><strong>Nombre de grupo</strong></ion-label>
-            <ion-label class="ion-text-end"><strong></strong></ion-label>
-          </ion-item>
+        <ion-select class="inputForm" [interfaceOptions]="{ header: 'Giro de la empresa'}" okText="Ok"
+          label-placement="floating" label="Giro de la empresa" cancelText="Cancelar"
+          [class.invalid]="getControl('giro')?.invalid && getControl('giro')?.touched"
+          formControlName="giro" (ionBlur)="getControl('giro')?.markAsTouched()">
+          <ion-select-option *ngFor="let giro of giros" [value]="giro.id">
+            {{ giro.nombre }}
+          </ion-select-option>
+        </ion-select>
+      </div>
 
-          <ion-item *ngFor="let item of visibleItems">
-            <ion-label>{{ item.nombreGrupo }}</ion-label>
-            <ion-button fill="clear" color="danger" slot="end" (click)="removeItem(item)">
-              Eliminar
-            </ion-button>
-          </ion-item>
-        </ion-list>
+      <!-- Logotipo -->
+      <div class="form-right">
+        <ion-text class="ion-text-center">Logotipo</ion-text>
+        <ion-item>
+          <ion-card (click)="fileInput.click()" class="upload-card">
+            <img *ngIf="imagenBase64" [src]="imagenBase64" />
+            <ion-card-content *ngIf="!imagenBase64" class="placeholder">
+              <ion-icon name="image-outline" size="large"></ion-icon>
+              <p>Haz clic para seleccionar una imagen.</p>
+              <p style="font-size: 11px;">Tamaño recomendado:</p>
+              <p style="font-size: 11px;">230 x 230 pixeles</p>
+            </ion-card-content>
+            <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" hidden />
+          </ion-card>
+        </ion-item>
+      </div>
+    </div>
 
-      </ion-card-content>
-    </ion-card>
-
-    <!-- <ion-button class="customButton" shape="round" [disabled]="formEnviado" (click)="enviarFormulario()">{{btnName}}</ion-button> -->
+    <!-- Botón -->
+    <div class="form-actions">
+      <ion-button class="customButton" shape="round" [disabled]="formEnviado" (click)="enviarFormulario()">
+        {{ btnName }}
+      </ion-button>
+    </div>
   </form>
 </ion-content>
 
-<ion-footer>
-  <ion-toolbar>
-    <div style="width: 100%; text-align: center;">
-      <ion-button class="customButton" shape="round" [disabled]="formEnviado" (click)="enviarFormulario()">
-        {{btnName}}
-      </ion-button>
-    </div>
-  </ion-toolbar>
-</ion-footer>
+
