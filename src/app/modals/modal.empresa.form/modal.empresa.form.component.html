@@ -1,4 +1,8 @@
 <ion-header class="modalHeader">
+
+  <ion-toolbar>
+    <ion-title>{{ title }} EMPRESA</ion-title>
+  </ion-toolbar>
   <ion-buttons slot="end">
     <ion-button (click)="close()">
       <ion-icon name="close"></ion-icon>
@@ -8,8 +12,6 @@
 
 <ion-content class="ion-padding" [fullscreen]="false">
   <form [formGroup]="formulario" class="modalform">
-    <h2 class="modalform-title ion-text-center">{{ title }} EMPRESA</h2>
-
     <!-- Contenedor principal en flex -->
     <div class="form-layout">
       <!-- Formulario principal -->
@@ -48,8 +50,8 @@
 
         <ion-select class="inputForm" [interfaceOptions]="{ header: 'Grupo de empresa'}" okText="Ok"
           label-placement="floating" label="Grupo de empresa" cancelText="Cancelar"
-          [class.invalid]="getControl('grupo')?.invalid && getControl('grupo')?.touched"
-          formControlName="grupo" (ionBlur)="getControl('grupo')?.markAsTouched()">
+          [class.invalid]="getControl('grupo')?.invalid && getControl('grupo')?.touched" formControlName="grupo"
+          (ionBlur)="getControl('grupo')?.markAsTouched()">
           <ion-select-option *ngFor="let grupo of grupos" [value]="grupo.id">
             {{ grupo.nombre }}
           </ion-select-option>
@@ -57,8 +59,8 @@
 
         <ion-select class="inputForm" [interfaceOptions]="{ header: 'Giro de la empresa'}" okText="Ok"
           label-placement="floating" label="Giro de la empresa" cancelText="Cancelar"
-          [class.invalid]="getControl('giro')?.invalid && getControl('giro')?.touched"
-          formControlName="giro" (ionBlur)="getControl('giro')?.markAsTouched()">
+          [class.invalid]="getControl('giro')?.invalid && getControl('giro')?.touched" formControlName="giro"
+          (ionBlur)="getControl('giro')?.markAsTouched()">
           <ion-select-option *ngFor="let giro of giros" [value]="giro.id">
             {{ giro.nombre }}
           </ion-select-option>
@@ -83,13 +85,14 @@
       </div>
     </div>
 
-    <!-- Botón -->
-    <div class="form-actions">
-      <ion-button class="customButton" shape="round" [disabled]="formEnviado" (click)="enviarFormulario()">
+  </form>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <div style="width: 100%; text-align: center;">
+      <ion-button class="customButton" [disabled]="formEnviado" (click)="enviarFormulario()">
         {{ btnName }}
       </ion-button>
     </div>
-  </form>
-</ion-content>
-
-
+  </ion-toolbar>
+</ion-footer>

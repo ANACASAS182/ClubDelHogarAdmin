@@ -54,14 +54,14 @@ ion-header.pagesHeader ion-toolbar {
 .inputBusqueda {
   margin: 12px 0;
   --background: #f1f1f1;
-  --border-radius: 30px;
+  --border-radius: 4px;
   --padding-start: 16px;
   --padding-end: 16px;
   width: 80%;
   color: #2c3e50 !important;
 
   border: 1px solid transparent;
-  border-radius: 30px;
+  border-radius: 4px;
   border-color: black;
   transition: border-color 0.3s ease;
   text-align: left;
@@ -121,17 +121,17 @@ ion-header.modalHeader {
 
   ion-modal.modal-empresa {
     --border-radius: 12px;
-    --height: 900px;
+    --height: 420px;
     --width: 800px;
   }
   ion-modal.modal-usuario {
     --border-radius: 12px;
-    --height: 900px;
+    --height: 420px;
     --width: 950px;
   }
   ion-modal.modal-periodo {
     --border-radius: 12px;
-    --height: 700px;
+    --height: 420px;
   }
 }
 

@@ -24,7 +24,7 @@
 
         <!-- Botón a la derecha -->
         <ion-col size="12" size-md="2" class="ion-text-center">
-          <ion-button expand="block" shape="round" class="customGreenButton" (click)="addModal()"><ion-icon name="add" color="white"></ion-icon> AGREGAR</ion-button>
+          <ion-button expand="block"  class="customGreenButton" (click)="addModal()"><ion-icon name="add" color="white"></ion-icon> AGREGAR</ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -63,7 +63,7 @@
           <ng-container matColumnDef="Visualizar">
             <th mat-header-cell *matHeaderCellDef> Opciones </th>
             <td mat-cell *matCellDef="let element">
-              <ion-button shape="round" fill="clear" (click)="editModal(element.id)">
+              <ion-button  fill="clear" (click)="editModal(element.id)">
                 <ion-icon slot="icon-only" name="create" ></ion-icon><small>Editar</small>
               </ion-button>
             </td>

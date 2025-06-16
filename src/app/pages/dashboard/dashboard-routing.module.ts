@@ -7,6 +7,7 @@ import { AdminGuard } from 'src/app/guards/admin.guard';
 import { ProductosResolver } from 'src/app/resolvers/productos.resolver';
 import { ReferenciasResolver } from 'src/app/resolvers/referencias.resolver';
 import { DashboardResolver } from 'src/app/resolvers/dashboard.resolver';
+import { CorteMensualPage } from '../corte-mensual/corte-mensual.page';
 
 const routes: Routes = [
   {
@@ -64,6 +65,11 @@ const routes: Routes = [
       {
         path: 'periodos',
         loadChildren: () => import('../periodos/periodos.module').then(m => m.PeriodosPageModule),
+        canActivate: [AdminGuard]
+      },
+      {
+        path: 'corte',
+        loadChildren: () => import('../corte-mensual/corte-mensual.module').then(m => m.CorteMensualPageModule),
         canActivate: [AdminGuard]
       }
     ]

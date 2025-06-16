@@ -40,7 +40,7 @@
 
     <mat-form-field appearance="fill" class="custom-datepicker" *ngIf="mesAnioSelected">
       <mat-label>Fecha pago de empresa</mat-label>
-      <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="picker" formControlName="fechaPagoEmpresas" />
+      <input matInput [min]="maxDate" [matDatepicker]="picker" formControlName="fechaPagoEmpresas" />
       <mat-hint>DD/MM/YYYY</mat-hint>
       <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker touchUi #picker></mat-datepicker>
@@ -51,7 +51,7 @@
 
     <mat-form-field appearance="fill" class="custom-datepicker" *ngIf="mesAnioSelected">
       <mat-label>Fecha pago de embajador</mat-label>
-      <input matInput [min]="minDate" [max]="maxDate" [matDatepicker]="picker" formControlName="fechaPagoEmbajadores" />
+      <input matInput [min]="maxDate"  [matDatepicker]="picker" formControlName="fechaPagoEmbajadores" />
       <mat-hint>DD/MM/YYYY</mat-hint>
       <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker touchUi #picker></mat-datepicker>
@@ -66,7 +66,7 @@
 <ion-footer>
   <ion-toolbar>
     <div style="width: 100%; text-align: center;">
-      <ion-button class="customButton" shape="round" [disabled]="formEnviado" (click)="enviarFormulario()">
+      <ion-button class="customButton"  [disabled]="formEnviado" (click)="enviarFormulario()">
         {{btnName}}
       </ion-button>
     </div>

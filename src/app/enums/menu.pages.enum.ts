@@ -6,5 +6,6 @@ export enum MenuPagesEnum {
     Productos = 5,
     Referencias = 6,
     Movimientos = 7,
-    Configuración = 8
+    Configuración = 8,
+    CorteMensual = 9
 }

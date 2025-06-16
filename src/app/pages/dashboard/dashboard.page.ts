@@ -22,7 +22,8 @@ export class DashboardPage implements OnInit, OnDestroy {
     { enum: MenuPagesEnum.Productos, title: 'Productos a Promocionar', url: '/dashboard/productos', icon: 'archive', visible: false, access: [RolesEnum.Admin, RolesEnum.Socio] },
     { enum: MenuPagesEnum.Referencias, title: 'Referencias', url: '/dashboard/referencias', icon: 'star', visible: false, access: [RolesEnum.Admin, RolesEnum.Socio] },
     // { enum: MenuPagesEnum.Movimientos, title: 'Movimientos', url: '/dashboard/movimientos', icon: 'sync-circle', visible: false, access: [RolesEnum.Admin] },
-    { enum: MenuPagesEnum.Configuración, title: 'Corte mensual / Tabla de periodos', url: '/dashboard/periodos', icon: 'calendar', visible: false, access: [RolesEnum.Admin] },
+    { enum: MenuPagesEnum.Configuración, title: 'Tabla de periodos', url: '/dashboard/periodos', icon: 'calendar', visible: false, access: [RolesEnum.Admin] },
+    { enum: MenuPagesEnum.CorteMensual, title: 'Corte mensual', url: '/dashboard/corte', icon: 'calendar', visible: false, access: [RolesEnum.Admin] },
     { enum: MenuPagesEnum.Configuración, title: 'Configuración', url: '/dashboard/configuracion', icon: 'settings', visible: false, access: [RolesEnum.Admin, RolesEnum.Socio] },
 
   ];

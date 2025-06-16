@@ -1,4 +1,7 @@
 <ion-header class="modalHeader">
+  <ion-toolbar>
+    <ion-title>{{title}} GRUPO</ion-title>
+  </ion-toolbar>
   <ion-buttons slot="end">
     <ion-button (click)="close()">
       <ion-icon name="close"></ion-icon>
@@ -8,8 +11,7 @@
 
 <ion-content class="ion-padding" [fullscreen]="false">
   <form [formGroup]="formulario" class="modalform">
-    <h2 class="modalform-title ion-text-center">{{title}} GRUPO</h2>
-
+    
     <ion-input class="inputForm" label-placement="floating" label="Nombre del grupo" [class.invalid]="getControl('nombre')?.invalid && getControl('nombre')?.touched"
       formControlName="nombre" placeholder="Nombre del grupo*" type="text"
       (ionBlur)="getControl('nombre')?.markAsTouched()"></ion-input>
@@ -17,14 +19,14 @@
       Campo obligatorio*
     </ion-text>
     
-    <!-- <ion-button class="customButton" shape="round" [disabled]="formEnviado" (click)="enviarFormulario()">{{btnName}}</ion-button> -->
+    <!-- <ion-button class="customButton"  [disabled]="formEnviado" (click)="enviarFormulario()">{{btnName}}</ion-button> -->
   </form>
 </ion-content>
 
 <ion-footer>
   <ion-toolbar>
     <div style="width: 100%; text-align: center;">
-      <ion-button class="customButton" shape="round" [disabled]="formEnviado" (click)="enviarFormulario()">
+      <ion-button class="customButton"  [disabled]="formEnviado" (click)="enviarFormulario()">
         {{btnName}}
       </ion-button>
     </div>

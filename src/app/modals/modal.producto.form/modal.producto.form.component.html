@@ -1,4 +1,7 @@
 <ion-header class="modalHeader">
+  <ion-toolbar>
+    <ion-title>{{title}} PRODUCTO</ion-title>
+  </ion-toolbar>
   <ion-buttons slot="end">
     <ion-button (click)="close()">
       <ion-icon name="close"></ion-icon>
@@ -7,7 +10,6 @@
 </ion-header>
 
 <ion-content class="ion-padding" [fullscreen]="false">
-  <h2 class="modalform-title ion-text-center">{{title}} PRODUCTO</h2>
 
   <form [formGroup]="formulario" class="modalform">
     <ion-grid>
@@ -232,7 +234,7 @@
 <ion-footer>
   <ion-toolbar>
     <div style="width: 100%; text-align: center;">
-      <ion-button class="customButton" shape="round" [disabled]="formEnviado" (click)="enviarFormulario()">
+      <ion-button class="customButton"  [disabled]="formEnviado" (click)="enviarFormulario()">
         {{btnName}}
       </ion-button>
     </div>

@@ -24,7 +24,11 @@ const routes: Routes = [
     resolve: {
       resolverData: DashboardResolver
     }
+  },  {
+    path: 'corte-mensual',
+    loadChildren: () => import('./pages/corte-mensual/corte-mensual.module').then( m => m.CorteMensualPageModule)
   }
+
 ];
 
 @NgModule({
