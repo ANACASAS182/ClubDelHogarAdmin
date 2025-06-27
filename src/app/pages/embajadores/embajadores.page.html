@@ -60,17 +60,9 @@
             <td mat-cell *matCellDef="let element"> {{ element.celular }} </td>
           </ng-container>
       
-          <ng-container matColumnDef="Visualizar">
-            <th mat-header-cell *matHeaderCellDef> Opciones </th>
-            <td mat-cell *matCellDef="let element">
-              <ion-button  fill="clear" (click)="editModal(element.id)">
-                <ion-icon slot="icon-only" name="create" ></ion-icon><small>Editar</small>
-              </ion-button>
-            </td>
-          </ng-container>
   
           <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon">
+          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon row_clickable" (click)="editModal(element.id)">
           </tr>
           <tr class="mat-row" *matNoDataRow>
             <td [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 1rem;">

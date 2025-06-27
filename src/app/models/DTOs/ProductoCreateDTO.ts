@@ -5,16 +5,11 @@ export interface ProductoCreateDTO {
   nombre: string;
   descripcion?: string;
   tipoComision?: TipoComisionEnum;
-  comisionCantidad?: number;
-  comisionPorcentaje?: number;
-  comisionPorcentajeCantidad?: number;
-  precio?: number;
   fechaCaducidad?: Date;
-  tipoComisionNivel: TipoComisionEnum;
   nivel1?: number;
   nivel2?: number;
   nivel3?: number;
   nivel4?: number;
   nivelMaster?: number;
-  nivelBase?: number;
+  nivelInvitacion?: number;
 }

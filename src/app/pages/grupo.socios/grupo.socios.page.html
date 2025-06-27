@@ -15,7 +15,7 @@
       <ion-row class="ion-align-items-center">
 
         <ion-col size="12" size-md="9"  class="ion-text-center">
-          <ion-input class="inputBusqueda"
+          <ion-input class="inputBusqueda" style="width: 100%;"
           (ionInput)="inputBuscar.next($event.detail.value || '')"
           placeholder="Buscar por Nombre">
           <ion-icon slot="end" name="search" aria-hidden="true"></ion-icon>
@@ -23,8 +23,8 @@
         </ion-col>
 
         <!-- Botón a la derecha -->
-        <ion-col size="12" size-md="2" class="ion-text-center">
-          <ion-button expand="block"  class="customGreenButton" (click)="addModal()"><ion-icon name="add" color="white"></ion-icon> AGREGAR</ion-button>
+        <ion-col size="12" size-md="3" class="ion-text-center">
+          <ion-button  style="width: 100%;" expand="block"  class="customGreenButton" (click)="addModal()"><ion-icon name="add" color="white"></ion-icon> AGREGAR</ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -42,7 +42,7 @@
 
           <ng-container matColumnDef="Nombre">
             <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Nombre </th>
-            <td mat-cell *matCellDef="let element"> {{ element.nombre }} </td>
+            <td mat-cell *matCellDef="let element" (click)="editModal(element.id)"> {{ element.nombre }} </td>
           </ng-container>
       
           <ng-container matColumnDef="Visualizar">
@@ -55,7 +55,7 @@
           </ng-container>
   
           <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon">
+          <tr  mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon row_clickable">
           </tr>
           <tr class="mat-row" *matNoDataRow>
             <td [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 1rem;">

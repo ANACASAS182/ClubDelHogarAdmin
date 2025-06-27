@@ -1,0 +1,28 @@
+.scrollable-div {
+  height: 300px;           /* Establece una altura fija */
+  overflow-y: auto;        /* Agrega scroll vertical cuando sea necesario */
+  border: 1px solid #bbb;  /* Solo para ver el contorno */
+  padding: 4px;
+}
+
+.badge_nivel{
+    margin-left: 2px;
+    color:#bbb;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 4px;
+    background-color: #444;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.badge_tipoComision{
+    margin-right: 2px;
+    color:#ffffff;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 4px;
+    background-color: #39595e;
+    padding-left: 4px;
+    padding-right: 4px;
+}

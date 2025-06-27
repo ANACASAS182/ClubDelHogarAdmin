@@ -1,0 +1,57 @@
+<div style="padding:8px;">
+    <ion-grid>
+        <ion-row>
+            <ion-col>
+                <strong>Embajador: </strong> {{detalleEmbajador?.nombreEmbajador}}<br />
+                <small>
+                    <strong>Fecha de registro: </strong> {{fechaRegistroTexto}}<br />
+                </small>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+    <div class="scrollable-div">
+        <ion-grid>
+            <ion-row>
+                <ion-col>
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #ccc;">
+                                <th style="text-align: start;">Referencia</th>
+                                <th style="text-align: end;">Importe Directo</th>
+                                <th style="text-align: end;">Importe Indirecto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #ccc;" *ngFor="let rf of detalleEmbajador?.referencias">
+                                <td style="text-align: start;">
+                                    {{rf.nombreReferido}}<br />
+                                    <small>{{rf.producto}} | {{rf.fechaEfectivaTexto}}</small><br />
+                                    <span *ngIf="rf.tipoComision == '%'">
+                                        <span class="badge_tipoComision">{{rf.tipoComision}}</span><small
+                                            style="color:#aaa;">{{rf.detallePorcentaje}}</small>
+                                    </span>
+
+                                </td>
+                                <td style="text-align: end; font-family: 'Courier New', Courier, monospace;">
+                                    <span *ngIf="rf.importeDirecto > 0">
+                                        <strong>+ </strong>${{rf.importeDirecto}}MXN
+                                    </span>
+                                </td>
+                                <td style="text-align: end; ">
+                                    <span *ngIf="rf.importeIndirecto > 0">
+                                        <span style="font-family: 'Courier New', Courier, monospace;">
+                                            <strong>+ </strong>
+                                            ${{rf.importeIndirecto}}MXN
+                                        </span>
+                                        <span class="badge_nivel">{{rf.nivel}}</span>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </div>
+
+</div>

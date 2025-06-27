@@ -18,7 +18,7 @@ export class GrupoSociosPage implements OnInit, AfterViewInit, OnDestroy {
 
   //table
   dataSourceTable = new MatTableDataSource<GrupoDTO>();
-  displayedColumns: string[] = ['Nombre', 'Visualizar'];
+  displayedColumns: string[] = ['Nombre'];
   total: any;
 
   @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;

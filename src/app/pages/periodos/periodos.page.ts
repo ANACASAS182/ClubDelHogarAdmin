@@ -18,7 +18,7 @@ export class PeriodosPage implements OnInit, OnDestroy {
 
   //table
   dataSourceTable = new MatTableDataSource<PeriodoDTO>();
-  displayedColumns: string[] = ['Anio', 'Mes', "FechaInicio", "FechaFin", "FechaPagoEmpresas", "FechaPagoEmbajadores", 'Visualizar'];
+  displayedColumns: string[] = ['Anio', 'Mes', "FechaInicio", "FechaFin", "FechaPagoEmpresas", "FechaPagoEmbajadores"];
   total: any;
 
   @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;

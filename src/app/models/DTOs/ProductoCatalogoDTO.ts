@@ -7,11 +7,9 @@ export interface ProductoCatalogoDTO {
   nombre?: string;
   descripcion?: string;
   tipoComision?: TipoComisionEnum;
-  comisionCantidad?: number;
-  comisionPorcentaje?: number;
-  comisionPorcentajeCantidad?: number;
   precio?: number;
   fechaCaducidad?: Date;
   empresaRazonSocial?: string;
   grupos: GrupoDTO[];
+  comision:string;
 }

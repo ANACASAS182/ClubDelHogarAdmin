@@ -26,9 +26,9 @@ export class ReferidoService {
             .set('sortBy', params.sortBy)
             .set('sortDir', params.sortDir)
             .set('searchQuery', params.searchQuery || '')
+            .set('empresaID', params.empresaID.toString())
             .set('grupoID', params.grupoID.toString())
-            .set('usuarioID', params.usuarioID.toString())
-            .set('empresaID', params.empresaID.toString());
+            .set('usuarioID', params.usuarioID.toString());
 
         if (params.statusEnum !== undefined && params.statusEnum !== null) {
             httpParams = httpParams.set('estatus', params.statusEnum.toString());

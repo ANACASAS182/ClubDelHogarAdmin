@@ -32,10 +32,68 @@ export class PeriodoService {
     return this.http.get<GenericResponseDTO<PeriodoDTO>>(`${this.apiUrl}/GetByID`, { params: parameters });
   }
 
+  getPeriodos(): Observable<PeriodoDTO[]> {
+    return this.http.get<PeriodoDTO[]>(`${this.apiUrl}/getPeriodos`);
+  }
+
+  getCorteMensual(periodoId:number): Observable<CorteMensual> {
+    return this.http.get<CorteMensual>(`${this.apiUrl}/getCorteMensual?periodoId=${periodoId}`);
+  }
+
+  getDetalleEmbajadorMes(embajadorId:number, periodoId:number): Observable<DetalleEmbajadorCorteMensual> {
+    return this.http.get<DetalleEmbajadorCorteMensual>(`${this.apiUrl}/getDetalleEmbajadorMes?embajadorId=${embajadorId}&periodoId=${periodoId}`);
+  }
+
   save(model: PeriodoDTO): Observable<GenericResponseDTO<boolean>> {
     return this.http.post<GenericResponseDTO<boolean>>(`${this.apiUrl}/Save`, model);
   }
 
 
 
+}
+
+
+export interface CorteMensual {
+  importeEmbassy:number;
+  importeTotal:number;
+  embajadoresMes:number;
+  embajadores:CorteMensualEmbajador[];
+}
+
+export interface CorteMensualEmbajador {
+  id:number;
+  nombre:string;
+  referenciasDirectas:number;
+  importeDirecto:number;
+  referenciasIndirectas:number;
+  importeIndirecto:number;
+}
+
+export interface DetalleEmbajadorCorteMensual{
+  embajadorId:number;
+  periodoId:number;
+  nombreEmbajador:string;
+  contactoEmbajador:string;
+  fechaRegistro:Date;
+  datosBancarios:string;
+  totalImporte:number;
+  referencias:DetalleEmbajadorCorteMensualReferencia[];
+}
+
+export interface DetalleEmbajadorCorteMensualReferencia{
+  referenciaId:number;
+  embajadorEfectivo:string;
+  nombreReferido:string;
+
+  fechaEfectiva:Date;
+  fechaEfectivaTexto:string;
+
+
+  tipoComision:string;
+    detallePorcentaje:string;
+
+  nivel:string;
+  importeDirecto:number;
+  importeIndirecto:number;
+  producto:string;
 }

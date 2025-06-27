@@ -21,7 +21,7 @@ export class EmpresasPage implements OnInit, AfterViewInit, OnDestroy {
 
   //table
   dataSourceTable = new MatTableDataSource<EmpresaCatalogoDTO>();
-  displayedColumns: string[] = ['RFC', 'RazonSocial', 'NombreComercial', 'Grupo', 'Visualizar'];
+  displayedColumns: string[] = ['RFC', 'RazonSocial', 'NombreComercial', 'Grupo'];
   total: any;
 
   @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;

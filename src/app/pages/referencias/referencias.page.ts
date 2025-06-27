@@ -31,7 +31,7 @@ export class ReferenciasPage implements OnInit, AfterViewInit, OnDestroy {
   //table
   dataSourceTable = new MatTableDataSource<ReferidoCatalogoDTO>();
   displayedColumns: string[] = [];
-  allColumns: string[] = ['Nombre', 'Email', 'Celular', 'Producto', 'Embajador', 'EstatusReferencia', 'QR', 'Visualizar'];
+  allColumns: string[] = ['Nombre', 'Email', 'Producto', 'Embajador', 'EstatusReferencia'];
   total: any;
 
   @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
@@ -95,7 +95,6 @@ export class ReferenciasPage implements OnInit, AfterViewInit, OnDestroy {
       const index = this.displayedColumns.indexOf(insertAfter);
       if (index !== -1) {
         this.displayedColumns.splice(index + 1, 0, 'Empresa');
-        this.displayedColumns.splice(index + 2, 0, 'Grupo');
       }
       this.inputBusquedaText = "Buscar por nombre, email, celular, producto, empresa o grupo"
     }

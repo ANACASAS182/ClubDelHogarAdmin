@@ -41,6 +41,11 @@
   color: white !important;
 }
 
+strong, th{
+  color: #222;
+}
+
+
 ion-content.pagesContent {
   --background: #dedede !important;
 }
@@ -133,6 +138,10 @@ ion-header.modalHeader {
     --border-radius: 12px;
     --height: 420px;
   }
+  ion-modal.modal-corte-mensual {
+    --border-radius: 4px;
+    --height: 420px;
+  }
 }
 
 ion-modal.modal-default.show-modal ~ ion-modal.modal-default {
@@ -212,7 +221,7 @@ ion-menu.custom-menu {
 
 .custom-datepicker .mdc-text-field--filled {
   background-color: transparent !important;
-  border-radius: 30px !important;
+  border-radius: 4px !important;
 }
 
 .custom-datepicker .mat-mdc-text-field-wrapper,
@@ -220,7 +229,7 @@ ion-menu.custom-menu {
 .custom-datepicker .mat-mdc-text-field-wrapper.mdc-text-field--focused,
 .custom-datepicker .mat-mdc-text-field-wrapper.mdc-text-field--filled {
   background-color: #f1f1f1 !important;
-  border-radius: 30px !important;
+  border-radius: 4px !important;
   border: 1px solid black !important;
   padding-left: 16px !important;
   padding-right: 5px !important;
@@ -249,4 +258,15 @@ ion-menu.custom-menu {
 .modal-wrapper{
   height: 720px !important;
   max-height: 720px !important;
+}
+
+
+.row_clickable{
+    user-select: none;
+}
+
+.row_clickable:hover{
+    background-color: #b0c6cf;
+    transition: 0.2s;
+    cursor: pointer;
 }

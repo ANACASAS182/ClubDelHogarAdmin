@@ -15,14 +15,14 @@ import { TokenService } from 'src/app/services/token.service';
 })
 export class DashboardPage implements OnInit, OnDestroy {
   public appPages = [
-    { enum: MenuPagesEnum.Grupos, title: 'Grupo de Socios', url: '/dashboard/grupos', icon: 'people', visible: false, access: [RolesEnum.Admin] },
-    { enum: MenuPagesEnum.Empresas, title: 'Empresas Socias', url: '/dashboard/empresas', icon: 'business', visible: false, access: [RolesEnum.Admin] },
+    { enum: MenuPagesEnum.Grupos, title: 'Grupos', url: '/dashboard/grupos', icon: 'people', visible: false, access: [RolesEnum.Admin] },
+    { enum: MenuPagesEnum.Empresas, title: 'Empresas', url: '/dashboard/empresas', icon: 'business', visible: false, access: [RolesEnum.Admin] },
     { enum: MenuPagesEnum.Embajadores, title: 'Embajadores', url: '/dashboard/embajadores', icon: 'flag', visible: false, access: [RolesEnum.Admin] },
     { enum: MenuPagesEnum.Celulas, title: 'Celulas', url: '/dashboard/celulas', icon: 'grid', visible: false, access: [RolesEnum.Admin] },
-    { enum: MenuPagesEnum.Productos, title: 'Productos a Promocionar', url: '/dashboard/productos', icon: 'archive', visible: false, access: [RolesEnum.Admin, RolesEnum.Socio] },
+    { enum: MenuPagesEnum.Productos, title: 'Productos', url: '/dashboard/productos', icon: 'archive', visible: false, access: [RolesEnum.Admin, RolesEnum.Socio] },
     { enum: MenuPagesEnum.Referencias, title: 'Referencias', url: '/dashboard/referencias', icon: 'star', visible: false, access: [RolesEnum.Admin, RolesEnum.Socio] },
     // { enum: MenuPagesEnum.Movimientos, title: 'Movimientos', url: '/dashboard/movimientos', icon: 'sync-circle', visible: false, access: [RolesEnum.Admin] },
-    { enum: MenuPagesEnum.Configuración, title: 'Tabla de periodos', url: '/dashboard/periodos', icon: 'calendar', visible: false, access: [RolesEnum.Admin] },
+    { enum: MenuPagesEnum.Configuración, title: 'Periodos', url: '/dashboard/periodos', icon: 'calendar', visible: false, access: [RolesEnum.Admin] },
     { enum: MenuPagesEnum.CorteMensual, title: 'Corte mensual', url: '/dashboard/corte', icon: 'calendar', visible: false, access: [RolesEnum.Admin] },
     { enum: MenuPagesEnum.Configuración, title: 'Configuración', url: '/dashboard/configuracion', icon: 'settings', visible: false, access: [RolesEnum.Admin, RolesEnum.Socio] },
 

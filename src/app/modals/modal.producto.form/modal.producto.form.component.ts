@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { finalize, firstValueFrom } from 'rxjs';
 import { getTiposComisionOptions, TipoComisionEnum } from 'src/app/enums/tipo.comision.enum';
@@ -18,6 +18,7 @@ import { ProductoCreateDTO } from 'src/app/models/DTOs/ProductoCreateDTO';
 import { ProductoService } from 'src/app/services/api.back.services/producto.service';
 import { cleanString } from 'src/app/classes/string-utils';
 import { sinEspaciosValidator } from 'src/app/classes/custom.validars';
+import { UtileriasService } from '../../services/utilerias.service';
 
 @Component({
   selector: 'app-modal.producto.form',
@@ -25,7 +26,7 @@ import { sinEspaciosValidator } from 'src/app/classes/custom.validars';
   styleUrls: ['./modal.producto.form.component.scss'],
   standalone: true,
   providers: [provideNativeDateAdapter()],
-  imports: [IonicModule, ReactiveFormsModule, CommonModule, MatFormFieldModule, MatInputModule, MatDatepickerModule],
+  imports: [IonicModule, ReactiveFormsModule, CommonModule, MatFormFieldModule, MatInputModule, MatDatepickerModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
@@ -47,6 +48,29 @@ export class ModalProductoFormComponent implements OnInit {
   rolUser: RolesEnum | undefined;
   empresaID: number = 0;
 
+
+  estatusDatosbasicos: number = 1;
+  estatusDatosComisiones: number = 0;
+  estatusDatosValidacion: number = 0;
+
+
+  nombreProductoAgregando: string = "";
+  descripcionProductoAgregando: string = "";
+  vigenciaProductoAgregando: string = "";
+
+  nivel1ProductoAgregando: string = "";
+  nivel2ProductoAgregando: string = "";
+  nivel3ProductoAgregando: string = "";
+  nivel4ProductoAgregando: string = "";
+  nivelInvitacionProductoAgregando: string = "";
+  nivelMasterProductoAgregando: string = "";
+  comisionTotalProductoAgregando: string = "";
+  tipoComisionAgregando: number = 0;
+  fechaVigenciaTextoAgregando: string = "";
+
+  confirmacionProductoAgregado:boolean = false;
+
+
   constructor(private fb: FormBuilder,
     private toastController: ToastController,
     private loadingCtrl: LoadingController,
@@ -54,12 +78,16 @@ export class ModalProductoFormComponent implements OnInit {
     private productoService: ProductoService,
     private usuarioService: UsuarioService,
     private cdr: ChangeDetectorRef,
+    private utilerias:UtileriasService,
     private modalCtrl: ModalController) {
+
+
+    let fechaSugerida: Date = this.obtenerUltimoDiaDeTresMesesDespues();
 
     this.formulario = this.fb.group({
       nombre: ['', [Validators.required, sinEspaciosValidator()]],
       descripcion: [''],
-      fechaVencimiento: ['', Validators.required],
+      fechaVencimiento: [fechaSugerida, Validators.required],
       empresa: [''],
       tipoComision: ['', Validators.required],
       comisionCantidad: [''],
@@ -71,9 +99,100 @@ export class ModalProductoFormComponent implements OnInit {
       nivel_3: ['', Validators.required],
       nivel_4: ['', Validators.required],
       nivel_master: ['', Validators.required],
-      nivel_base: ['', Validators.required]
+      nivel_invitacion: ['', Validators.required]
     });
   }
+
+  obtenerUltimoDiaDeTresMesesDespues(): Date {
+    const fechaActual = new Date();
+    const fechaTresMesesDespues = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 13, 1);
+    const ultimoDia = new Date(fechaTresMesesDespues.getFullYear(), fechaTresMesesDespues.getMonth(), 0);
+    return ultimoDia;
+  }
+
+  pasoActual: string = "Descripción";
+
+  siguientePaso(paso: number) {
+
+    this.confirmacionProductoAgregado = false;
+
+    this.nombreProductoAgregando = cleanString(this.formulario.controls["nombre"].value)!;
+    this.descripcionProductoAgregando = this.formulario.controls["descripcion"].value;
+
+    this.fechaVigenciaTextoAgregando =this.utilerias.formatearFecha(this.formulario.controls["fechaVencimiento"].value)
+
+    let tipoComision:number = this.formulario.controls["tipoComision"].value;
+
+    this.tipoComisionAgregando = tipoComision;
+
+    let nivel1Suma: number = Number.parseFloat(this.formulario.controls["nivel_1"].value);
+    let nivel2Suma: number = Number.parseFloat(this.formulario.controls["nivel_2"].value);
+    let nivel3Suma: number = Number.parseFloat(this.formulario.controls["nivel_3"].value);
+    let nivel4Suma: number = Number.parseFloat(this.formulario.controls["nivel_4"].value);
+    let nivelInvitacionSuma: number = Number.parseFloat(this.formulario.controls["nivel_invitacion"].value);
+    let nivelMasterSuma: number = Number.parseFloat(this.formulario.controls["nivel_master"].value);
+    let comisionTotal: number = nivel1Suma + nivel2Suma + nivel3Suma + nivel4Suma + nivelInvitacionSuma + nivelMasterSuma;
+
+    if (tipoComision == 0) {
+      this.nivel1ProductoAgregando = "$" + nivel1Suma.toFixed(2) + " MXN";
+      this.nivel2ProductoAgregando = "$" + nivel2Suma.toFixed(2) + "MXN";
+      this.nivel3ProductoAgregando = "$" + nivel3Suma.toFixed(2) + "MXN";
+      this.nivel4ProductoAgregando = "$" + nivel4Suma.toFixed(2) + "MXN";
+      this.nivelInvitacionProductoAgregando = "$" + nivelInvitacionSuma.toFixed(2) + "MXN";
+      this.nivelMasterProductoAgregando = "$" + nivelMasterSuma.toFixed(2) + "MXN";
+
+      this.comisionTotalProductoAgregando = "$" + comisionTotal.toFixed(2) + "MXN";
+    }
+
+    if (tipoComision == 1) {
+      this.nivel1ProductoAgregando = nivel1Suma.toFixed(2) + "%";
+      this.nivel2ProductoAgregando = nivel2Suma.toFixed(2) + "%";
+      this.nivel3ProductoAgregando = nivel3Suma.toFixed(2) + "%";
+      this.nivel4ProductoAgregando = nivel4Suma.toFixed(2) + "%";
+      this.nivelInvitacionProductoAgregando = nivelInvitacionSuma.toFixed(2) + "%";
+      this.nivelMasterProductoAgregando = nivelMasterSuma.toFixed(2) + "%";
+
+      this.comisionTotalProductoAgregando = comisionTotal.toFixed(2) + "%";
+    }
+
+
+
+    if (paso == 1) {
+      this.estatusDatosbasicos = 0;
+      this.estatusDatosComisiones = 1;
+      this.estatusDatosValidacion = 0;
+
+      this.pasoActual = "Comisiones";
+    }
+    if (paso == 2) {
+      this.estatusDatosbasicos = 0;
+      this.estatusDatosComisiones = 0;
+      this.estatusDatosValidacion = 1;
+
+      this.pasoActual = "Validación";
+    }
+
+  }
+  pasoAnterior(paso: number) {
+    this.confirmacionProductoAgregado = false;
+
+    if (paso == 1) {
+      this.estatusDatosbasicos = 1;
+      this.estatusDatosComisiones = 0;
+      this.estatusDatosValidacion = 0;
+
+      this.pasoActual = "Descripción";
+    }
+    if (paso == 2) {
+      this.estatusDatosbasicos = 0;
+      this.estatusDatosComisiones = 1;
+      this.estatusDatosValidacion = 0;
+
+      this.pasoActual = "Comisiones";
+    }
+  }
+
+
 
   async ngOnInit() {
     this.tiposComision = getTiposComisionOptions();
@@ -114,15 +233,7 @@ export class ModalProductoFormComponent implements OnInit {
   }
 
   enviarFormulario() {
-    if (this.formEnviado) return;
 
-    this.formEnviado = true;
-
-    if (this.formulario.invalid) {
-      this.formulario.markAllAsTouched();
-      this.formEnviado = false;
-      return;
-    }
 
     const fechaCaducidad: Date = this.formulario.controls["fechaVencimiento"].value;
     const hoy = new Date();
@@ -144,19 +255,14 @@ export class ModalProductoFormComponent implements OnInit {
       nombre: cleanString(this.formulario.controls["nombre"].value)!,
       descripcion: cleanString(this.formulario.controls["descripcion"].value),
       empresaID: IDEmpresa,
-      tipoComisionNivel: this.formulario.controls["otroTipoComision"].value,
-      comisionCantidad: this.formulario.controls["comisionCantidad"].value == '' ? undefined : this.formulario.controls["comisionCantidad"].value,
-      comisionPorcentaje: this.formulario.controls["comisionPorcentaje"].value == '' ? undefined : this.formulario.controls["comisionPorcentaje"].value,
-      comisionPorcentajeCantidad: this.formulario.controls["cantidadPorcentaje"].value == '' ? undefined : this.formulario.controls["cantidadPorcentaje"].value,
       fechaCaducidad: this.formulario.controls["fechaVencimiento"].value,
       nivel1: this.formulario.controls["nivel_1"].value,
       nivel2: this.formulario.controls["nivel_2"].value,
       nivel3: this.formulario.controls["nivel_3"].value,
       nivel4: this.formulario.controls["nivel_4"].value,
-      nivelBase: this.formulario.controls["nivel_base"].value,
+      nivelInvitacion: this.formulario.controls["nivel_invitacion"].value,
       nivelMaster: this.formulario.controls["nivel_master"].value,
       tipoComision: this.formulario.controls["tipoComision"].value,
-      precio: 0
     };
 
     this.productoService.save(model).pipe(

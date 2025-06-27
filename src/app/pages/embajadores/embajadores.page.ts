@@ -19,7 +19,7 @@ export class EmbajadoresPage implements OnInit, AfterViewInit, OnDestroy {
 
   //table
   dataSourceTable = new MatTableDataSource<UsuarioCatalogoDTO>();
-  displayedColumns: string[] = ['NombreCompleto', 'Rol', 'Email', 'Celular', 'Visualizar'];
+  displayedColumns: string[] = ['NombreCompleto', 'Rol', 'Email', 'Celular'];
   total: any;
 
   @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;

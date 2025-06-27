@@ -89,44 +89,14 @@
             <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.empresaRazonSocial }} </td>
           </ng-container>
 
-          <ng-container matColumnDef="Grupo">
-            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Grupo </th>
+          
+          <ng-container matColumnDef="Comision">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Comisión </th>
             <td mat-cell *matCellDef="let element">
-              <span *ngFor="let grupo of element.grupos; let last = last">
-                {{ grupo.nombre }}<span *ngIf="!last">, </span>
-              </span>
+              {{ element.comision}}
             </td>
           </ng-container>
 
-          <ng-container matColumnDef="ComisionCantidad">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Comision $ </th>
-            <td mat-cell *matCellDef="let element">
-              {{ (element.comisionCantidad === 0 || element.comisionCantidad == undefined)
-              ? 'No aplica'
-              : (element.comisionCantidad | currency:'MXN':'symbol':'1.2-2') + ' MXN'
-              }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="ComisionPorcentaje">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Comision % </th>
-            <td mat-cell *matCellDef="let element">
-              {{ (element.comisionPorcentaje === 0 || element.comisionPorcentaje == undefined)
-              ? 'No aplica'
-              : (element.comisionPorcentaje | currency:'MXN':'symbol':'1.2-2') + ' %'
-              }}
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="ComisionPorcentajeCantidad">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Valor del % </th>
-            <td mat-cell *matCellDef="let element">
-              {{ (element.comisionPorcentajeCantidad === 0 || element.comisionPorcentajeCantidad == undefined)
-              ? 'No aplica'
-              : (element.comisionPorcentajeCantidad | currency:'MXN':'symbol':'1.2-2')
-              }}
-            </td>
-          </ng-container>
 
           <ng-container matColumnDef="FechaCaducidad">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Caducidad </th>
@@ -143,7 +113,7 @@
 
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon">
+          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon row_clickable" (click)="visualizarModal()">
           </tr>
           <tr class="mat-row" *matNoDataRow>
             <td [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 1rem;">

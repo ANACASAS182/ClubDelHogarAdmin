@@ -27,7 +27,7 @@ export class ProductosPage implements OnInit, AfterViewInit, OnDestroy {
   //table
   dataSourceTable = new MatTableDataSource<ProductoCatalogoDTO>();
   displayedColumns: string[] = [];
-  allColumns: string[] = ['Nombre', 'ComisionCantidad', 'ComisionPorcentaje', 'ComisionPorcentajeCantidad', 'FechaCaducidad'];
+  allColumns: string[] = ['Nombre', 'Comision', 'FechaCaducidad'];
   total: any;
 
   @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
@@ -86,8 +86,7 @@ export class ProductosPage implements OnInit, AfterViewInit, OnDestroy {
       const index = this.displayedColumns.indexOf(insertAfter);
       if (index !== -1) {
         this.displayedColumns.splice(index + 1, 0, 'Empresa');
-        this.displayedColumns.splice(index + 2, 0, 'Grupo');
-      }
+        }
       this.inputBusquedaText = "Buscar por nombre de producto, empresa o grupo"
     }
 
@@ -163,6 +162,7 @@ export class ProductosPage implements OnInit, AfterViewInit, OnDestroy {
           if (response === null) {
             return [];
           }
+
           this.total = response.data.total;
           return response.data.items;
         }),
@@ -202,6 +202,10 @@ export class ProductosPage implements OnInit, AfterViewInit, OnDestroy {
       .subscribe(response => {
         this.dataSourceTable = new MatTableDataSource(response);
       });
+  }
+
+  async visualizarModal(){
+    
   }
 
 
