@@ -53,7 +53,6 @@ ion-content.pagesContent {
 ion-header.pagesHeader ion-toolbar {
   --background: #333740 !important;
   --color: #ffffff;
-  height: 8cap;
 }
 
 .inputBusqueda {
@@ -62,7 +61,7 @@ ion-header.pagesHeader ion-toolbar {
   --border-radius: 4px;
   --padding-start: 16px;
   --padding-end: 16px;
-  width: 80%;
+  width: 100%;
   color: #2c3e50 !important;
 
   border: 1px solid transparent;
@@ -161,6 +160,7 @@ ion-modal.modal-default.show-modal ~ ion-modal.modal-default {
   --background: #4a9a09;
   font-weight: bold;
   color: white;
+  
 }
 
 .custom-alert {

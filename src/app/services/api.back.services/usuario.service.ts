@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { GenericResponseDTO } from 'src/app/models/DTOs/GenericResponseDTO';
 import { LoginUsuarioDTO } from 'src/app/models/DTOs/LoginUsuarioDTO';
-import { Usuario } from 'src/app/models/Usuario';
+import { Usuario, UsuarioBasico } from 'src/app/models/Usuario';
 import { PaginationModelDTO } from 'src/app/models/DTOs/PaginationModelDTO';
 import { UsuarioCatalogoDTO } from 'src/app/models/DTOs/UsuarioCatalogoDTO';
 import { UsuarioEditDTO } from 'src/app/models/DTOs/UsuarioEditDTO';
@@ -40,6 +40,10 @@ export class UsuarioService {
     }
     const options = { headers };
     return this.http.get<GenericResponseDTO<Usuario>>(`${this.apiUrl}/GetUsuarioLogeado`, options);
+  }
+
+   getEmbajadorPorCorreo(correo:string): Observable<UsuarioBasico> {
+    return this.http.get<UsuarioBasico>(`${this.apiUrl}/getEmbajadorPorCorreo?correo=` + correo);
   }
 
   getTablePaginated(params: { page: number, size: number, sortBy: string, sortDir: string, searchQuery: string }): Observable<GenericResponseDTO<PaginationModelDTO<UsuarioCatalogoDTO[]>>> {

@@ -17,3 +17,9 @@ export interface Usuario{
     roles?: Roles;
     grupoID?: number;
 }
+
+export interface UsuarioBasico{
+    id:  number;
+    nombre: string;
+    email: string;
+}

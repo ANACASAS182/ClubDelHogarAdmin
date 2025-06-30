@@ -25,15 +25,21 @@
       </ion-row>
 
       <ion-row class="ion-align-items-center">
+        
+
+        
+
         <ion-col size="12" size-md="3" class="ion-text-center" *ngIf="rolUsuario === RolesEnum.Admin">
           <ion-item class="inputBusqueda">
-            <ion-label position="floating">Filtro por grupo</ion-label>
-            <ionic-selectable item-content [items]="grupos" itemValueField="id" closeButtonSlot="end"
-              itemTextField="nombre" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
-              clearButtonText="Limpiar" (onChange)="onGrupoSelect($event)" (onClear)="onGrupoClear($event)">
+            <ion-label position="floating">Filtro por empresa</ion-label>
+            <ionic-selectable item-content [items]="empresas" itemValueField="id" closeButtonSlot="end"
+              itemTextField="razonSocial" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
+              clearButtonText="Limpiar" (onChange)="onEmpresaSelect($event)" (onClear)="onEmpresaClear($event)">
             </ionic-selectable>
           </ion-item>
         </ion-col>
+
+        
 
         <ion-col size="12" size-md="3" class="ion-text-center" *ngIf="rolUsuario === RolesEnum.Admin">
           <ion-item class="inputBusqueda">
@@ -51,16 +57,6 @@
                   </p>
                 </ion-item>
               </ng-template>
-            </ionic-selectable>
-          </ion-item>
-        </ion-col>
-
-        <ion-col size="12" size-md="3" class="ion-text-center" *ngIf="rolUsuario === RolesEnum.Admin">
-          <ion-item class="inputBusqueda">
-            <ion-label position="floating">Filtro por empresa</ion-label>
-            <ionic-selectable item-content [items]="empresas" itemValueField="id" closeButtonSlot="end"
-              itemTextField="razonSocial" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
-              clearButtonText="Limpiar" (onChange)="onEmpresaSelect($event)" (onClear)="onEmpresaClear($event)">
             </ionic-selectable>
           </ion-item>
         </ion-col>

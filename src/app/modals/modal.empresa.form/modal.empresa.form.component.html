@@ -65,6 +65,29 @@
             {{ giro.nombre }}
           </ion-select-option>
         </ion-select>
+
+        <div *ngIf="embajadorBusquedaId > 0">
+          <small>Embajador que invitó a esta empresa:</small><br />
+          <strong>{{embajadorRelacionadoNombre}}</strong><br />
+          <ion-button class="customButton" (click)="embajadorBusquedaId = 0">
+            <small>Cambiar</small>
+          </ion-button>
+        </div>
+        <div *ngIf="embajadorBusquedaId == 0">
+          <ion-input class="inputForm" label-placement="floating"
+            label="Ingresa el correo del embajador que invitó esta empresa" formControlName="embajadorBusquedaCorreo"
+            placeholder="Correo electrónico*" type="text">
+          </ion-input>
+<div *ngIf="embajadorBusquedaEstatus == -1" style="width: 100%; border-radius: 2px; border: 1px solid #7e1d1d; padding:4px;" >
+            <small style ="color:#7e1d1d;">No se localizó ningún embajador con el correo electrónico proporcionado</small>
+          </div>
+          <ion-button class="customButton" (click)="getEmbajadorPorCorreo()">
+            <small>Buscar embajador</small>
+          </ion-button>
+
+          
+
+        </div>
       </div>
 
       <!-- Logotipo -->

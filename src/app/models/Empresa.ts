@@ -8,4 +8,7 @@ export interface Empresa{
     logotipoBase64?:string;
     giro?:number;
     grupo?:number;
+
+    embajadorId?:number;
+    embajadorNombre?:string;
 }

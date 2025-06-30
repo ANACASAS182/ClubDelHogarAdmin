@@ -9,4 +9,6 @@ export interface EmpresaCreateDTO {
     logotipoBase64: string;
     giro:number;
     grupo:number;
+
+    embajadorId?:number;
 }

@@ -14,6 +14,8 @@ import { Empresa } from 'src/app/models/Empresa';
 import { EmpresaGrupoService } from 'src/app/services/api.back.services/empresa.grupo.service';
 import { EmpresaService } from 'src/app/services/api.back.services/empresa.service';
 import { GrupoService } from 'src/app/services/api.back.services/grupo.service';
+import { UsuarioService } from 'src/app/services/api.back.services/usuario.service';
+import { EmbajadoresPageRoutingModule } from '../../pages/embajadores/embajadores-routing.module';
 
 @Component({
   selector: 'app-modal.empresa.form',
@@ -41,6 +43,7 @@ export class ModalEmpresaFormComponent implements OnInit {
     private grupoService: GrupoService,
     private toastController: ToastController,
     private loadingCtrl: LoadingController,
+    private usuarioService: UsuarioService,
     private modalCtrl: ModalController) {
 
     this.giros = [
@@ -64,10 +67,35 @@ export class ModalEmpresaFormComponent implements OnInit {
       descripcion: [""],
       grupo: [""],
       giro: [""],
-
+      embajadorBusquedaCorreo: [""]
     });
   }
 
+
+  embajadorBusquedaId: number = 0;
+  embajadorRelacionadoNombre: string = "";
+  embajadorBusquedaEstatus:number = 0;
+  getEmbajadorPorCorreo() {
+
+    let buscar: string = cleanString(this.formulario.controls["embajadorBusquedaCorreo"].value.trim())!;
+this.embajadorBusquedaEstatus = 0;
+    this.usuarioService.getEmbajadorPorCorreo(buscar).subscribe({
+      next: (data) => {
+        if (data) {
+          this.embajadorBusquedaId = data.id!;
+          this.embajadorBusquedaEstatus = 1;
+          this.embajadorRelacionadoNombre = data.nombre + " (" + data.email + ")";
+
+        } else {
+          this.embajadorBusquedaId = 0;
+          this.embajadorBusquedaEstatus = -1;
+        }
+      }, 
+      error:(err) =>{
+        this.embajadorBusquedaEstatus = -1;
+      }
+    });
+  }
 
   async ngOnInit() {
 
@@ -95,6 +123,9 @@ export class ModalEmpresaFormComponent implements OnInit {
               giro: response.data.giro,
             });
             this.imagenBase64 = response.data.logotipoBase64;
+
+            this.embajadorBusquedaId = response.data.embajadorId ?   response.data.embajadorId : 0;
+            this.embajadorRelacionadoNombre = response.data.embajadorNombre!;
           }
         });
 
@@ -139,8 +170,9 @@ export class ModalEmpresaFormComponent implements OnInit {
       nombreComercial: cleanString(this.formulario.controls["nombreComercial"].value)!,
       descripcion: cleanString(this.formulario.controls["descripcion"].value),
       logotipoBase64: this.imagenBase64 ?? "",
-      giro:this.formulario.controls["giro"].value,
-      grupo:this.formulario.controls["grupo"].value
+      giro: this.formulario.controls["giro"].value,
+      grupo: this.formulario.controls["grupo"].value,
+      embajadorId: this.embajadorBusquedaId
     };
 
     if (this.id != undefined) {
