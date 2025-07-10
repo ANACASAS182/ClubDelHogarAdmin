@@ -18,7 +18,7 @@ export class DashboardPage implements OnInit, OnDestroy {
     { enum: MenuPagesEnum.Grupos, title: 'Grupos', url: '/dashboard/grupos', icon: 'people', visible: false, access: [RolesEnum.Admin] },
     { enum: MenuPagesEnum.Empresas, title: 'Empresas', url: '/dashboard/empresas', icon: 'business', visible: false, access: [RolesEnum.Admin] },
     { enum: MenuPagesEnum.Embajadores, title: 'Embajadores', url: '/dashboard/embajadores', icon: 'flag', visible: false, access: [RolesEnum.Admin] },
-    { enum: MenuPagesEnum.Celulas, title: 'Celulas', url: '/dashboard/celulas', icon: 'grid', visible: false, access: [RolesEnum.Admin] },
+    { enum: MenuPagesEnum.Celulas, title: 'Células', url: '/dashboard/celulas', icon: 'grid', visible: false, access: [RolesEnum.Admin] },
     { enum: MenuPagesEnum.Productos, title: 'Productos', url: '/dashboard/productos', icon: 'archive', visible: false, access: [RolesEnum.Admin, RolesEnum.Socio] },
     { enum: MenuPagesEnum.Referencias, title: 'Referencias', url: '/dashboard/referencias', icon: 'star', visible: false, access: [RolesEnum.Admin, RolesEnum.Socio] },
     // { enum: MenuPagesEnum.Movimientos, title: 'Movimientos', url: '/dashboard/movimientos', icon: 'sync-circle', visible: false, access: [RolesEnum.Admin] },

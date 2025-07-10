@@ -9,6 +9,7 @@ import { PaginationModelDTO } from 'src/app/models/DTOs/PaginationModelDTO';
 import { UsuarioCatalogoDTO } from 'src/app/models/DTOs/UsuarioCatalogoDTO';
 import { UsuarioEditDTO } from 'src/app/models/DTOs/UsuarioEditDTO';
 import { Empresa } from 'src/app/models/Empresa';
+import { CelulaDisplay, CelulaNode } from 'src/app/pages/celulas/celulas.page';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +31,10 @@ export class UsuarioService {
     const options = { headers };
 
     return this.http.post<GenericResponseDTO<string>>(url, user, options);
+  }
+
+  getCelulaFromHere(embajadorId:number): Observable<CelulaDisplay> {
+    return this.http.get<CelulaDisplay>(`${environment.apiUrl}api/Embajadores/getCelulaFromHere?embajadorBase=` + embajadorId);
   }
 
   getUsuario(skipErrorHandler = false): Observable<GenericResponseDTO<Usuario>> {
