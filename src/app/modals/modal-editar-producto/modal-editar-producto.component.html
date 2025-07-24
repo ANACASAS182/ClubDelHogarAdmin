@@ -1,0 +1,73 @@
+<div class="producto-modal-content" *ngIf="producto">
+
+  <!-- Contenido principal en 2 columnas -->
+  <div class="modal-body">
+
+    <!-- Columna izquierda: descripción y fechas -->
+    <div class="modal-info">
+      <h2>{{producto!.nombre}}</h2>
+      <p class="modal-descripcion">{{producto!.descripcion}}</p>
+
+      <div class="modal-fechas">
+        <p><strong>Fecha de creación:</strong> {{producto!.creacionLetra}}</p>
+        <p><strong>Vigencia:</strong> {{producto!.vigenciaLetra}}</p>
+      </div>
+    </div>
+
+    <!-- Columna derecha: comisiones -->
+    <div class="modal-comisiones">
+  <h2>Comisiones</h2>
+  <table class="comisiones-table">
+    <tbody>
+      <tr>
+        <td><strong>Nivel 1</strong></td>
+        <td class="monto">
+          {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivel1 | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Nivel 2</strong></td>
+        <td class="monto">
+          {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivel2 | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Nivel 3</strong></td>
+        <td class="monto">
+          {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivel3 | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Nivel 4</strong></td>
+        <td class="monto">
+          {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivel4 | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Invitación</strong></td>
+        <td class="monto">
+          {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivelInvitacion | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Master</strong></td>
+        <td class="monto">
+          {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivelMaster | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
+        </td>
+      </tr>
+      <tr class="comision-total">
+        <td><strong>Total</strong></td>
+        <td class="monto">
+          {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.totalComision | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+  </div>
+</div>
+
+<style>
+
+</style>

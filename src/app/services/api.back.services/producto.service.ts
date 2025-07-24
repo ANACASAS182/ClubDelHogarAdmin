@@ -17,6 +17,10 @@ export class ProductoService {
 
     constructor(private http: HttpClient) { }
 
+    getProductoById(productoId: number): Observable<Producto> {
+        return this.http.get<Producto>(`${this.apiUrl}/getProductoById?productoId=` + productoId);
+    }
+
     getAllProductosEmpresa(empresaID: number): Observable<GenericResponseDTO<Producto[]>> {
         let params = new HttpParams().set("empresaID", empresaID);
         return this.http.get<GenericResponseDTO<Producto[]>>(`${this.apiUrl}/GetProductosEmpresa`, { params });

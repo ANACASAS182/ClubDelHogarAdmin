@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LoadingController, ModalController } from '@ionic/angular';
 import { catchError, debounceTime, distinctUntilChanged, firstValueFrom, map, merge, of, startWith, Subject, switchMap, takeUntil } from 'rxjs';
 import { RolesEnum } from 'src/app/enums/roles.enum';
+import { ModalEditarProductoComponent } from 'src/app/modals/modal-editar-producto/modal-editar-producto.component';
 import { ModalProductoFormComponent } from 'src/app/modals/modal.producto.form/modal.producto.form.component';
 import { GrupoDTO } from 'src/app/models/DTOs/GrupoDTO';
 import { ProductoCatalogoDTO } from 'src/app/models/DTOs/ProductoCatalogoDTO';
@@ -204,8 +205,21 @@ export class ProductosPage implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  async visualizarModal(){
-    
+  async visualizarModal(id:number){
+    const modal = await this.modalCtrl.create({
+      component: ModalEditarProductoComponent,
+      cssClass: 'modal-empresa',
+      componentProps: {
+        productoId: id
+      }
+    });
+
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    if (data) {
+      console.log(data);
+      this.loadtable();
+    }
   }
 
 

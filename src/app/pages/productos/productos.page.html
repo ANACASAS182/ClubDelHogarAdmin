@@ -113,7 +113,7 @@
 
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon row_clickable" (click)="visualizarModal()">
+          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon row_clickable" (dblclick)="visualizarModal(element.id!)">
           </tr>
           <tr class="mat-row" *matNoDataRow>
             <td [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 1rem;">

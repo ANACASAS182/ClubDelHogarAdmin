@@ -1,0 +1,79 @@
+.producto-modal-content {
+    padding: 24px;
+    background-color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .modal-titulo {
+    font-size: 26px;
+    margin-bottom: 24px;
+    color: #2c3e50;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 6px;
+  }
+
+  .modal-body {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .modal-info {
+    flex: 1;
+    min-width: 250px;
+  }
+
+  .modal-descripcion {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .modal-fechas p {
+    font-size: 14px;
+    margin: 4px 0;
+  }
+
+  .modal-comisiones {
+    margin-top: 20px;
+  }
+
+  .modal-comisiones h2 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: #1e8449;
+  }
+
+  .comisiones-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+  }
+
+  .comisiones-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .comisiones-table td:first-child {
+    text-align: left;
+  }
+
+  .comisiones-table .monto {
+    text-align: right;
+    font-weight: 500;
+  }
+
+  .comisiones-table .comision-total td {
+    border-top: 2px solid #444;
+    font-weight: bold;
+  }
+
+  @media (max-width: 768px) {
+    .modal-body {
+      flex-direction: column;
+    }
+  }
