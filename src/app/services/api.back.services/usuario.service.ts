@@ -10,6 +10,7 @@ import { UsuarioCatalogoDTO } from 'src/app/models/DTOs/UsuarioCatalogoDTO';
 import { UsuarioEditDTO } from 'src/app/models/DTOs/UsuarioEditDTO';
 import { Empresa } from 'src/app/models/Empresa';
 import { CelulaDisplay, CelulaNode } from 'src/app/pages/celulas/celulas.page';
+import { UsuarioDTO } from 'src/app/pages/registro/registro.page';
 
 @Injectable({
   providedIn: 'root',
@@ -33,7 +34,23 @@ export class UsuarioService {
     return this.http.post<GenericResponseDTO<string>>(url, user, options);
   }
 
-  getCelulaFromHere(embajadorId:number): Observable<CelulaDisplay> {
+  GetDatosInvitacion(codigo: string): Observable<InvitacionDTO> {
+    return this.http.get<InvitacionDTO>(`${this.apiUrl}/GetDatosInvitacion?codigo=${codigo}`);
+  }
+
+  RegistroUsuarioCodigoInvitacion(user: UsuarioDTO, skipErrorHandler = false): Observable<GenericResponseDTO<boolean>> {
+    let headers = new HttpHeaders();
+
+    if (skipErrorHandler) {
+      headers = headers.set('skipErrorHandler', 'true');
+    }
+    const options = { headers };
+
+    return this.http.post<GenericResponseDTO<boolean>>(`${this.apiUrl}/RegistroUsuarioCodigoInvitacion`, user, options);
+  }
+
+
+  getCelulaFromHere(embajadorId: number): Observable<CelulaDisplay> {
     return this.http.get<CelulaDisplay>(`${environment.apiUrl}api/Embajadores/getCelulaFromHere?embajadorBase=` + embajadorId);
   }
 
@@ -47,7 +64,7 @@ export class UsuarioService {
     return this.http.get<GenericResponseDTO<Usuario>>(`${this.apiUrl}/GetUsuarioLogeado`, options);
   }
 
-   getEmbajadorPorCorreo(correo:string): Observable<UsuarioBasico> {
+  getEmbajadorPorCorreo(correo: string): Observable<UsuarioBasico> {
     return this.http.get<UsuarioBasico>(`${this.apiUrl}/getEmbajadorPorCorreo?correo=` + correo);
   }
 
@@ -78,15 +95,23 @@ export class UsuarioService {
     return this.http.get<GenericResponseDTO<UsuarioEditDTO>>(`${this.apiUrl}/GetUserByID`, { params: parameters });
   }
 
-   getEmpresaByUsuario(id: number): Observable<GenericResponseDTO<Empresa>> {
+  getEmpresaByUsuario(id: number): Observable<GenericResponseDTO<Empresa>> {
     let parameters = {
       usuarioID: id,
     }
     return this.http.get<GenericResponseDTO<Empresa>>(`${this.apiUrl}/GetEmpresaUsuario`, { params: parameters });
   }
-  
+
   save(model: UsuarioEditDTO): Observable<GenericResponseDTO<boolean>> {
     return this.http.post<GenericResponseDTO<boolean>>(`${this.apiUrl}/Save`, model);
   }
 
+}
+
+export interface InvitacionDTO {
+  vigente: boolean;
+  codigo: string;
+  nombreInvitador: string;
+  correoElectronicoInvitacion: string;
+  embajadorReferenteId: number;
 }

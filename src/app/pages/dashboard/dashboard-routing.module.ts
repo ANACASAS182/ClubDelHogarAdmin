@@ -71,7 +71,12 @@ const routes: Routes = [
         path: 'corte',
         loadChildren: () => import('../corte-mensual/corte-mensual.module').then(m => m.CorteMensualPageModule),
         canActivate: [AdminGuard]
-      }
+      },
+      {
+        path: 'corteMensual',
+        loadChildren: () => import('../corte-mensual/corte-mensual.module').then(m => m.CorteMensualPageModule),
+        canActivate: [AdminGuard]
+      },
     ]
   }
 ];

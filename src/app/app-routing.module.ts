@@ -17,6 +17,16 @@ const routes: Routes = [
     canActivate: [NoAuthGuard],
   },
   {
+    path: 'registro',
+    loadChildren: () => import('./pages/registro/registro.module').then(m => m.RegistroPageModule),
+    runGuardsAndResolvers: 'always'
+  },
+  {
+    path: 'registro/:codigo',
+    loadChildren: () => import('./pages/registro/registro.module').then(m => m.RegistroPageModule),
+    runGuardsAndResolvers: 'always'
+  },
+  {
     path: 'dashboard',
     loadChildren: () => import('./pages/dashboard/dashboard.module').then(m => m.DashboardPageModule),
     canActivate: [AuthGuard],
@@ -24,10 +34,9 @@ const routes: Routes = [
     resolve: {
       resolverData: DashboardResolver
     }
-  },  {
-    path: 'corte-mensual',
-    loadChildren: () => import('./pages/corte-mensual/corte-mensual.module').then( m => m.CorteMensualPageModule)
-  }
+  },
+
+
 
 ];
 

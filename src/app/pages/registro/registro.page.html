@@ -1,0 +1,44 @@
+<div class="registro-container" *ngIf="!registroExitoso; else mensajeExito">
+  <h1>Embassy te da la bienvenida</h1>
+
+  <p><strong>Fuiste invitado por:</strong> {{ usuarioInvita }}</p>
+
+  <div class="codigo-invitacion">
+    <small><strong>Código de invitación:</strong> {{ codigoInvitacion }}</small>
+  </div>
+
+  <div class="form-group">
+    <ion-input class="inputForm" label-placement="floating" label="Correo electrónico" type="email" id="email" [value]="email" disabled></ion-input>
+  </div>
+
+  <div class="form-group">
+    <ion-input class="inputForm" label-placement="floating" label="Ingresa tu contraseña" type="password" id="password" [(ngModel)]="password"></ion-input>
+  </div>
+
+  <div class="form-group">
+    <ion-input class="inputForm" label-placement="floating" label="Confirmar contraseña" type="password" id="confirmPassword" [(ngModel)]="confirmPassword"></ion-input>
+  </div>
+
+  <div class="form-group checkbox-group">
+    <input type="checkbox" id="terminos" [(ngModel)]="aceptaTerminos" />
+    <label for="terminos">Aceptar <a href="#">términos y condiciones</a></label>
+  </div>
+
+  <button (click)="registrarUsuario()" [disabled]="!formularioValido()">Registrarme</button>
+</div>
+
+<ng-template #mensajeExito>
+  <div class="registro-exitoso">
+    <h2>Tu cuenta ha sido creada</h2>
+    <p>Descarga la aplicación de Embassy para acceder a tu cuenta y comenzar a generar ingresos.</p>
+
+    <div class="app-links">
+      <a href="https://play.google.com/store/apps/details?id=com.embassybusiness.app" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" />
+      </a>
+      <a href="https://apps.apple.com/mx/app/embassy/id6747898144" target="_blank">
+        <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store" />
+      </a>
+    </div>
+  </div>
+</ng-template>
