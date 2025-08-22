@@ -4,148 +4,121 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>
-      <h1><ion-icon name="grid" color="white"></ion-icon> Células</h1>
+      <h1><ion-icon name="grid" color="white"></ion-icon> Empresas </h1>
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <style>
-  .contenido {
-    opacity: 0.5;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-    /* evita que el texto interfiera con el hover */
+  :root {
+    --line: #94a3b8;            
+    --badge: #0ea5e9;           
+    --chip:  #22c55e;           
+    --text:  #ffffff;
   }
 
-  .contenidoContacto {
-    opacity: 0.0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-    /* evita que el texto interfiera con el hover */
-  }
+  .contenido { opacity: .6; transition: opacity .15s ease; pointer-events: none; }
+  .contenidoContacto { opacity: 0; transition: opacity .15s ease; pointer-events: none; }
+  .hover-group:hover .contenido, .hover-group:hover .contenidoContacto { opacity: 1; }
 
+  .zoomable { transition: transform .15s ease, filter .15s ease; }
+  .hover-group:hover .zoomable { transform: translateY(-2px); filter: brightness(.98); cursor: pointer !important; }
 
-  .subcontenido {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-    /* evita que el texto interfiera con el hover */
-  }
-
-  .hover-group:hover .contenido {
-    opacity: 1;
-
-  }
-
-  .hover-group:hover .contenidoContacto {
-    opacity: 1;
-
-  }
-
-  .hover-subgroup:hover .subcontenido {
-    opacity: 1;
-
-  }
-
-  .zoomable {
-    transition: all 0.3s ease;
-  }
-
-  /*.zoomable:hover {*/
-  .hover-group:hover .zoomable {
-    width: 240px;
-    cursor: pointer !important;
-    fill: #023f3c;
-  }
-
-  .hoverable {
-    transition: all 0.3s ease;
-  }
-
-  /*.zoomable:hover {*/
-  .hover-group:hover .hoverable {
-    cursor: pointer !important;
-    fill: #023f3c;
-  }
-
-  .expandible {
-    transition: all 0.3s ease;
-  }
-
-  .expandible:hover {
-    width: 240px;
-    height: 240px;
-    fill: #023f3c;
-    cursor: pointer !important;
-  }
+  .hoverable { transition: filter .15s ease; }
+  .hover-group:hover .hoverable { filter: brightness(.95); cursor: pointer !important; }
 </style>
 
-
-
 <ion-content>
+  <svg #svgRef class="org-svg"
+       [attr.width]="canvasWidth"
+       [attr.height]="canvasHeight"
+       [attr.viewBox]="'0 0 ' + canvasWidth + ' ' + canvasHeight">
 
+       <defs>
+        <!-- Sombras suaves -->
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.25"/>
+        </filter>
 
+        <!-- Gradientes -->
+        <linearGradient id="gradRoot" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#10b981"/> <!-- emerald-500 -->
+          <stop offset="100%" stop-color="#34d399"/> <!-- emerald-400 -->
+        </linearGradient>
 
-  <svg #svgRef class="org-svg">
+        <linearGradient id="gradAdmin" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#16a34a"/> <!-- green-600 -->
+          <stop offset="100%" stop-color="#22c55e"/> <!-- green-500 -->
+        </linearGradient>
 
-
-
+        <linearGradient id="gradEmpresa" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#2563eb"/> <!-- indigo-600 -->
+          <stop offset="100%" stop-color="#60a5fa"/> <!-- indigo-300 -->
+        </linearGradient>
+      </defs>
 
     <g [attr.transform]="transform">
 
+      <!-- home -->
       <g class="hover-group" (click)="nivelSuperior(0)" *ngIf="baseNode.usuarioId != 0">
-        <rect [attr.x]="baseNode.x - 80" [attr.y]="baseNode.y" width="30" height="30" fill="#4CAF50" rx="4" ry="4"
-          class="hoverable" />
-          <text [attr.x]="baseNode.x - 80 " [attr.y]="baseNode.y + 20" font-size="18" text-anchor="start"
-          fill="white" class="contenido">🏠</text>
+        <rect [attr.x]="baseNode.x - 80" [attr.y]="baseNode.y" width="30" height="30" fill="#4CAF50" rx="4" ry="4" class="hoverable"/>
+        <text [attr.x]="baseNode.x - 80" [attr.y]="baseNode.y + 20" font-size="18" text-anchor="start" fill="white" class="contenido">🏠</text>
       </g>
 
+      <!-- subir -->
       <g class="hover-group" (click)="nivelSuperior(baseNode.parentId)" *ngIf="baseNode.parentId > 0">
-        <rect [attr.x]="baseNode.x - 40" [attr.y]="baseNode.y" width="30" height="30" fill="#4CAF50" rx="4" ry="4"
-          class="hoverable" />
-          <text [attr.x]="baseNode.x - 40" [attr.y]="baseNode.y + 20" font-size="18" text-anchor="start"
-          fill="white" class="contenido">⬆️</text>
+        <rect [attr.x]="baseNode.x - 40" [attr.y]="baseNode.y" width="30" height="30" fill="#4CAF50" rx="4" ry="4" class="hoverable"/>
+        <text [attr.x]="baseNode.x - 40" [attr.y]="baseNode.y + 20" font-size="18" text-anchor="start" fill="white" class="contenido">⬆️</text>
       </g>
 
-      <!-- Nodo principal -->
+      <!-- raiz -->
       <g class="hover-group" (click)="onRectClick(0)">
-        <rect [attr.x]="baseNode.x" [attr.y]="baseNode.y" width="180" height="60" fill="#4CAF50" rx="4" ry="4"
-          class="zoomable" />
-        <text [attr.x]="baseNode.x + nodeTextLeftPadding" [attr.y]="baseNode.y + 25" font-size="18" text-anchor="start"
-          fill="white" class="contenido">{{baseNode.nombre}}</text>
-        <text [attr.x]="baseNode.x + nodeTextLeftPadding" [attr.y]="baseNode.y + 40" font-size="12" text-anchor="start"
-          fill="white" class="contenidoContacto">{{baseNode.contacto}}</text>
+        <rect [attr.x]="baseNode.x" [attr.y]="baseNode.y"
+        [attr.width]="baseNode.w" [attr.height]="baseNode.h"
+        [attr.fill]="gradientFor(undefined, true)" rx="8" ry="8"
+        filter="url(#shadow)" class="zoomable"/>
+        <text [attr.x]="baseNode.x + nodeTextLeftPadding" [attr.y]="baseNode.y + 25" font-size="18" text-anchor="start" fill="white" class="contenido">{{baseNode.nombre}}</text>
+        <text [attr.x]="baseNode.x + nodeTextLeftPadding" [attr.y]="baseNode.y + 40" font-size="12" text-anchor="start" fill="white" class="contenidoContacto">{{baseNode.contacto}}</text>
       </g>
 
-      <g class="hover-group" *ngFor="let node of precalculatedNodesReversed" (click)="onRectClick(node.usuarioId)">
+      <path *ngIf="busVerticalPath"    [attr.d]="busVerticalPath"    stroke-width="2" stroke="#444" fill="none" />
+      <path *ngIf="busHorizontalPath"  [attr.d]="busHorizontalPath"  stroke-width="2" stroke="#444" fill="none" />
 
-        <rect [attr.x]="node.x" [attr.y]="node.y" width="180" height="60" fill="#4CAF50" rx="4" ry="4"
-          class="zoomable" />
-        <text [attr.x]="node.x + nodeTextLeftPadding" [attr.y]="node.y + 25" font-size="18" text-anchor="start"
-          fill="white" class="contenido">{{node.nombre}}</text>
-        <text [attr.x]="node.x + nodeTextLeftPadding" [attr.y]="node.y + 40" font-size="12" text-anchor="start"
-          fill="white" class="contenidoContacto">{{node.contacto}}</text>
-        <path *ngIf="node.parent && node.nivel == 0" [attr.d]="node.ruta" stroke-width="2" stroke="#444" fill="none" />
-        <line *ngIf="node.parent && node.nivel == 1" [attr.x1]="node.x - 90" [attr.y1]="node.y + 30" [attr.x2]="node.x"
-          [attr.y2]="node.y + 30" stroke="#444" stroke-width="2" />
+      <!-- nodos -->
+      <g [ngClass]="{ 'hover-group': node.tipoNodo !== 'empresa' }"
+      *ngFor="let node of precalculatedNodesReversed"
+      (click)="onNodeClick(node)">
+        <path *ngIf="node.parent" [attr.d]="node.ruta" stroke-width="2" stroke="#444" fill="none" />
+        
+        <rect [attr.x]="node.x" [attr.y]="node.y"
+        [attr.width]="node.w" [attr.height]="node.h"
+        [attr.fill]="gradientFor(node)" rx="8" ry="8"
+        filter="url(#shadow)" class="zoomable"/>
+        <text [attr.x]="node.x + nodeTextLeftPadding" [attr.y]="node.y + 25" font-size="18" text-anchor="start" fill="white" class="contenido">{{node.nombre}}</text>
+        <text [attr.x]="node.x + nodeTextLeftPadding" [attr.y]="node.y + 40" font-size="12" text-anchor="start" fill="white" class="contenidoContacto">{{node.contacto}}</text>
 
-        <ng-container *ngIf="node.nivel > 0 && node.children!.length > 0" >
-          <!--sub children-->
-          <g class="hover-subgroup">
-            <rect [attr.x]="node.x + 160" [attr.y]="node.y + 70" width="20" height="20" fill="#4CAF50" rx="4" ry="4"
-              class="expandible" />
+        <!-- badge (embajadores) -->
+        <g *ngIf="node.nivel == 1 && node.childrenCount > 0">
+          <rect [attr.x]="node.x + node.w - 22" [attr.y]="node.y + 4" rx="8" ry="8" width="18" height="18" fill="#2e7d32"></rect>
+          <text [attr.x]="node.x + node.w - 13" [attr.y]="node.y + 17" font-size="12" text-anchor="middle" fill="white">
+            {{ node.childrenCount }}
+          </text>
+        </g>
 
-            <text *ngFor="let ch of node.children; let i = index" [attr.x]="node.x + nodeTextLeftPadding + 160"
-              [attr.y]="node.y + (25 * ( 1 + i)) + 70" font-size="14" text-anchor="start" fill="white"
-              class="subcontenido">{{ch}}</text>
-
-
-          </g>
-        </ng-container>
+        <!-- chips de embajadores -->
+        <g *ngIf="node.nivel == 1 && node.childrenPreview.length">
+          <ng-container *ngFor="let ch of node.childrenPreview; let i = index">
+            <rect [attr.x]="node.x + 10 + (i * 22)" [attr.y]="node.y + node.h + 2" width="18" height="8" rx="4" ry="4" fill="#4CAF50"></rect>
+          </ng-container>
+          <text *ngIf="node.childrenCount > 4"
+                [attr.x]="node.x + 10 + (4 * 22) + 10"
+                [attr.y]="node.y + node.h + 9"
+                font-size="10" text-anchor="start" fill="#444">
+            +{{ node.childrenCount - 4 }}
+          </text>
+        </g>
       </g>
-
 
     </g>
   </svg>
-
 </ion-content>

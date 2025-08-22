@@ -1,6 +1,5 @@
 <ion-content>
   <ion-split-pane contentId="main-content">
-    <!---->
     <ion-menu class="custom-menu" contentId="main-content" type="overlay">
       <ion-content>
         <ion-list id="inbox-list">
@@ -9,24 +8,68 @@
             <img src="../../../assets/logo.PNG" alt="Logo" class="logo" />
           </ion-menu-toggle>
 
-
           @for (p of appPages; track p; let i = $index) {
-          <ion-menu-toggle auto-hide="false">
-            @if(p.visible){
-            <ion-item routerDirection="root" [routerLink]="p.url" lines="none" detail="false"
-              routerLinkActive="selected">
-              <ion-icon color="white" aria-hidden="true" slot="start" [ios]="p.icon + '-outline'"
-                [md]="p.icon + '-sharp'"></ion-icon>
-              <ion-label>{{ p.title }}</ion-label>
-            </ion-item>
+
+            <ion-menu-toggle auto-hide="false">
+              @if (p.visible && p.enum !== MenuPagesEnum.Celulas) {
+                <ion-item
+                  routerDirection="root"
+                  [routerLink]="p.url"
+                  lines="none"
+                  detail="false"
+                  routerLinkActive="selected"
+                >
+                  <ion-icon
+                    color="white"
+                    aria-hidden="true"
+                    slot="start"
+                    [ios]="p.icon + '-outline'"
+                    [md]="p.icon + '-sharp'">
+                  </ion-icon>
+                  <ion-label>{{ p.title }}</ion-label>
+                </ion-item>
+              }
+            </ion-menu-toggle>
+
+            @if (p.visible && p.enum === MenuPagesEnum.Referencias && celulasVisible) {
+              <ion-accordion-group class="menu-accordion">
+                <ion-accordion value="celulas">
+                  <ion-item slot="header" lines="none" detail="false" class="celulas-header">
+                    <ion-icon slot="start" color="white" [ios]="'grid-outline'" [md]="'grid-sharp'"></ion-icon>
+                    <ion-label>Células</ion-label>
+                  </ion-item>
+
+                  <div slot="content" class="submenu">
+                    <ion-menu-toggle auto-hide="false">
+                      <ion-item
+                        lines="none"
+                        detail="false"
+                        routerDirection="root"
+                        [routerLink]="['/dashboard/celulas']"
+                        [queryParams]="{ view: 'empresa' }">
+                        <ion-label>Empresa</ion-label>
+                      </ion-item>
+                    </ion-menu-toggle>
+
+                    <ion-menu-toggle auto-hide="false">
+                      <ion-item
+                        lines="none"
+                        detail="false"
+                        routerDirection="root"
+                        [routerLink]="['/dashboard/embajadores-diagrama']">
+                        <ion-label>Embajadores</ion-label>
+                      </ion-item>
+                    </ion-menu-toggle>
+                  </div>
+                </ion-accordion>
+              </ion-accordion-group>
             }
-          </ion-menu-toggle>
           }
 
           <div class="menu-separator"></div>
 
           <ion-menu-toggle auto-hide="false" style="margin-bottom: 100px;">
-            <span class="name-text">{{userName}}</span>
+            <span class="name-text">{{ userName }}</span>
           </ion-menu-toggle>
 
           <div style="height: 10px;"></div>
@@ -40,11 +83,10 @@
             </div>
           </ion-menu-toggle>
         </ion-list>
-
       </ion-content>
     </ion-menu>
 
-    <!--Panel derecho contenido-->
+    <!-- Panel derecho -->
     <div class="ion-page" id="main-content">
       <ion-content>
         <ion-router-outlet></ion-router-outlet>
@@ -52,3 +94,13 @@
     </div>
   </ion-split-pane>
 </ion-content>
+
+<style>
+  .menu-accordion .ion-accordion-toggle-icon,
+  .menu-accordion ion-accordion::part(toggle-icon) {
+    display: none !important;
+  }
+  .celulas-header ion-icon {
+    color: #fff !important;
+  }
+</style>

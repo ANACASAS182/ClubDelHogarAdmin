@@ -1,44 +1,126 @@
-<div class="registro-container" *ngIf="!registroExitoso; else mensajeExito">
-  <h1>Embassy te da la bienvenida</h1>
+<ion-content [fullscreen]="true">
+  <div class="registro-scroll">
 
-  <p><strong>Fuiste invitado por:</strong> {{ usuarioInvita }}</p>
+    <!-- Muestra el formulario solo si NO hay registro exitoso -->
+    <ng-container *ngIf="!registroExitoso; else mensajeExito">
+      <div class="registro-container">
+        <h1>Embassy te da la bienvenida</h1>
 
-  <div class="codigo-invitacion">
-    <small><strong>Código de invitación:</strong> {{ codigoInvitacion }}</small>
+        <p><strong>Fuiste invitado por:</strong> {{ usuarioInvita }}</p>
+
+        <div class="codigo-invitacion">
+          <small><strong>Código de invitación:</strong> {{ codigoInvitacion }}</small>
+        </div>
+
+        <div class="form-group">
+          <ion-input class="inputForm" label-placement="floating" label="Correo electrónico"
+                     type="email" id="email" [value]="email" disabled></ion-input>
+        </div>
+
+        <div class="form-group">
+          <ion-input class="inputForm" label-placement="floating" label="Nombre"
+                     type="text" id="nombres" [(ngModel)]="nombres"></ion-input>
+        </div>
+
+        <div class="form-group">
+          <ion-input class="inputForm" label-placement="floating" label="Apellido"
+                     type="text" id="apellidos" [(ngModel)]="apellidos"></ion-input>
+        </div>
+
+        <div class="form-group">
+          <ion-input class="inputForm" label-placement="floating" label="Celular"
+                     type="tel" inputmode="tel" id="celular" [(ngModel)]="celular"></ion-input>
+        </div>
+
+        <div class="form-group">
+          <h3 style="margin:16px 0 6px;">Ubicación</h3>
+        </div>
+
+        <!-- País -->
+        <div class="form-group">
+          <ion-searchbar placeholder="Buscar país..." debounce="150"
+                         (ionInput)="onPaisSearch($event)">
+          </ion-searchbar>
+
+          <ion-select class="inputForm"
+                      label="País"
+                      label-placement="floating"
+                      interface="popover"
+                      placeholder="Selecciona un país"
+                      [(ngModel)]="paisCodigo"
+                      (ionChange)="onPaisChange($event)">
+            <ion-select-option *ngFor="let p of paisesFiltrados" [value]="p.codigo">
+              {{ p.descripcion }} ({{ p.codigo }})
+            </ion-select-option>
+          </ion-select>
+        </div>
+
+        <!-- Estado (solo MEX) -->
+        <div class="form-group">
+          <ion-select class="inputForm"
+                      label="Estado / Provincia"
+                      label-placement="floating"
+                      interface="popover"
+                      placeholder="Selecciona un estado"
+                      [disabled]="paisCodigo !== 'MEX' || estadosFiltrados.length === 0"
+                      [(ngModel)]="estadoCodigo">
+            <ion-select-option *ngFor="let e of estadosFiltrados" [value]="e.codigo">
+              {{ e.nombre }} ({{ e.codigo }})
+            </ion-select-option>
+          </ion-select>
+
+          <small *ngIf="paisCodigo && paisCodigo !== 'MEX'">
+            Por ahora solo se listan estados de México. Puedes continuar sin seleccionar estado.
+          </small>
+        </div>
+
+        <!-- Ciudad -->
+        <div class="form-group">
+          <ion-input class="inputForm"
+                     label-placement="floating"
+                     label="Ciudad"
+                     type="text"
+                     id="ciudad"
+                     [(ngModel)]="ciudad"
+                     placeholder="Ej. Juárez">
+          </ion-input>
+        </div>
+
+        <div class="form-group">
+          <ion-input class="inputForm" label-placement="floating" label="Ingresa tu contraseña"
+                     type="password" id="password" [(ngModel)]="password"></ion-input>
+        </div>
+
+        <div class="form-group">
+          <ion-input class="inputForm" label-placement="floating" label="Confirmar contraseña"
+                     type="password" id="confirmPassword" [(ngModel)]="confirmPassword"></ion-input>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="terminos" [(ngModel)]="aceptaTerminos" />
+          <label for="terminos">Aceptar <a href="#">términos y condiciones</a></label>
+        </div>
+
+        <button (click)="registrarUsuario()" [disabled]="!formularioValido()">Registrarme</button>
+      </div>
+    </ng-container>
+
+    <!-- Cuadro verde de éxito -->
+    <ng-template #mensajeExito>
+      <div class="registro-exitoso">
+        <h2>Tu cuenta ha sido creada</h2>
+        <p>Descarga la aplicación de Embassy para acceder a tu cuenta y comenzar a generar ingresos.</p>
+
+        <div class="app-links">
+          <a href="https://play.google.com/store/apps/details?id=com.embassybusiness.app" target="_blank">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" />
+          </a>
+          <a href="https://apps.apple.com/mx/app/embassy/id6747898144" target="_blank">
+            <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store" />
+          </a>
+        </div>
+      </div>
+    </ng-template>
+
   </div>
-
-  <div class="form-group">
-    <ion-input class="inputForm" label-placement="floating" label="Correo electrónico" type="email" id="email" [value]="email" disabled></ion-input>
-  </div>
-
-  <div class="form-group">
-    <ion-input class="inputForm" label-placement="floating" label="Ingresa tu contraseña" type="password" id="password" [(ngModel)]="password"></ion-input>
-  </div>
-
-  <div class="form-group">
-    <ion-input class="inputForm" label-placement="floating" label="Confirmar contraseña" type="password" id="confirmPassword" [(ngModel)]="confirmPassword"></ion-input>
-  </div>
-
-  <div class="form-group checkbox-group">
-    <input type="checkbox" id="terminos" [(ngModel)]="aceptaTerminos" />
-    <label for="terminos">Aceptar <a href="#">términos y condiciones</a></label>
-  </div>
-
-  <button (click)="registrarUsuario()" [disabled]="!formularioValido()">Registrarme</button>
-</div>
-
-<ng-template #mensajeExito>
-  <div class="registro-exitoso">
-    <h2>Tu cuenta ha sido creada</h2>
-    <p>Descarga la aplicación de Embassy para acceder a tu cuenta y comenzar a generar ingresos.</p>
-
-    <div class="app-links">
-      <a href="https://play.google.com/store/apps/details?id=com.embassybusiness.app" target="_blank">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" />
-      </a>
-      <a href="https://apps.apple.com/mx/app/embassy/id6747898144" target="_blank">
-        <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="App Store" />
-      </a>
-    </div>
-  </div>
-</ng-template>
+</ion-content>

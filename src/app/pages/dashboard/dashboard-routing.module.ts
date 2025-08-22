@@ -77,6 +77,12 @@ const routes: Routes = [
         loadChildren: () => import('../corte-mensual/corte-mensual.module').then(m => m.CorteMensualPageModule),
         canActivate: [AdminGuard]
       },
+      {
+        path: 'embajadores-diagrama',
+        loadChildren: () =>
+          import('../embajadores-diagrama/embajadores-diagrama.module')
+            .then(m => m.EmbajadoresDiagramaModule)
+      }
     ]
   }
 ];
