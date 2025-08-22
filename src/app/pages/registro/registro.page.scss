@@ -85,3 +85,18 @@ button:disabled {
     justify-content: center;
   }
 }
+
+.registro-scroll {
+  height: 100%;
+  overflow-y: auto;            /* barra de scroll vertical */
+  box-sizing: border-box;
+  padding: 24px 16px 40px;  
+}
+
+
+.registro-container,
+.registro-exitoso {
+  max-width: 520px;
+  margin: 0 auto;
+}
+

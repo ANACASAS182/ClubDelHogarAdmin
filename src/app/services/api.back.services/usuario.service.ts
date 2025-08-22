@@ -106,6 +106,10 @@ export class UsuarioService {
     return this.http.post<GenericResponseDTO<boolean>>(`${this.apiUrl}/Save`, model);
   }
 
+  getArbolEmbajadores(baseId: number): Observable<any> {
+  return this.http.get<any>(`${environment.apiUrl}api/Embajadores/getArbolEmbajadores?baseId=${baseId}`);
+}
+
 }
 
 export interface InvitacionDTO {

@@ -1,0 +1,120 @@
+<ion-header class="pagesHeader">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <h1><ion-icon name="flag" color="white"></ion-icon> Embajadores</h1>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<style>
+  :root { --line: #94a3b8; } /* mismo gris de la 2da imagen */
+
+  .contenido      { opacity:.6; pointer-events:none; transition:opacity .15s ease; }
+  .contenido2     { opacity:0;  pointer-events:none; transition:opacity .15s ease; }
+  .mini-group:hover .contenido,
+  .mini-group:hover .contenido2 { opacity:1; }
+
+  .mini-rect { transition:transform .15s ease, filter .15s ease; }
+  .mini-group:hover .mini-rect { transform: translateY(-2px); filter: brightness(.98); }
+
+  /* igual que en Células: usamos viewBox + tamaño explícito */
+  .org-svg { display:block; width:100%; height:auto; }
+</style>
+
+<ion-content>
+  <svg #svgRef class="org-svg"
+       [attr.width]="miniWidth"
+       [attr.height]="miniHeight"
+       [attr.viewBox]="'0 0 ' + miniWidth + ' ' + miniHeight">
+
+    <defs>
+      <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.25"/>
+      </filter>
+
+      <!-- gradientes idénticos a la 2da imagen -->
+      <linearGradient id="gradRoot" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stop-color="#10b981"/> <!-- emerald-500 -->
+        <stop offset="100%" stop-color="#34d399"/> <!-- emerald-400 -->
+      </linearGradient>
+      <linearGradient id="gradN2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stop-color="#16a34a"/> <!-- green-600 -->
+        <stop offset="100%" stop-color="#22c55e"/> <!-- green-500 -->
+      </linearGradient>
+      <linearGradient id="gradN3" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stop-color="#2563eb"/>
+        <stop offset="100%" stop-color="#60a5fa"/>
+      </linearGradient>
+    </defs>
+
+    <g [attr.transform]="transform">
+
+      <!-- Home / Up con el mismo verde -->
+      <g *ngIf="rootNode?.usuarioId !== 0" class="mini-group" (click)="goHome()">
+        <rect [attr.x]="(rootNode?.x||0) - 80" [attr.y]="rootNode?.y"
+              width="30" height="30" fill="url(#gradN2)" rx="4" ry="4" filter="url(#shadow)"/>
+        <text [attr.x]="(rootNode?.x||0) - 65" [attr.y]="(rootNode?.y||0) + 21"
+              font-size="16" fill="#fff" text-anchor="middle">🏠</text>
+      </g>
+      <g *ngIf="(rootNode?.parentId||0) > 0" class="mini-group" (click)="goUp()">
+        <rect [attr.x]="(rootNode?.x||0) - 40" [attr.y]="rootNode?.y"
+              width="30" height="30" fill="url(#gradN2)" rx="4" ry="4" filter="url(#shadow)"/>
+        <text [attr.x]="(rootNode?.x||0) - 25" [attr.y]="(rootNode?.y||0) + 21"
+              font-size="16" fill="#fff" text-anchor="middle">⬆️</text>
+      </g>
+
+      <!-- CONECTORES -->
+      <path *ngIf="busVerticalPath"   [attr.d]="busVerticalPath"   class="link"/>
+      <path *ngIf="busHorizontalPath" [attr.d]="busHorizontalPath" class="link"/>
+
+      <!-- piernas bus -> N2 -->
+      <ng-container *ngFor="let n of n2Nodes">
+        <path *ngIf="n.rutaDesdeBus" [attr.d]="n.rutaDesdeBus" class="link"/>
+      </ng-container>
+
+      <!-- piernas padre -> N3 -->
+      <ng-container *ngFor="let c of n3Nodes">
+        <path *ngIf="c.rutaDesdePadre" [attr.d]="c.rutaDesdePadre" class="link"/>
+      </ng-container>
+
+      <!-- RAÍZ -->
+      <g *ngIf="rootNode" class="mini-group">
+        <rect class="mini-rect" filter="url(#shadow)"
+              [attr.x]="rootNode.x" [attr.y]="rootNode.y"
+              [attr.width]="rootNode.w" [attr.height]="rootNode.h"
+              fill="url(#gradRoot)" rx="8" ry="8"/>
+        <text class="contenido"  fill="#fff" font-size="18"
+              [attr.x]="rootNode.x + 16" [attr.y]="rootNode.y + 25">{{ rootNode.nombre }}</text>
+        <text class="contenido2" fill="#fff" font-size="12"
+              [attr.x]="rootNode.x + 16" [attr.y]="rootNode.y + 42">{{ rootNode.contacto }}</text>
+      </g>
+
+      <!-- NIVEL 2 (verde) -->
+      <g *ngFor="let n of n2Nodes" class="mini-group" (click)="onN2Click(n)">
+        <rect class="mini-rect" filter="url(#shadow)"
+              [attr.x]="n.x" [attr.y]="n.y"
+              [attr.width]="n.w" [attr.height]="n.h"
+              fill="url(#gradN2)" rx="8" ry="8"/>
+        <text class="contenido"  fill="#fff" font-size="16"
+              [attr.x]="n.x + 16" [attr.y]="n.y + 24">{{ n.nombre }}</text>
+        <text class="contenido2" fill="#fff" font-size="12"
+              [attr.x]="n.x + 16" [attr.y]="n.y + 40">{{ n.contacto }}</text>
+      </g>
+
+      <!-- NIVEL 3 (azul) -->
+      <g *ngFor="let c of n3Nodes" class="mini-group">
+        <rect class="mini-rect" filter="url(#shadow)"
+              [attr.x]="c.x" [attr.y]="c.y"
+              [attr.width]="c.w" [attr.height]="c.h"
+              fill="url(#gradN3)" rx="8" ry="8"/>
+        <text class="contenido"  fill="#fff" font-size="16"
+              [attr.x]="c.x + 16" [attr.y]="c.y + 24">{{ c.nombre }}</text>
+        <text class="contenido2" fill="#fff" font-size="12"
+              [attr.x]="c.x + 16" [attr.y]="c.y + 40">{{ c.contacto }}</text>
+      </g>
+    </g>
+  </svg>
+</ion-content>

@@ -1,0 +1,45 @@
+.org-svg {
+  width: 100%;
+  height: calc(100vh - 112px); /* ajusta según tu header */
+  display: block;
+}
+.pagesHeader { --background: var(--ion-color-dark); }
+
+/* Paleta para igualar a la 2da imagen */
+:root {
+  --green-top:   #16a34a; /* green-600 */
+  --green-bot:   #22c55e; /* green-500 */
+}
+
+/* Botón AGREGAR con el mismo verde (gradiente) */
+.customGreenButton {
+  --background: linear-gradient(180deg, var(--green-top), var(--green-bot));
+  --background-hover: linear-gradient(180deg, #15803d, var(--green-top));
+  --background-activated: linear-gradient(180deg, #15803d, var(--green-top));
+  --box-shadow: 0 4px 10px rgba(0,0,0,.18);
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* Header del card “Empresas” con el mismo verde (gradiente) */
+.referidosHeader {
+  background: linear-gradient(180deg, var(--green-top), var(--green-bot));
+  color: #fff;
+
+  .title, ion-card-title, h2, h3 { color:#fff !important; }
+}
+
+/* (Opcional) resaltar inputs para que combinen sutilmente */
+.inputBusqueda {
+  --border-color: rgba(34, 197, 94, .35);
+  --highlight-color-focused: var(--green-bot);
+  --highlight-color-valid: var(--green-bot);
+  border-radius:12px;
+}
+
+.link {
+  stroke: #090909; 
+  stroke-width: 2;
+  fill: none;
+}

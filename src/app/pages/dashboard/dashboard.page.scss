@@ -29,3 +29,9 @@
   margin: 0 10px;
   justify-content: center;
 }
+
+.menu-accordion {
+  .submenu {
+    padding-left: 44px; // alinea con el icono del padre
+  }
+}
