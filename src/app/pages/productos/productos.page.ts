@@ -226,7 +226,7 @@ export class ProductosPage implements OnInit, AfterViewInit, OnDestroy {
   async addModal() {
     const modal = await this.modalCtrl.create({
       component: ModalProductoFormComponent,
-      cssClass: 'modal-empresa'
+      cssClass: 'modal-xl',
     });
 
     await modal.present();

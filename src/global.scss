@@ -255,10 +255,10 @@ ion-menu.custom-menu {
   width: 100% !important;
 }
 
-.modal-wrapper{
+/*.modal-wrapper{
   height: 720px !important;
   max-height: 720px !important;
-}
+}*/
 
 
 .row_clickable{
@@ -269,4 +269,46 @@ ion-menu.custom-menu {
     background-color: #b0c6cf;
     transition: 0.2s;
     cursor: pointer;
+}
+
+/* Modal grande */
+ion-modal.modal-xl {
+  --width: clamp(900px, 96vw, 1200px);
+  --height: 55vh;           /*altura fija del modal */
+  --border-radius: 14px;
+}
+
+/* Aplica las vars al host interno del modal */
+ion-modal.modal-xl::part(content) {
+  width: var(--width);
+  height: var(--height);    /* nada de auto aquí */
+}
+
+/* (Opcional) header y footer pegados */
+ion-modal.modal-xl ion-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--ion-color-step-50, #fff);
+}
+ion-modal.modal-xl ion-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  background: var(--ion-color-step-50, #fff);
+  border-top: 1px solid rgba(0,0,0,.06);
+}
+
+/* El scroll va en el contenido */
+ion-modal.modal-xl ion-content {
+  height: 100%;
+  --padding-bottom: 16px;
+}
+
+/* Ancho cómodo del grid */
+ion-modal.modal-xl .modalform,
+ion-modal.modal-xl ion-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
 }

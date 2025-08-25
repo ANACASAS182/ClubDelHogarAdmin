@@ -22,13 +22,26 @@
     margin: 0 10px;
 }
 
-.name-text{
+.name-text {
   color: white !important;
   font-weight: bold;
   font-size: 14px;
-  margin: 0 10px;
-  justify-content: center;
+  text-align: center;
+
+  white-space: nowrap;   // evita salto de línea
+  overflow: hidden;      // corta lo que sobra
+  text-overflow: ellipsis; // añade "..."
+  max-width: 100%;       // se ajusta al ancho del menú
 }
+
+.user-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 12px;       // deja respiración lateral
+  text-align: center;
+}
+
 
 .menu-accordion {
   .submenu {

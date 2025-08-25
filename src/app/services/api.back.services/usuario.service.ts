@@ -12,6 +12,15 @@ import { Empresa } from 'src/app/models/Empresa';
 import { CelulaDisplay, CelulaNode } from 'src/app/pages/celulas/celulas.page';
 import { UsuarioDTO } from 'src/app/pages/registro/registro.page';
 
+type GetUsuariosParams = {
+  page: number;
+  size: number;
+  sortBy: string;
+  sortDir: string;
+  searchQuery: string;
+  rolesId?: number | null; 
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -21,8 +30,8 @@ export class UsuarioService {
 
   constructor(private http: HttpClient) { }
 
-  login(user: LoginUsuarioDTO, skipErrorHandler = false): Observable<GenericResponseDTO<string>> {
-    let url = this.apiUrl + "/LoginPanelAdministrador";
+ login(user: LoginUsuarioDTO, skipErrorHandler = false): Observable<GenericResponseDTO<string>> {
+  let url = this.apiUrl + "/LoginPanelAdministrador";
 
     let headers = new HttpHeaders();
 
@@ -68,17 +77,25 @@ export class UsuarioService {
     return this.http.get<UsuarioBasico>(`${this.apiUrl}/getEmbajadorPorCorreo?correo=` + correo);
   }
 
-  getTablePaginated(params: { page: number, size: number, sortBy: string, sortDir: string, searchQuery: string }): Observable<GenericResponseDTO<PaginationModelDTO<UsuarioCatalogoDTO[]>>> {
+  getTablePaginated(params: GetUsuariosParams): Observable<GenericResponseDTO<PaginationModelDTO<UsuarioCatalogoDTO[]>>> {
 
-    let parameters = {
-      page: params.page.toString(),
-      size: params.size.toString(),
-      sortBy: params.sortBy,
-      sortDir: params.sortDir,
-      searchQuery: params.searchQuery
-    }
-    return this.http.get<GenericResponseDTO<PaginationModelDTO<UsuarioCatalogoDTO[]>>>(`${this.apiUrl}/GetUsuariosPaginated`, { params: parameters });
+  let parameters: any = {
+    page: params.page.toString(),
+    size: params.size.toString(),
+    sortBy: params.sortBy,
+    sortDir: params.sortDir,
+    searchQuery: params.searchQuery
+  };
+
+  if (params.rolesId !== undefined && params.rolesId !== null) {
+    parameters.rolesId = params.rolesId.toString();
   }
+
+  return this.http.get<GenericResponseDTO<PaginationModelDTO<UsuarioCatalogoDTO[]>>>(
+    `${this.apiUrl}/GetUsuariosPaginated`,
+    { params: parameters }
+  );
+}
 
 
   busquedaUsuario(searchQuery: string): Observable<GenericResponseDTO<UsuarioCatalogoDTO[]>> {
