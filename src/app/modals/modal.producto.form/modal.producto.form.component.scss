@@ -1,7 +1,21 @@
-.visible{
-    display: block;
+.inputForm {
+  width: 100%;
 }
 
-.invisible{
-    display: none;
+.custom-datepicker,
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+/* Que los botones del footer se acomoden mejor en pantallas chicas */
+:host ::ng-deep ion-footer .customButton {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Opcional: columnas 2x para niveles cuando hay espacio */
+@media (min-width: 768px) {
+  .niveles-2col ion-col[size="12"] {
+    --ion-grid-column-span: 6;
+  }
 }

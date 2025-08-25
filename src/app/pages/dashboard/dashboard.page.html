@@ -31,46 +31,48 @@
               }
             </ion-menu-toggle>
 
-            @if (p.visible && p.enum === MenuPagesEnum.Referencias && celulasVisible) {
-              <ion-accordion-group class="menu-accordion">
-                <ion-accordion value="celulas">
-                  <ion-item slot="header" lines="none" detail="false" class="celulas-header">
-                    <ion-icon slot="start" color="white" [ios]="'grid-outline'" [md]="'grid-sharp'"></ion-icon>
-                    <ion-label>Células</ion-label>
-                  </ion-item>
+            @if (p.visible && p.enum === MenuPagesEnum.Celulas) {
+            <ion-accordion-group class="menu-accordion">
+              <ion-accordion value="celulas">
+                <ion-item slot="header" lines="none" detail="false" class="celulas-header">
+                  <ion-icon slot="start" color="white" [ios]="'grid-outline'" [md]="'grid-sharp'"></ion-icon>
+                  <ion-label>Células</ion-label>
+                </ion-item>
 
-                  <div slot="content" class="submenu">
-                    <ion-menu-toggle auto-hide="false">
-                      <ion-item
-                        lines="none"
-                        detail="false"
-                        routerDirection="root"
-                        [routerLink]="['/dashboard/celulas']"
-                        [queryParams]="{ view: 'empresa' }">
-                        <ion-label>Empresa</ion-label>
-                      </ion-item>
-                    </ion-menu-toggle>
+                <div slot="content" class="submenu">
+                  <ion-menu-toggle auto-hide="false">
+                    <ion-item
+                      lines="none"
+                      detail="false"
+                      routerDirection="root"
+                      [routerLink]="['/dashboard/celulas']"
+                      [queryParams]="{ view: 'empresa' }">
+                      <ion-label>Empresa</ion-label>
+                    </ion-item>
+                  </ion-menu-toggle>
 
-                    <ion-menu-toggle auto-hide="false">
-                      <ion-item
-                        lines="none"
-                        detail="false"
-                        routerDirection="root"
-                        [routerLink]="['/dashboard/embajadores-diagrama']">
-                        <ion-label>Embajadores</ion-label>
-                      </ion-item>
-                    </ion-menu-toggle>
-                  </div>
-                </ion-accordion>
-              </ion-accordion-group>
-            }
+                  <ion-menu-toggle auto-hide="false">
+                    <ion-item
+                      lines="none"
+                      detail="false"
+                      routerDirection="root"
+                      [routerLink]="['/dashboard/embajadores-diagrama']">
+                      <ion-label>Embajadores</ion-label>
+                    </ion-item>
+                  </ion-menu-toggle>
+                </div>
+              </ion-accordion>
+            </ion-accordion-group>
+          }
           }
 
           <div class="menu-separator"></div>
 
           <ion-menu-toggle auto-hide="false" style="margin-bottom: 100px;">
-            <span class="name-text">{{ userName }}</span>
-          </ion-menu-toggle>
+          <div class="user-container">
+            <span class="name-text">Usuario: {{ userName }}</span>
+          </div>
+        </ion-menu-toggle>
 
           <div style="height: 10px;"></div>
 

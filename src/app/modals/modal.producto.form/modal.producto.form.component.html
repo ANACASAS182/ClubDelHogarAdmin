@@ -1,33 +1,33 @@
 <ion-header class="modalHeader">
   <ion-toolbar>
-    <ion-title>Agregar producto - {{pasoActual}}</ion-title>
+    <ion-title>Agregar producto - {{ pasoActual }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
-  <ion-buttons slot="end">
-    <ion-button (click)="close()">
-      <ion-icon name="close"></ion-icon>
-    </ion-button>
-  </ion-buttons>
 </ion-header>
 
-<ion-content class="ion-padding" [fullscreen]="false">
-
-  <ion-grid style="width: 100%;">
+<ion-content class="ion-padding" [fullscreen]="true">
+  <ion-grid style="width:100%;max-width:1100px;margin:0 auto;">
     <form [formGroup]="formulario" class="modalform">
-      <div [ngClass]="{'visible': estatusDatosbasicos == 1, 'invisible': estatusDatosbasicos == 0}">
+
+      <!-- PASO 1: Descripción -->
+       <ng-container *ngIf="estatusDatosbasicos == 1">
         <ion-row>
-          <!-- Nombre -->
           <ion-col size="8">
             <ion-input class="inputForm" label-placement="floating" label="Nombre del producto"
-              [class.invalid]="getControl('nombre')?.invalid && getControl('nombre')?.touched" formControlName="nombre"
-              placeholder="Nombre del producto" type="text" (ionBlur)="getControl('nombre')?.markAsTouched()">
+              [class.invalid]="getControl('nombre')?.invalid && getControl('nombre')?.touched"
+              formControlName="nombre" placeholder="Nombre del producto" type="text"
+              (ionBlur)="getControl('nombre')?.markAsTouched()">
             </ion-input>
             <ion-text color="danger" *ngIf="getControl('nombre')?.invalid && getControl('nombre')?.touched">
               Campo requerido
             </ion-text>
           </ion-col>
-          <ion-col size="4">
-            <!-- Fecha Vencimiento -->
 
+          <ion-col size="4">
             <mat-form-field appearance="fill" class="custom-datepicker">
               <mat-label>Fecha de vencimiento</mat-label>
               <input matInput [matDatepicker]="picker" formControlName="fechaVencimiento" />
@@ -39,15 +39,12 @@
               *ngIf="getControl('fechaVencimiento')?.invalid && getControl('fechaVencimiento')?.touched">
               Campo requerido
             </ion-text>
-            <!-- <ion-datetime label="Fecha Vencimiento" labelPlacement="floating" formControlName="fechaVencimiento"
-            presentation="date" prefer="modal">
-          </ion-datetime> -->
           </ion-col>
         </ion-row>
+
         <ion-row>
-          <!-- Descripción -->
           <ion-col size="12">
-            <ion-input class="inputForm" label-placement="floating" label="Descripción" formControlName="descripcion"
+            <ion-input class="inputForm" label-placement="floating" label="Descripción"
               placeholder="Descripción del producto" type="text"
               [class.invalid]="getControl('descripcion')?.invalid && getControl('descripcion')?.touched"
               formControlName="descripcion">
@@ -57,15 +54,15 @@
             </ion-text>
           </ion-col>
         </ion-row>
-        <ion-row>
-          <!--Empresa opcion admin-->
-          <ion-col size="12" *ngIf="mostrarEmpresas">
-            <ion-select [interfaceOptions]="{ header: 'Selecciona empresa'}" okText="Ok" cancelText="Cancelar"
+
+        <ion-row *ngIf="mostrarEmpresas">
+          <ion-col size="12">
+            <ion-select [interfaceOptions]="{ header: 'Selecciona empresa' }" okText="Ok" cancelText="Cancelar"
               class="inputForm" label-placement="floating" label="Empresa"
               [class.invalid]="getControl('empresa')?.invalid && getControl('empresa')?.touched"
               formControlName="empresa" (ionBlur)="getControl('empresa')?.markAsTouched()">
               <ion-select-option *ngFor="let item of empresas" [value]="item.id">
-                {{ item.rfc }} - {{ item.razonSocial}}
+                {{ item.rfc }} - {{ item.razonSocial }}
               </ion-select-option>
             </ion-select>
             <ion-text color="danger" *ngIf="getControl('empresa')?.invalid && getControl('empresa')?.touched">
@@ -73,15 +70,15 @@
             </ion-text>
           </ion-col>
         </ion-row>
-      </div>
-      <div [ngClass]="{'visible': estatusDatosComisiones == 1, 'invisible': estatusDatosComisiones == 0}">
+      </ng-container>
+      <!-- PASO 2: Comisiones -->
+      <ng-container *ngIf="estatusDatosComisiones == 1"> 
         <ion-row>
           <ion-col size="6">
-            <strong>Producto:</strong> {{nombreProductoAgregando}}
+            <strong>Producto:</strong> {{ nombreProductoAgregando }}
           </ion-col>
-          <!-- tipo comisión -->
           <ion-col size="6">
-            <ion-select [interfaceOptions]="{ header: 'Tipo de comision'}" class="inputForm" okText="Ok"
+            <ion-select [interfaceOptions]="{ header: 'Tipo de comision' }" class="inputForm" okText="Ok"
               cancelText="Cancelar" label-placement="floating" label="Tipo de comision"
               [class.invalid]="getControl('tipoComision')?.invalid && getControl('tipoComision')?.touched"
               formControlName="tipoComision" (ionChange)="onTipoComisionChange($event)"
@@ -90,16 +87,16 @@
                 {{ item.nombre }}
               </ion-select-option>
             </ion-select>
-            <ion-text color="danger" *ngIf="getControl('tipoComision')?.invalid && getControl('tipoComision')?.touched">
+            <ion-text color="danger"
+              *ngIf="getControl('tipoComision')?.invalid && getControl('tipoComision')?.touched">
               Campo requerido
             </ion-text>
           </ion-col>
         </ion-row>
-        <ion-row>
 
-          <!-- Sección: Niveles -->
-
-          <ion-col size="12">
+        <!-- Niveles (2 columnas en >= md) -->
+        <ion-row class="niveles">
+          <ion-col size="12" size-md="6">
             <ion-input class="inputForm" label-placement="floating" label="Nivel 1"
               [class.invalid]="getControl('nivel_1')?.invalid && getControl('nivel_1')?.touched"
               formControlName="nivel_1" placeholder="Nivel 1" type="number" min="0"
@@ -109,9 +106,8 @@
               Campo requerido
             </ion-text>
           </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col size="12">
+
+          <ion-col size="12" size-md="6">
             <ion-input class="inputForm" label-placement="floating" label="Nivel 2"
               [class.invalid]="getControl('nivel_2')?.invalid && getControl('nivel_2')?.touched"
               formControlName="nivel_2" placeholder="Nivel 2" type="number" min="0"
@@ -121,9 +117,8 @@
               Campo requerido
             </ion-text>
           </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col size="12">
+
+          <ion-col size="12" size-md="6">
             <ion-input class="inputForm" label-placement="floating" label="Nivel 3"
               [class.invalid]="getControl('nivel_3')?.invalid && getControl('nivel_3')?.touched"
               formControlName="nivel_3" placeholder="Nivel 3" type="number" min="0"
@@ -133,9 +128,8 @@
               Campo requerido
             </ion-text>
           </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col size="12">
+
+          <ion-col size="12" size-md="6">
             <ion-input class="inputForm" label-placement="floating" label="Nivel 4"
               [class.invalid]="getControl('nivel_4')?.invalid && getControl('nivel_4')?.touched"
               formControlName="nivel_4" placeholder="Nivel 4" type="number" min="0"
@@ -145,12 +139,10 @@
               Campo requerido
             </ion-text>
           </ion-col>
-        </ion-row>
 
-        <ion-row>
-          <ion-col size="12">
+          <ion-col size="12" size-md="6">
             <ion-input class="inputForm" label-placement="floating" label="Nivel Invitación"
-              [class.invalid]="getControl('nivel_base')?.invalid && getControl('nivel_invitacion')?.touched"
+              [class.invalid]="getControl('nivel_invitacion')?.invalid && getControl('nivel_invitacion')?.touched"
               formControlName="nivel_invitacion" placeholder="Nivel Invitación" type="number" min="0"
               (ionBlur)="getControl('nivel_invitacion')?.markAsTouched()">
             </ion-input>
@@ -160,124 +152,94 @@
             </ion-text>
           </ion-col>
 
-
-        </ion-row>
-
-        <ion-row>
-          <ion-col size="12">
+          <ion-col size="12" size-md="6">
             <ion-input class="inputForm" label-placement="floating" label="Nivel Master"
               [class.invalid]="getControl('nivel_master')?.invalid && getControl('nivel_master')?.touched"
               formControlName="nivel_master" placeholder="Nivel Master" type="number" min="0"
               (ionBlur)="getControl('nivel_master')?.markAsTouched()">
             </ion-input>
-            <ion-text color="danger" *ngIf="getControl('nivel_master')?.invalid && getControl('nivel_master')?.touched">
+            <ion-text color="danger"
+              *ngIf="getControl('nivel_master')?.invalid && getControl('nivel_master')?.touched">
               Campo requerido
             </ion-text>
           </ion-col>
         </ion-row>
+      </ng-container>
 
-      </div>
-    </form>
-      <div [ngClass]="{'visible': estatusDatosValidacion == 1, 'invisible': estatusDatosValidacion == 0}">
+      <!-- PASO 3: Validación -->
+      <ng-container *ngIf="estatusDatosValidacion == 1">
         <ion-row>
-          <ion-col size="6">
-            <strong>Producto: </strong> {{nombreProductoAgregando}}<br />
+          <ion-col size="12" size-md="6">
+            <strong>Producto: </strong> {{ nombreProductoAgregando }}<br />
             <small>
-              {{descripcionProductoAgregando}}<br /><br />
-              <strong>Vigencia: </strong> {{fechaVigenciaTextoAgregando}}<br />
+              {{ descripcionProductoAgregando }}<br /><br />
+              <strong>Vigencia: </strong> {{ fechaVigenciaTextoAgregando }}<br />
               Valida los datos del producto que publicarás. <br />
               Una vez que el producto ha sido publicado, no podrá ser modificado.
             </small>
           </ion-col>
-          <ion-col size="6">
-            <table style="width: 100%;">
-              <tr>
-                <th colspan="2">Tabla de comisiones</th>
-              </tr>
-              <tr>
-                <th style="text-align: start;">Nivel 1</th>
-                <td style="text-align: end;">{{nivel1ProductoAgregando}}</td>
-              </tr>
-              <tr>
-                <th style="text-align: start;">Nivel 2</th>
-                <td style="text-align: end;">{{nivel2ProductoAgregando}}</td>
-              </tr>
-              <tr>
-                <th style="text-align: start;">Nivel 3</th>
-                <td style="text-align: end;">{{nivel3ProductoAgregando}}</td>
-              </tr>
-              <tr>
-                <th style="text-align: start;">Nivel 4</th>
-                <td style="text-align: end;">{{nivel4ProductoAgregando}}</td>
-              </tr>
-              <tr>
-                <th style="text-align: start;">Invitador</th>
-                <td style="text-align: end;">{{nivelInvitacionProductoAgregando}}</td>
-              </tr>
-              <tr>
-                <th style="text-align: start;">Embassy</th>
-                <td style="text-align: end;">{{nivelMasterProductoAgregando}}</td>
-              </tr>
-              <tr>
-                <th style="text-align: start;">Total</th>
-                <th style="text-align: end;">{{comisionTotalProductoAgregando}}</th>
-              </tr>
+
+          <ion-col size="12" size-md="6">
+            <table style="width:100%;">
+              <tr><th colspan="2">Tabla de comisiones</th></tr>
+              <tr><th style="text-align:start;">Nivel 1</th><td style="text-align:end;">{{ nivel1ProductoAgregando }}</td></tr>
+              <tr><th style="text-align:start;">Nivel 2</th><td style="text-align:end;">{{ nivel2ProductoAgregando }}</td></tr>
+              <tr><th style="text-align:start;">Nivel 3</th><td style="text-align:end;">{{ nivel3ProductoAgregando }}</td></tr>
+              <tr><th style="text-align:start;">Nivel 4</th><td style="text-align:end;">{{ nivel4ProductoAgregando }}</td></tr>
+              <tr><th style="text-align:start;">Invitador</th><td style="text-align:end;">{{ nivelInvitacionProductoAgregando }}</td></tr>
+              <tr><th style="text-align:start;">Embassy</th><td style="text-align:end;">{{ nivelMasterProductoAgregando }}</td></tr>
+              <tr><th style="text-align:start;">Total</th><th style="text-align:end;">{{ comisionTotalProductoAgregando }}</th></tr>
             </table>
           </ion-col>
         </ion-row>
+
         <ion-row>
           <ion-col size="12">
             <span *ngIf="tipoComisionAgregando == 0">
-              Pagarás {{comisionTotalProductoAgregando}} por cada una de las referencias que se hagan válidas para este
-              producto
+              Pagarás {{ comisionTotalProductoAgregando }} por cada una de las referencias que se hagan válidas para este producto
             </span>
             <span *ngIf="tipoComisionAgregando == 1">
-              Pagarás un {{comisionTotalProductoAgregando}} por cada una de las referencias que se hagan válidas para
-              este producto. <br><small>Deberás indicar el importe con el cual la venta del producto fue cerrada para
-                deteminar los valores de cada una de las comisiones a repartir</small>
+              Pagarás un {{ comisionTotalProductoAgregando }} por cada una de las referencias que se hagan válidas para este producto.
+              <br><small>Deberás indicar el importe con el cual la venta del producto fue cerrada para determinar los valores de cada una de las comisiones a repartir</small>
             </span>
           </ion-col>
         </ion-row>
+
         <ion-row>
           <ion-col>
-            <ion-checkbox labelPlacement="end" (change)="confirmacionProductoAgregado = !confirmacionProductoAgregado" [(ngModel)]="confirmacionProductoAgregado">Acepto los Términos y Condiciones y la <a href = "https://www.sistemasperseo.com/Embassy_Terminos_y_Privacidad.pdf">Política de Privacidad</a></ion-checkbox>
+            <ion-checkbox labelPlacement="end"
+              (change)="confirmacionProductoAgregado = !confirmacionProductoAgregado"
+              [(ngModel)]="confirmacionProductoAgregado">
+              Acepto los Términos y Condiciones y la
+              <a href="https://www.sistemasperseo.com/Embassy_Terminos_y_Privacidad.pdf">Política de Privacidad</a>
+            </ion-checkbox>
           </ion-col>
         </ion-row>
-      </div>
-    </ion-grid>
+      </ng-container>
 
+    </form>
+  </ion-grid>
 </ion-content>
 
 <ion-footer>
   <ion-toolbar>
-    <div style="text-align: center;">
-      <div style="width: 45%; display: inline-block;" *ngIf="estatusDatosbasicos == 1">
-        <ion-button class="customButton" [disabled]="formEnviado" (click)="siguientePaso(1)">
-          Continuar
-        </ion-button>
+    <div style="text-align:center;">
+      <div style="width:45%;display:inline-block;" *ngIf="estatusDatosbasicos == 1">
+        <ion-button class="customButton" [disabled]="formEnviado" (click)="siguientePaso(1)">Continuar</ion-button>
       </div>
 
-
-      <div style="width: 45%; display: inline-block;" *ngIf="estatusDatosComisiones == 1">
-        <ion-button class="customButton" [disabled]="formEnviado" (click)="pasoAnterior(1)">
-          Regresar
-        </ion-button>
+      <div style="width:45%;display:inline-block;" *ngIf="estatusDatosComisiones == 1">
+        <ion-button class="customButton" [disabled]="formEnviado" (click)="pasoAnterior(1)">Regresar</ion-button>
       </div>
-      <div style="width: 45%; display: inline-block;" *ngIf="estatusDatosComisiones == 1">
-        <ion-button class="customButton" [disabled]="formEnviado" (click)="siguientePaso(2)">
-          Validar
-        </ion-button>
+      <div style="width:45%;display:inline-block;" *ngIf="estatusDatosComisiones == 1">
+        <ion-button class="customButton" [disabled]="formEnviado" (click)="siguientePaso(2)">Validar</ion-button>
       </div>
 
-
-      <div style="width: 45%; display: inline-block;" *ngIf="estatusDatosValidacion == 1">
-        <ion-button class="customButton" [disabled]="formEnviado" (click)="pasoAnterior(2)">
-          Regresar
-        </ion-button>
+      <div style="width:45%;display:inline-block;" *ngIf="estatusDatosValidacion == 1">
+        <ion-button class="customButton" [disabled]="formEnviado" (click)="pasoAnterior(2)">Regresar</ion-button>
       </div>
-
-      <div style="width: 45%; display: inline-block; " *ngIf="estatusDatosValidacion == 1">
-        <ion-button [disabled]="confirmacionProductoAgregado == false"  class="customButton" (click)="enviarFormulario()">
+      <div style="width:45%;display:inline-block;" *ngIf="estatusDatosValidacion == 1">
+        <ion-button class="customButton" [disabled]="confirmacionProductoAgregado == false" (click)="enviarFormulario()">
           PUBLICAR
         </ion-button>
       </div>

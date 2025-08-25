@@ -14,7 +14,26 @@
     <ion-grid>
       <ion-row class="ion-align-items-center">
 
-        <ion-col size="12" size-md="9"  class="ion-text-center">
+          <!-- Filtro por ROL -->
+        <ion-col size="12" size-md="5" class="ion-text-center">
+          <ion-segment value="{{ selectedRole ?? 'all' }}" (ionChange)="onRoleChange($event)">
+            <ion-segment-button value="all">
+              <ion-label>Todos</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="1">
+              <ion-label>Admins</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="2">
+              <ion-label>Socios</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="3">
+              <ion-label>Embajadores</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+        </ion-col>
+
+
+        <ion-col size="10" size-md="7"  class="ion-text-center">
           <ion-input class="inputBusqueda"
           (ionInput)="inputBuscar.next($event.detail.value || '')"
           placeholder="Buscar por Nombres, Apellidos, Rol, Email o Celular">

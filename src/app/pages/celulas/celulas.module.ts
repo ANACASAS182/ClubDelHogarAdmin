@@ -18,3 +18,4 @@ import { CelulasPage } from './celulas.page';
   declarations: [CelulasPage]
 })
 export class CelulasPageModule {}
+  

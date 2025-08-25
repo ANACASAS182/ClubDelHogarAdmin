@@ -17,6 +17,8 @@ import { UsuarioService } from 'src/app/services/api.back.services/usuario.servi
 })
 export class EmbajadoresPage implements OnInit, AfterViewInit, OnDestroy {
 
+  selectedRole: number | null = null; // 1=Admin, 2=Socio, 3=Embajador, null=Todos
+
   //table
   dataSourceTable = new MatTableDataSource<UsuarioCatalogoDTO>();
   displayedColumns: string[] = ['NombreCompleto', 'Rol', 'Email', 'Celular'];
@@ -32,8 +34,12 @@ export class EmbajadoresPage implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private usuarioService: UsuarioService, private modalCtrl: ModalController) { }
 
-  ngAfterViewInit() {
+   ngAfterViewInit() {
     this.dataSourceTable.paginator = this.paginator;
+
+    // si cambia el sort, resetea página
+    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
+
     this.loadtable();
   }
 
@@ -45,39 +51,42 @@ export class EmbajadoresPage implements OnInit, AfterViewInit, OnDestroy {
     this.inputBuscar.pipe(
       debounceTime(1000),
       distinctUntilChanged(),
-      takeUntil(this.destroy$))
-      .subscribe(value => {
-        this.query = value.toString();
-        this.loadtable();
-      });
+      takeUntil(this.destroy$)
+    ).subscribe(value => {
+      this.query = value.toString();
+      this.paginator.firstPage();     // al cambiar búsqueda, regresamos a la primera página
+      this.loadtable();
+    });
+  }
+
+  onRoleChange(ev: any) {
+    const val = ev.detail?.value;
+    this.selectedRole = (val === 'all') ? null : Number(val);
+    this.paginator.firstPage();
+    this.loadtable();
   }
 
   loadtable() {
-    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
     merge(this.sort.sortChange, this.paginator.page)
       .pipe(
         startWith({}),
-        switchMap(() => {
-          return this.usuarioService.getTablePaginated({
-            page: this.paginator.pageIndex,
-            size: this.paginator.pageSize,
-            sortBy: this.sort.active,
-            sortDir: this.sort.direction,
-            searchQuery: this.query
-          })
-            .pipe(catchError(() => of(null)));
-        }),
+        switchMap(() => this.usuarioService.getTablePaginated({
+          page: this.paginator.pageIndex,
+          size: this.paginator.pageSize,
+          sortBy: this.sort.active,
+          sortDir: this.sort.direction,
+          searchQuery: this.query,
+          // 👇 envia el filtro de rol al backend (null = sin filtro)
+          rolesId: this.selectedRole
+        }).pipe(catchError(() => of(null)))),
         map(response => {
-          if (response === null) {
-            return [];
-          }
+          if (!response) return [];
           this.total = response.data.total;
           return response.data.items;
-        }),
+        })
       )
-      .subscribe(response => {
-        this.dataSourceTable = new MatTableDataSource(response);
+      .subscribe(items => {
+        this.dataSourceTable = new MatTableDataSource(items);
       });
   }
 
