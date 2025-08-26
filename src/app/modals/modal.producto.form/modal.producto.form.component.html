@@ -207,9 +207,10 @@
 
         <ion-row>
           <ion-col>
-            <ion-checkbox labelPlacement="end"
-              (change)="confirmacionProductoAgregado = !confirmacionProductoAgregado"
-              [(ngModel)]="confirmacionProductoAgregado">
+            <ion-checkbox
+              labelPlacement="end"
+              [checked]="confirmacionProductoAgregado"
+              (ionChange)="confirmacionProductoAgregado = $event.detail.checked">
               Acepto los Términos y Condiciones y la
               <a href="https://www.sistemasperseo.com/Embassy_Terminos_y_Privacidad.pdf">Política de Privacidad</a>
             </ion-checkbox>
@@ -239,7 +240,9 @@
         <ion-button class="customButton" [disabled]="formEnviado" (click)="pasoAnterior(2)">Regresar</ion-button>
       </div>
       <div style="width:45%;display:inline-block;" *ngIf="estatusDatosValidacion == 1">
-        <ion-button class="customButton" [disabled]="confirmacionProductoAgregado == false" (click)="enviarFormulario()">
+        <ion-button class="customButton"
+          [disabled]="formEnviado || !confirmacionProductoAgregado"
+          (click)="enviarFormulario()">
           PUBLICAR
         </ion-button>
       </div>
