@@ -1,0 +1,123 @@
+<ion-header class="pagesHeader">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      <h1><ion-icon name="business" color="white"></ion-icon> Mi empresa</h1>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="pagesContent">
+  <ion-refresher slot="fixed" (ionRefresh)="refrescar($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ng-container *ngIf="!cargando; else skeleton">
+
+    <!-- Panel: Identificación -->
+    <ion-card class="panel">
+      <ion-card-header class="panel-heading">
+        <ion-card-title class="title">Identificación</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content class="panel-body">
+
+        <!-- Header con logo + nombre -->
+        <div class="empresa-head">
+          <div class="logo" *ngIf="view.logoSrc; else placeholder">
+            <img [src]="view.logoSrc" alt="Logo empresa" />
+          </div>
+          <ng-template #placeholder>
+            <div class="logo placeholder">
+              <ion-icon name="business-outline"></ion-icon>
+            </div>
+          </ng-template>
+
+          <div class="empresa-titles">
+            <div class="rs">{{ view.razonSocial || '—' }}</div>
+            <div class="rfc">RFC: {{ view.rfc || '—' }}</div>
+          </div>
+        </div>
+
+        <div class="table-like mt">
+          <div class="row">
+            <div class="col col-h">Nombre comercial</div>
+            <div class="col">{{ view.nombreComercial || '—' }}</div>
+          </div>
+          <div class="row">
+            <div class="col col-h">Descripción</div>
+            <div class="col pre">{{ view.descripcion || '—' }}</div>
+          </div>
+          <div class="row">
+            <div class="col col-h">Giro</div>
+            <div class="col">{{ view.giro ?? '—' }}</div>
+          </div>
+          <div class="row">
+            <div class="col col-h">Grupo</div>
+            <div class="col">{{ view.grupo ?? '—' }}</div>
+          </div>
+          <div class="row">
+            <div class="col col-h">Embajador ID</div>
+            <div class="col">{{ view.embajadorId ?? '—' }}</div>
+          </div>
+          <div class="row">
+            <div class="col col-h">Fecha de creación</div>
+            <div class="col">
+              {{ view.fechaCreacion ? (view.fechaCreacion | date:'dd/MM/yyyy HH:mm') : '—' }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-h">Estatus</div>
+            <div class="col">
+              <span class="status">
+                <span class="dot" [class.ok]="view.estatus === 'Vigente' && !view.eliminado"></span>
+                <span>
+                  {{ view.eliminado ? 'Eliminada' : (view.estatus || '—') }}
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Panel: Contacto -->
+    <ion-card class="panel">
+      <ion-card-header class="panel-heading">
+        <ion-card-title class="title">Contacto</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="panel-body">
+        <div class="table-like">
+          <div class="row">
+            <div class="col col-h">Correo</div>
+            <div class="col">{{ view.correo || '—' }}</div>
+          </div>
+          <div class="row">
+            <div class="col col-h">Teléfono</div>
+            <div class="col">{{ view.telefono || '—' }}</div>
+          </div>
+          <div class="row">
+            <div class="col col-h">Domicilio</div>
+            <div class="col pre">{{ view.domicilio || '—' }}</div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+  </ng-container>
+
+  <ng-template #skeleton>
+    <ion-card class="panel">
+      <ion-card-header class="panel-heading">
+        <ion-card-title class="title">Cargando…</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="panel-body">
+        <ion-skeleton-text animated style="height:16px;width:30%"></ion-skeleton-text>
+        <ion-skeleton-text animated style="height:14px;width:100%"></ion-skeleton-text>
+        <ion-skeleton-text animated style="height:14px;width:100%"></ion-skeleton-text>
+      </ion-card-content>
+    </ion-card>
+  </ng-template>
+</ion-content>

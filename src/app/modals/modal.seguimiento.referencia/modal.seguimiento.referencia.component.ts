@@ -175,4 +175,10 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
     const anio = f.getFullYear();
     return `${dia}-${mes}-${anio}`;
   }
+
+  mostrarTodos = false;
+
+  trackByIndex(i: number, _it: any) { return i; } // si tu modelo trae id, usa it.id
+
 }
+

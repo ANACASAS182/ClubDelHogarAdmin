@@ -112,12 +112,19 @@ export class UsuarioService {
     return this.http.get<GenericResponseDTO<UsuarioEditDTO>>(`${this.apiUrl}/GetUserByID`, { params: parameters });
   }
 
-  getEmpresaByUsuario(id: number): Observable<GenericResponseDTO<Empresa>> {
-    let parameters = {
-      usuarioID: id,
-    }
-    return this.http.get<GenericResponseDTO<Empresa>>(`${this.apiUrl}/GetEmpresaUsuario`, { params: parameters });
+  getEmpresaByUsuario(id: number, skipErrorHandler = false): Observable<GenericResponseDTO<Empresa>> {
+  let headers = new HttpHeaders();
+  if (skipErrorHandler) {
+    headers = headers.set('skipErrorHandler', 'true'); // <- evita toast global
   }
+
+  const options = {
+    headers,
+    params: { usuarioID: id }
+  };
+
+  return this.http.get<GenericResponseDTO<Empresa>>(`${this.apiUrl}/GetEmpresaUsuario`, options);
+}
 
   save(model: UsuarioEditDTO): Observable<GenericResponseDTO<boolean>> {
     return this.http.post<GenericResponseDTO<boolean>>(`${this.apiUrl}/Save`, model);

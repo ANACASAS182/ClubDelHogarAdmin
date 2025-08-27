@@ -82,6 +82,12 @@ const routes: Routes = [
         loadChildren: () =>
           import('../embajadores-diagrama/embajadores-diagrama.module')
             .then(m => m.EmbajadoresDiagramaModule)
+      },
+      {
+        path: 'visual-empresa',
+        loadChildren: () =>
+          import('../visual-empresa-view/visual-empresa-view.module')
+            .then(m => m.VisualEmpresaViewPageModule)
       }
     ]
   }
