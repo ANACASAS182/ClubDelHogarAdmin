@@ -48,3 +48,48 @@
     padding-left: 44px; // alinea con el icono del padre
   }
 }
+
+/* Caja del bloque meta */
+.user-meta {
+  width: calc(100% - 24px);
+  margin: 10px 12px 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: saturate(120%) blur(0.5px);
+}
+
+/* Fila Empresa/Usuario */
+.meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  line-height: 1.2;
+  margin: 4px 0;
+}
+
+/* Etiqueta: pequeña, mayúsculas, color suave */
+.meta-label {
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #cbd5e1; /* slate-300 */
+  font-weight: 700;
+  min-width: 64px; /* alinea etiquetas */
+}
+
+/* Valor: más grande y legible */
+.meta-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 1px 1px rgba(0,0,0,.2);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Ajuste fino en pantallas densas */
+@media (min-resolution: 2dppx) {
+  .meta-value { text-shadow: none; }
+}

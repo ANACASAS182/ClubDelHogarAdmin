@@ -68,9 +68,16 @@
 
           <div class="menu-separator"></div>
 
-          <ion-menu-toggle auto-hide="false" style="margin-bottom: 100px;">
-          <div class="user-container">
-            <span class="name-text">Usuario: {{ userName }}</span>
+          <ion-menu-toggle auto-hide="false">
+          <div class="user-meta">
+            <div class="meta-row" *ngIf="empresaName">
+              <span class="meta-label">Empresa</span>
+              <span class="meta-value">{{ empresaName }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Usuario</span>
+              <span class="meta-value">{{ userName }}</span>
+            </div>
           </div>
         </ion-menu-toggle>
 
