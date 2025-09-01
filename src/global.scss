@@ -312,3 +312,39 @@ ion-modal.modal-xl ion-grid {
   margin: 0 auto;
   width: 100%;
 }
+
+/* ====== Tamaño del modal de seguimiento ====== */
+ion-modal.modal-empresa {
+  /* ancho */
+  --width: 1000px;       /* tamaño “cómodo” en desktop */
+  --max-width: 95vw;     /* no desbordar pantallas más angostas */
+
+  /* alto */
+  --height: 85vh;        /* ocupa el 85% de la altura de la ventana */
+  --max-height: 90vh;
+
+  /* estética */
+  --border-radius: 16px;
+  --box-shadow: 0 20px 40px rgba(0,0,0,.18);
+}
+
+/* Laptops/entre 768–1200px: que use más ancho disponible */
+@media (max-width: 1200px) {
+  ion-modal.modal-empresa {
+    --width: 90vw;
+  }
+}
+
+/* Móvil: fullscreen, sin bordes redondeados */
+@media (max-width: 640px) {
+  ion-modal.modal-empresa {
+    --width: 100vw;
+    --height: 100vh;
+    --border-radius: 0;
+  }
+}
+
+/* (opcional) quitar padding interno del contenedor del modal */
+ion-modal.modal-empresa::part(content) {
+  padding: 0;
+}

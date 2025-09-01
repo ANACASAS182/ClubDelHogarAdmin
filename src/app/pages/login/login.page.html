@@ -5,8 +5,8 @@
       <h2 class="form-title">Inicia Sesión</h2>
 
       @if (hasError) {
-      <div class="ion-padding custom-alert warning">
-        <ion-text> {{ messageError }}</ion-text>
+      <div class="custom-alert warning" *ngIf="hasError">
+        <ion-text>{{ messageError }}</ion-text>
       </div>
       }
 

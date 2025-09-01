@@ -13,55 +13,50 @@
 
   <!-- ===== FICHA DEL REFERIDO ===== -->
   <ion-card class="section-card">
-    <ion-card-header>
-      <ion-card-title class="section-title">Referido</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <div class="detail-grid">
-        <div class="detail-row">
-          <div class="detail-label">Nombre</div>
-          <div class="detail-value">{{ referido?.nombreCompleto }}</div>
-        </div>
+  <ion-card-header>
+    <ion-card-title class="section-title">Estatus</ion-card-title>
+  </ion-card-header>
 
-        <div class="detail-row">
-          <div class="detail-label">Email</div>
-          <div class="detail-value">
-            <ion-chip *ngIf="referido?.email; else sinCorreo" outline="true" color="medium" class="chip">
-              <ion-icon name="mail-outline"></ion-icon>
-              <ion-label>{{ referido?.email }}</ion-label>
-            </ion-chip>
-            <ng-template #sinCorreo><span class="muted">Sin correo</span></ng-template>
-          </div>
-        </div>
+  <ion-card-content>
+    <form [formGroup]="formStatus" class="status-form">
+      <ion-select
+        [interfaceOptions]="{ header: 'Estatus de seguimiento'}"
+        class="inputForm"
+        okText="Ok"
+        cancelText="Cancelar"
+        label-placement="floating"
+        label="Estatus seguimiento"
+        formControlName="status"
+        [compareWith]="compareNum"
+        (ionBlur)="statusCtrl?.markAsTouched()">
 
-        <div class="detail-row">
-          <div class="detail-label">Celular</div>
-          <div class="detail-value">
-            <ion-chip outline="true" color="medium" class="chip">
-              <ion-icon name="call-outline"></ion-icon>
-              <ion-label>{{ referido?.celular || 'No proporcionado' }}</ion-label>
-            </ion-chip>
-          </div>
-        </div>
+        <ion-select-option
+          *ngFor="let item of estatus"
+          [value]="item.valor"
+          [disabled]="isCreadoDisabled(item.valor)">
+          {{ item.nombre }}
+        </ion-select-option>
+      </ion-select>
 
-        <div class="detail-row">
-          <div class="detail-label">Producto</div>
-          <div class="detail-value">{{ referido?.productoNombre }}</div>
-        </div>
+      <ion-text color="danger" *ngIf="statusCtrl?.invalid && statusCtrl?.touched">
+        Campo requerido
+      </ion-text>
 
-        <div class="detail-row">
-          <div class="detail-label">Embajador</div>
-          <div class="detail-value">{{ referido?.usuarioNombreCompleto }}</div>
-        </div>
+      <div class="actions-row">
+        <ion-button [disabled]="formEnviado" (click)="enviarFormularioStatus()">
+          Actualizar estatus
+        </ion-button>
       </div>
-    </ion-card-content>
-  </ion-card>
+    </form>
+  </ion-card-content>
+</ion-card>
 
   <!-- ===== ESTATUS ===== -->
   <ion-card class="section-card">
     <ion-card-header>
       <ion-card-title class="section-title">Estatus</ion-card-title>
     </ion-card-header>
+
     <ion-card-content>
       <form [formGroup]="formStatus" class="status-form">
         <ion-select
@@ -71,18 +66,19 @@
           cancelText="Cancelar"
           label-placement="floating"
           label="Estatus seguimiento"
-          [class.invalid]="getControl('status')?.invalid && getControl('status')?.touched"
           formControlName="status"
-          (ionBlur)="getControl('status')?.markAsTouched()">
+          [compareWith]="compareNum"
+          (ionBlur)="statusCtrl?.markAsTouched()">
+
           <ion-select-option
             *ngFor="let item of estatus"
             [value]="item.valor"
-            [disabled]="item.valor === estatusReferenciaEnum.Creado">
+            [disabled]="isCreadoDisabled(item.valor)">
             {{ item.nombre }}
           </ion-select-option>
         </ion-select>
 
-        <ion-text color="danger" *ngIf="getControl('status')?.invalid && getControl('status')?.touched">
+        <ion-text color="danger" *ngIf="statusCtrl?.invalid && statusCtrl?.touched">
           Campo requerido
         </ion-text>
 

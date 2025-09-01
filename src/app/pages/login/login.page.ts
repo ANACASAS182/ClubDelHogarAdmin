@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
 import { TokenService } from 'src/app/services/token.service';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, firstValueFrom } from 'rxjs';
 import { UsuarioService } from 'src/app/services/api.back.services/usuario.service';
 import { LoginUsuarioDTO } from 'src/app/models/DTOs/LoginUsuarioDTO';
 
@@ -15,29 +15,27 @@ import { LoginUsuarioDTO } from 'src/app/models/DTOs/LoginUsuarioDTO';
 })
 export class LoginPage implements OnInit {
   loginForm: FormGroup;
-  hasError: boolean = false;
-  messageError: string = "";
+  hasError = false;
+  messageError = '';
+  formEnviado = false;
 
-  formEnviado: boolean = false;
-  constructor(private fb: FormBuilder,
+  constructor(
+    private fb: FormBuilder,
     private router: Router,
     private usuarioService: UsuarioService,
     private toastController: ToastController,
-    private tokenService: TokenService) {
-
+    private tokenService: TokenService
+  ) {
     this.loginForm = this.fb.group({
       user: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
-
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
-  onSubmit() {
+  async onSubmit() {
     if (this.formEnviado) return;
-
     this.formEnviado = true;
 
     if (!this.loginForm.valid) {
@@ -46,31 +44,51 @@ export class LoginPage implements OnInit {
       return;
     }
 
-    let user: LoginUsuarioDTO = {
-      email: this.loginForm.controls["user"].value,
-      password: this.loginForm.controls["password"].value
+    const user: LoginUsuarioDTO = {
+      email: this.loginForm.controls['user'].value,
+      password: this.loginForm.controls['password'].value,
     };
 
-    this.usuarioService.login(user, true).pipe(
-      finalize(() => {
-        this.formEnviado = false;
-      })
-    ).subscribe({
-      next: (res) => {
-        this.tokenService.saveToken(res.data);
-        this.router.navigate(['/dashboard'], { replaceUrl: true });
+    try {
+      // 1) Login: obten token
+      const res = await firstValueFrom(
+        this.usuarioService.login(user, true).pipe(
+          finalize(() => (this.formEnviado = false))
+        )
+      );
 
-        // this.router.navigate(['/dashboard']);
-      },
-      error: (res) => {
+      if (!res?.success || !res?.data) {
         this.hasError = true;
-        this.messageError = res.error.message;
+        this.messageError = res?.message || 'No se pudo iniciar sesión.';
+        return;
       }
-    });
+
+      // 2) Persistir token (AWAIT obligatorio para evitar carreras)
+      await this.tokenService.saveToken(res.data);
+
+      // 3) (Opcional recomendado) Obtener perfil fresco y guardarlo localmente
+      try {
+        const perfil = await firstValueFrom(this.usuarioService.getUsuario(true));
+        if (perfil?.success && perfil?.data) {
+          localStorage.setItem('usuario-actual', JSON.stringify(perfil.data));
+        } else {
+          localStorage.removeItem('usuario-actual');
+        }
+      } catch {
+        // Si falla, limpiamos perfil para no reciclar datos viejos
+        localStorage.removeItem('usuario-actual');
+      }
+
+      // 4) Navegar “en frío” (sin dejar la pila del login)
+      await this.router.navigate(['/dashboard'], { replaceUrl: true });
+    } catch (err: any) {
+      this.hasError = true;
+      this.messageError =
+        err?.error?.message || 'Error al iniciar sesión. Intenta de nuevo.';
+    }
   }
 
   getControl(campo: string) {
     return this.loginForm.get(campo);
   }
-
 }
