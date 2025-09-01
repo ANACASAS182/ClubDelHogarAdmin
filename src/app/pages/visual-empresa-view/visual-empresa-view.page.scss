@@ -1,60 +1,99 @@
 :host {
   .panel {
-    margin: 10px 8px 14px;
-    border-radius: 6px;
+    /* más ancho visual: menos margen lateral y más presencia */
+    margin: 16px 12px 20px;
+    border-radius: 12px;
     background: #fff;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    border: 1px solid #e2e5ea;
+    box-shadow: 0 10px 22px rgba(17, 24, 39, .08);
   }
-  .panel-heading {
-    background: #f3f4f6;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 10px 12px;
-  }
-  .title { font-weight: 700; font-size: 14px; color: #374151; margin: 0; }
-  .panel-body { padding: 8px 10px 12px; }
 
-  /* Encabezado con logo */
+  .panel-heading {
+    background: linear-gradient(180deg, #f5f7fa 0%, #edf1f6 100%);
+    border-bottom: 1px solid #e2e5ea;
+    padding: 14px 18px;
+  }
+
+  .title {
+    margin: 0;
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 800; font-size: 17px; color: #1f2937;
+    ion-icon { font-size: 20px; opacity: .9; }
+  }
+
+  .panel-body { padding: 18px 18px 20px; }
+
+  /* Encabezado con logo más grande */
   .empresa-head {
     display: grid;
-    grid-template-columns: 56px 1fr;
-    gap: 12px;
+    grid-template-columns: 72px 1fr;
+    gap: 14px;
     align-items: center;
-    padding: 2px 2px 10px;
+    padding-bottom: 14px;
     border-bottom: 1px solid rgba(0,0,0,.06);
   }
-  .empresa-head .logo {
-    width: 56px; height: 56px; border-radius: 10px; overflow: hidden;
-    background: #eef2f7; display:flex; align-items:center; justify-content:center;
-    img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    &.placeholder ion-icon { font-size: 28px; color: #6b7280; }
-  }
-  .empresa-titles .rs { font-weight: 700; font-size: 16px; color: #111827; }
-  .empresa-titles .rfc { color: #6b7280; font-size: 12px; }
-  .mt { margin-top: 8px; }
 
-  /* Tabla 2 columnas */
+  .empresa-head .logo {
+    width: 72px; height: 72px; border-radius: 14px; overflow: hidden;
+    background: #eef2f7;
+    display:flex; align-items:center; justify-content:center;
+    img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    &.placeholder ion-icon { font-size: 32px; color: #6b7280; }
+  }
+
+  .empresa-titles {
+    display: grid; gap: 6px;
+    .rs { font-weight: 800; font-size: 20px; color: #111827; line-height: 1.2; }
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 700; letter-spacing: .25px;
+      padding: 5px 10px; border-radius: 999px;
+      color: #374151; background: #eef2f7; border: 1px solid #e5e7eb;
+    }
+  }
+
+  .mt { margin-top: 12px; }
+
+  /* Tabla 2 columnas más ancha y con filas más altas */
   .table-like {
     .row {
       display: grid;
-      grid-template-columns: 220px 1fr;
-      align-items: center;
-      padding: 10px 6px;
+      grid-template-columns: 320px 1fr;   /* antes 230px */
+      align-items: start;
+      padding: 14px 8px;                  /* antes 12px 6px */
+      min-height: 46px;                   /* sube la altura mínima */
       border-bottom: 1px solid rgba(0,0,0,.06);
     }
     .row:last-child { border-bottom: none; }
 
-    .col-h { font-weight: 700; color: #6b7280; }
+    .col-h { font-weight: 700; color: #6b7280; font-size: 14px; }
+    .col   { font-size: 15px; color: #1f2937; }
     .pre { white-space: pre-line; }
   }
 
-  .status {
-    display: inline-flex; align-items: center; gap: 8px;
-    .dot { width: 8px; height: 8px; border-radius: 999px; background: #9ca3af; }
-    .dot.ok { background: var(--ion-color-success, #10b981); }
+  /* Full-bleed opcional: panel casi a todo lo ancho del contenedor */
+  :host-context(.pagesContent) .panel.panel-identificacion {
+    max-width: 1280px;     /* controla el ancho máximo “grande” */
+    margin-left: auto;
+    margin-right: auto;
   }
 
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .table-like .row { grid-template-columns: 260px 1fr; }
+  }
+  @media (max-width: 992px) {
+    .table-like .row { grid-template-columns: 200px 1fr; padding: 12px 6px; }
+    .empresa-head { grid-template-columns: 64px 1fr; }
+    .empresa-head .logo { width: 64px; height: 64px; }
+    .empresa-titles .rs { font-size: 18px; }
+  }
   @media (max-width: 768px) {
-    .table-like .row { grid-template-columns: 150px 1fr; }
+    .panel { margin: 12px 10px 16px; }
+    .table-like .row { grid-template-columns: 140px 1fr; padding: 10px 4px; }
+    .empresa-head { grid-template-columns: 56px 1fr; }
+    .empresa-head .logo { width: 56px; height: 56px; border-radius: 10px; }
+    .empresa-titles .rs { font-size: 16px; }
   }
 }

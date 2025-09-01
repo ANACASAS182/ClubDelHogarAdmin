@@ -63,15 +63,32 @@ export class UsuarioService {
     return this.http.get<CelulaDisplay>(`${environment.apiUrl}api/Embajadores/getCelulaFromHere?embajadorBase=` + embajadorId);
   }
 
-  getUsuario(skipErrorHandler = false): Observable<GenericResponseDTO<Usuario>> {
-    let headers = new HttpHeaders();
+  // usuario.service.ts
+getUsuario(skipErrorHandler = false): Observable<GenericResponseDTO<Usuario>> {
+  let headers = new HttpHeaders()
+    .set('ngsw-bypass', 'true')                // 👈 no uses caché del SW
+    .set('Cache-Control', 'no-cache');         // 👈 pide revalidación
 
-    if (skipErrorHandler) {
-      headers = headers.set('skipErrorHandler', 'true');
-    }
-    const options = { headers };
-    return this.http.get<GenericResponseDTO<Usuario>>(`${this.apiUrl}/GetUsuarioLogeado`, options);
+  if (skipErrorHandler) {
+    headers = headers.set('skipErrorHandler', 'true');
   }
+  const options = { headers };
+  return this.http.get<GenericResponseDTO<Usuario>>(`${this.apiUrl}/GetUsuarioLogeado`, options);
+}
+
+getEmpresaByUsuario(id: number, skipErrorHandler = false): Observable<GenericResponseDTO<Empresa>> {
+  let headers = new HttpHeaders()
+    .set('ngsw-bypass', 'true')
+    .set('Cache-Control', 'no-cache');
+
+  if (skipErrorHandler) headers = headers.set('skipErrorHandler', 'true');
+
+  return this.http.get<GenericResponseDTO<Empresa>>(
+    `${this.apiUrl}/GetEmpresaUsuario`,
+    { headers, params: { usuarioID: id } }
+  );
+}
+
 
   getEmbajadorPorCorreo(correo: string): Observable<UsuarioBasico> {
     return this.http.get<UsuarioBasico>(`${this.apiUrl}/getEmbajadorPorCorreo?correo=` + correo);
@@ -111,20 +128,6 @@ export class UsuarioService {
     }
     return this.http.get<GenericResponseDTO<UsuarioEditDTO>>(`${this.apiUrl}/GetUserByID`, { params: parameters });
   }
-
-  getEmpresaByUsuario(id: number, skipErrorHandler = false): Observable<GenericResponseDTO<Empresa>> {
-  let headers = new HttpHeaders();
-  if (skipErrorHandler) {
-    headers = headers.set('skipErrorHandler', 'true'); // <- evita toast global
-  }
-
-  const options = {
-    headers,
-    params: { usuarioID: id }
-  };
-
-  return this.http.get<GenericResponseDTO<Empresa>>(`${this.apiUrl}/GetEmpresaUsuario`, options);
-}
 
   save(model: UsuarioEditDTO): Observable<GenericResponseDTO<boolean>> {
     return this.http.post<GenericResponseDTO<boolean>>(`${this.apiUrl}/Save`, model);

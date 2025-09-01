@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, LoadingController, ModalController, ToastController } from '@ionic/angular';
-import { IonHeader } from "@ionic/angular/standalone";
 import { finalize, firstValueFrom } from 'rxjs';
 import { sinEspaciosValidator } from 'src/app/classes/custom.validars';
 import { cleanString } from 'src/app/classes/string-utils';
@@ -24,47 +23,70 @@ import { SeguimientoReferidoService } from 'src/app/services/api.back.services/s
 export class ModalSeguimientoReferenciaComponent implements OnInit {
   formulario: FormGroup;
   formStatus: FormGroup;
-  formEnviado: boolean = false;
-  numSeguimientos: number = 0;
+  formEnviado = false;
+
+  numSeguimientos = 0;
   seguimientos: SeguimientoReferido[] = [];
-  referido: ReferidoDTO | undefined;
+  referido?: ReferidoDTO;
 
-  estatus: { nombre: string; valor: EstatusReferenciaEnum }[] = [];
-
+  estatus = getEstatusReferenciaOptions();
   estatusReferenciaEnum = EstatusReferenciaEnum;
 
-  @Input() id?: number = undefined;
+  /** asegura que 1 === '1' en el select */
+  compareNum = (a: any, b: any) => Number(a) === Number(b);
 
+  @Input() id?: number;
 
-  constructor(private fb: FormBuilder, private modalCtrl: ModalController,
+  constructor(
+    private fb: FormBuilder,
+    private modalCtrl: ModalController,
     private toastController: ToastController,
     private loadingCtrl: LoadingController,
     private referidoService: ReferidoService,
-    private seguimientoReferidoService: SeguimientoReferidoService) {
-
+    private seguimientoReferidoService: SeguimientoReferidoService
+  ) {
     this.formulario = this.fb.group({
-      comentario: ["", [Validators.required, sinEspaciosValidator()]],
+      comentario: ['', [Validators.required, sinEspaciosValidator()]],
     });
     this.formStatus = this.fb.group({
-      status: ["", Validators.required],
+      status: ['', Validators.required],
     });
   }
 
+  /** Toma 1er valor válido: enum, id, etc. y lo convierte a número */
+  private getEstatusActual(r?: any): number | null {
+    const cand = r?.estatusReferenciaEnum ?? r?.estatusReferenciaID ?? r?.estatus ?? null;
+    const n = Number(cand);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  get statusCtrl() { return this.formStatus.get('status'); }
+
+  /** Para deshabilitar 'Creado' sólo si el actual NO es 'Creado' */
+  isCreadoDisabled(value: EstatusReferenciaEnum): boolean {
+    const current = Number(this.statusCtrl?.value);
+    return value === this.estatusReferenciaEnum.Creado && current !== this.estatusReferenciaEnum.Creado;
+  }
+
+  /** Para mostrar/ocultar la tarjeta "Agregar seguimiento" */
+  get estaEnSeguimiento(): boolean {
+    const actual = this.getEstatusActual(this.referido);
+    return actual === this.estatusReferenciaEnum.Seguimiento;
+  }
+
   async ngOnInit() {
-
-    this.estatus = getEstatusReferenciaOptions();
-
-    const loading = await this.loadingCtrl.create({
-      message: 'Cargando datos...'
-    });
+    const loading = await this.loadingCtrl.create({ message: 'Cargando datos...' });
     await loading.present();
 
     try {
       const refResponse = await firstValueFrom(this.referidoService.getByID(this.id!));
       this.referido = refResponse.data;
-      this.formStatus.patchValue({
-        status: this.referido.estatusReferenciaEnum
-      });
+
+      const actual = this.getEstatusActual(this.referido);
+      if (actual !== null) {
+        // parchar como número y sin disparar eventos extra
+        this.formStatus.patchValue({ status: actual }, { emitEvent: false });
+      }
 
       this.getSeguimientos();
     } catch (error) {
@@ -72,23 +94,19 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
     } finally {
       loading.dismiss();
     }
-
-
   }
 
   getSeguimientos() {
     this.seguimientoReferidoService.getSeguimientosReferido(this.id!).subscribe({
       next: (response: GenericResponseDTO<SeguimientoReferido[]>) => {
-        this.seguimientos = response.data;
+        this.seguimientos = response.data || [];
         this.numSeguimientos = this.seguimientos.length;
       }
     });
   }
 
-
   enviarFormularioStatus() {
     if (this.formEnviado) return;
-
     this.formEnviado = true;
 
     if (this.formStatus.invalid) {
@@ -97,35 +115,37 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
       return;
     }
 
-    var model: EstatusReferidoDTO = {
+    const nuevo = Number(this.formStatus.controls['status'].value);
+    const model: EstatusReferidoDTO = {
       id: this.id!,
-      estatusReferenciaEnum  :this.formStatus.controls["status"].value
+      estatusReferenciaEnum: nuevo
     };
 
-    this.referidoService.updateEstatus(model).pipe(
-      finalize(() => {
-        this.formEnviado = false;
-      })
-    ).subscribe({
-      next: (response: GenericResponseDTO<boolean>) => {
-        if (response) {
-          this.toastController.create({
-            message: "Estatus actualizado.",
-            duration: 3000,
-            color: "success",
-            position: 'top'
-          }).then(toast => toast.present());
-          this.getSeguimientos();
-          this.referido!.estatusReferenciaEnum = model.estatusReferenciaEnum;
-        }
-      }
-    });
+    this.referidoService.updateEstatus(model)
+      .pipe(finalize(() => (this.formEnviado = false)))
+      .subscribe({
+        next: (response: GenericResponseDTO<boolean>) => {
+          if (response) {
+            this.toastController.create({
+              message: 'Estatus actualizado.',
+              duration: 3000,
+              color: 'success',
+              position: 'top'
+            }).then(t => t.present());
 
+            // refresca lista y estado local (tolerando ambos nombres)
+            this.getSeguimientos();
+            if (this.referido) {
+              (this.referido as any).estatusReferenciaEnum = nuevo;
+              (this.referido as any).estatusReferenciaID   = nuevo;
+            }
+          }
+        }
+      });
   }
 
   enviarFormulario() {
     if (this.formEnviado) return;
-
     this.formEnviado = true;
 
     if (this.formulario.invalid) {
@@ -134,39 +154,33 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
       return;
     }
 
-    var model: SeguimientoReferido = {
-      comentario: cleanString(this.formulario.controls["comentario"].value)!,
+    const model: SeguimientoReferido = {
+      comentario: cleanString(this.formulario.controls['comentario'].value)!,
       referidoID: this.id!,
     };
 
-    this.seguimientoReferidoService.save(model).pipe(
-      finalize(() => {
-        this.formEnviado = false;
-      })
-    ).subscribe({
-      next: (response: GenericResponseDTO<boolean>) => {
-        if (response) {
-          this.toastController.create({
-            message: "seguimiento guardado.",
-            duration: 3000,
-            color: "success",
-            position: 'top'
-          }).then(toast => toast.present());
-          this.getSeguimientos();
-          this.formulario.reset();
+    this.seguimientoReferidoService.save(model)
+      .pipe(finalize(() => (this.formEnviado = false)))
+      .subscribe({
+        next: (response: GenericResponseDTO<boolean>) => {
+          if (response) {
+            this.toastController.create({
+              message: 'Seguimiento guardado.',
+              duration: 3000,
+              color: 'success',
+              position: 'top'
+            }).then(t => t.present());
+
+            this.getSeguimientos();
+            this.formulario.reset();
+          }
         }
-      }
-    });
-
+      });
   }
 
+  getControl(name: string) { return this.formulario.get(name); }
+  close() { this.modalCtrl.dismiss(); }
 
-  getControl(name: string) {
-    return this.formulario.get(name);
-  }
-  close() {
-    this.modalCtrl.dismiss();
-  }
   formatFecha(fecha: Date): string {
     const f = new Date(fecha);
     const dia = f.getDate().toString().padStart(2, '0');
@@ -177,8 +191,5 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
   }
 
   mostrarTodos = false;
-
-  trackByIndex(i: number, _it: any) { return i; } // si tu modelo trae id, usa it.id
-
+  trackByIndex(i: number) { return i; }
 }
-
