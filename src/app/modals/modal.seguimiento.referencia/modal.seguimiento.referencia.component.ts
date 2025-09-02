@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { finalize, firstValueFrom } from 'rxjs';
 import { sinEspaciosValidator } from 'src/app/classes/custom.validars';
@@ -21,6 +21,9 @@ import { SeguimientoReferidoService } from 'src/app/services/api.back.services/s
   imports: [IonicModule, ReactiveFormsModule, CommonModule],
 })
 export class ModalSeguimientoReferenciaComponent implements OnInit {
+
+  @Input() id?: number;
+
   formulario: FormGroup;
   formStatus: FormGroup;
   formEnviado = false;
@@ -32,10 +35,9 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
   estatus = getEstatusReferenciaOptions();
   estatusReferenciaEnum = EstatusReferenciaEnum;
 
-  /** asegura que 1 === '1' en el select */
-  compareNum = (a: any, b: any) => Number(a) === Number(b);
+  showSegForm = false; // controla “Agregar seguimiento”
 
-  @Input() id?: number;
+  compareNum = (a: any, b: any) => Number(a) === Number(b);
 
   constructor(
     private fb: FormBuilder,
@@ -48,31 +50,19 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
     this.formulario = this.fb.group({
       comentario: ['', [Validators.required, sinEspaciosValidator()]],
     });
+
     this.formStatus = this.fb.group({
-      status: ['', Validators.required],
+      status: [null as unknown as number, Validators.required],
     });
   }
 
-  /** Toma 1er valor válido: enum, id, etc. y lo convierte a número */
-  private getEstatusActual(r?: any): number | null {
-    const cand = r?.estatusReferenciaEnum ?? r?.estatusReferenciaID ?? r?.estatus ?? null;
-    const n = Number(cand);
-    return Number.isFinite(n) ? n : null;
+  get statusCtrl(): FormControl<number> {
+    return this.formStatus.get('status') as FormControl<number>;
   }
-
-  get statusCtrl() { return this.formStatus.get('status'); }
-
-  /** Para deshabilitar 'Creado' sólo si el actual NO es 'Creado' */
-  isCreadoDisabled(value: EstatusReferenciaEnum): boolean {
-    const current = Number(this.statusCtrl?.value);
-    return value === this.estatusReferenciaEnum.Creado && current !== this.estatusReferenciaEnum.Creado;
+  get comentarioCtrl(): FormControl<string> {
+    return this.formulario.get('comentario') as FormControl<string>;
   }
-
-  /** Para mostrar/ocultar la tarjeta "Agregar seguimiento" */
-  get estaEnSeguimiento(): boolean {
-    const actual = this.getEstatusActual(this.referido);
-    return actual === this.estatusReferenciaEnum.Seguimiento;
-  }
+  getControl(name: string) { return this.formulario.get(name); }
 
   async ngOnInit() {
     const loading = await this.loadingCtrl.create({ message: 'Cargando datos...' });
@@ -82,15 +72,31 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
       const refResponse = await firstValueFrom(this.referidoService.getByID(this.id!));
       this.referido = refResponse.data;
 
-      const actual = this.getEstatusActual(this.referido);
-      if (actual !== null) {
-        // parchar como número y sin disparar eventos extra
-        this.formStatus.patchValue({ status: actual }, { emitEvent: false });
+      // 👇 LEE CON EL CASE CORRECTO (y alternativas) PARA NO QUEDAR EN BLANCO
+      const r = this.referido as any;
+      const currentStatus = Number(
+        r?.estatusReferenciaEnum ??
+        r?.EstatusReferenciaEnum ??
+        r?.estatusReferenciaID ??
+        r?.EstatusReferenciaID ??
+        null
+      );
+
+      if (Number.isFinite(currentStatus)) {
+        this.statusCtrl.setValue(currentStatus as number);
+      } else {
+        this.formStatus.reset();
       }
 
+      // mostrar el bloque “Agregar seguimiento” si aplica
+      this.showSegForm = this.statusCtrl.value === EstatusReferenciaEnum.Seguimiento;
+      this.statusCtrl.valueChanges.subscribe(v => {
+        this.showSegForm = Number(v) === EstatusReferenciaEnum.Seguimiento;
+      });
+
       this.getSeguimientos();
-    } catch (error) {
-      console.error('Error al cargar datos', error);
+    } catch (e) {
+      console.error('Error al cargar datos', e);
     } finally {
       loading.dismiss();
     }
@@ -105,6 +111,11 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
     });
   }
 
+  isCreadoDisabled(valor: number): boolean {
+    return valor === EstatusReferenciaEnum.Creado &&
+           this.statusCtrl.value !== EstatusReferenciaEnum.Creado;
+  }
+
   enviarFormularioStatus() {
     if (this.formEnviado) return;
     this.formEnviado = true;
@@ -115,33 +126,35 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
       return;
     }
 
-    const nuevo = Number(this.formStatus.controls['status'].value);
+    const nuevo = Number(this.statusCtrl.value);
+
     const model: EstatusReferidoDTO = {
       id: this.id!,
       estatusReferenciaEnum: nuevo
     };
 
-    this.referidoService.updateEstatus(model)
-      .pipe(finalize(() => (this.formEnviado = false)))
-      .subscribe({
-        next: (response: GenericResponseDTO<boolean>) => {
-          if (response) {
-            this.toastController.create({
-              message: 'Estatus actualizado.',
-              duration: 3000,
-              color: 'success',
-              position: 'top'
-            }).then(t => t.present());
-
-            // refresca lista y estado local (tolerando ambos nombres)
-            this.getSeguimientos();
-            if (this.referido) {
-              (this.referido as any).estatusReferenciaEnum = nuevo;
-              (this.referido as any).estatusReferenciaID   = nuevo;
-            }
+    this.referidoService.updateEstatus(model).pipe(
+      finalize(() => this.formEnviado = false)
+    ).subscribe({
+      next: (response: GenericResponseDTO<boolean>) => {
+        if (response?.data) {
+          if (this.referido) {
+            (this.referido as any).estatusReferenciaEnum = nuevo;
+            (this.referido as any).EstatusReferenciaID   = nuevo;
           }
+          this.showSegForm = nuevo === EstatusReferenciaEnum.Seguimiento;
+
+          this.toastController.create({
+            message: 'Estatus actualizado.',
+            duration: 2200,
+            color: 'success',
+            position: 'top'
+          }).then(t => t.present());
+
+          this.getSeguimientos();
         }
-      });
+      }
+    });
   }
 
   enviarFormulario() {
@@ -155,30 +168,28 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
     }
 
     const model: SeguimientoReferido = {
-      comentario: cleanString(this.formulario.controls['comentario'].value)!,
+      comentario: cleanString(this.comentarioCtrl.value)!,
       referidoID: this.id!,
     };
 
-    this.seguimientoReferidoService.save(model)
-      .pipe(finalize(() => (this.formEnviado = false)))
-      .subscribe({
-        next: (response: GenericResponseDTO<boolean>) => {
-          if (response) {
-            this.toastController.create({
-              message: 'Seguimiento guardado.',
-              duration: 3000,
-              color: 'success',
-              position: 'top'
-            }).then(t => t.present());
-
-            this.getSeguimientos();
-            this.formulario.reset();
-          }
+    this.seguimientoReferidoService.save(model).pipe(
+      finalize(() => this.formEnviado = false)
+    ).subscribe({
+      next: (response: GenericResponseDTO<boolean>) => {
+        if (response?.data) {
+          this.toastController.create({
+            message: 'Seguimiento guardado.',
+            duration: 2200,
+            color: 'success',
+            position: 'top'
+          }).then(t => t.present());
+          this.getSeguimientos();
+          this.formulario.reset();
         }
-      });
+      }
+    });
   }
 
-  getControl(name: string) { return this.formulario.get(name); }
   close() { this.modalCtrl.dismiss(); }
 
   formatFecha(fecha: Date): string {

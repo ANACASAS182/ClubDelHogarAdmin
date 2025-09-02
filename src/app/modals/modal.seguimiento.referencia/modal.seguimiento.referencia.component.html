@@ -13,43 +13,49 @@
 
   <!-- ===== FICHA DEL REFERIDO ===== -->
   <ion-card class="section-card">
-  <ion-card-header>
-    <ion-card-title class="section-title">Estatus</ion-card-title>
-  </ion-card-header>
+    <ion-card-header>
+      <ion-card-title class="section-title">Referido</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="detail-grid">
+        <div class="detail-row">
+          <div class="detail-label">Nombre</div>
+          <div class="detail-value">{{ referido?.nombreCompleto }}</div>
+        </div>
 
-  <ion-card-content>
-    <form [formGroup]="formStatus" class="status-form">
-      <ion-select
-        [interfaceOptions]="{ header: 'Estatus de seguimiento'}"
-        class="inputForm"
-        okText="Ok"
-        cancelText="Cancelar"
-        label-placement="floating"
-        label="Estatus seguimiento"
-        formControlName="status"
-        [compareWith]="compareNum"
-        (ionBlur)="statusCtrl?.markAsTouched()">
+        <div class="detail-row">
+          <div class="detail-label">Email</div>
+          <div class="detail-value">
+            <ion-chip *ngIf="referido?.email; else sinCorreo" outline="true" color="medium" class="chip">
+              <ion-icon name="mail-outline"></ion-icon>
+              <ion-label>{{ referido?.email }}</ion-label>
+            </ion-chip>
+            <ng-template #sinCorreo><span class="muted">Sin correo</span></ng-template>
+          </div>
+        </div>
 
-        <ion-select-option
-          *ngFor="let item of estatus"
-          [value]="item.valor"
-          [disabled]="isCreadoDisabled(item.valor)">
-          {{ item.nombre }}
-        </ion-select-option>
-      </ion-select>
+        <div class="detail-row">
+          <div class="detail-label">Celular</div>
+          <div class="detail-value">
+            <ion-chip outline="true" color="medium" class="chip">
+              <ion-icon name="call-outline"></ion-icon>
+              <ion-label>{{ referido?.celular || 'No proporcionado' }}</ion-label>
+            </ion-chip>
+          </div>
+        </div>
 
-      <ion-text color="danger" *ngIf="statusCtrl?.invalid && statusCtrl?.touched">
-        Campo requerido
-      </ion-text>
+        <div class="detail-row">
+          <div class="detail-label">Producto</div>
+          <div class="detail-value">{{ referido?.productoNombre }}</div>
+        </div>
 
-      <div class="actions-row">
-        <ion-button [disabled]="formEnviado" (click)="enviarFormularioStatus()">
-          Actualizar estatus
-        </ion-button>
+        <div class="detail-row">
+          <div class="detail-label">Embajador</div>
+          <div class="detail-value">{{ referido?.usuarioNombreCompleto }}</div>
+        </div>
       </div>
-    </form>
-  </ion-card-content>
-</ion-card>
+    </ion-card-content>
+  </ion-card>
 
   <!-- ===== ESTATUS ===== -->
   <ion-card class="section-card">
@@ -60,7 +66,6 @@
     <ion-card-content>
       <form [formGroup]="formStatus" class="status-form">
         <ion-select
-          [interfaceOptions]="{ header: 'Estatus de seguimiento'}"
           class="inputForm"
           okText="Ok"
           cancelText="Cancelar"
@@ -68,7 +73,7 @@
           label="Estatus seguimiento"
           formControlName="status"
           [compareWith]="compareNum"
-          (ionBlur)="statusCtrl?.markAsTouched()">
+          (ionBlur)="statusCtrl.markAsTouched()">
 
           <ion-select-option
             *ngFor="let item of estatus"
@@ -78,12 +83,8 @@
           </ion-select-option>
         </ion-select>
 
-        <ion-text color="danger" *ngIf="statusCtrl?.invalid && statusCtrl?.touched">
-          Campo requerido
-        </ion-text>
-
         <div class="actions-row">
-          <ion-button [disabled]="formEnviado" (click)="enviarFormularioStatus()">
+          <ion-button [disabled]="formEnviado || formStatus.invalid" (click)="enviarFormularioStatus()">
             Actualizar estatus
           </ion-button>
         </div>
@@ -91,8 +92,8 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- ===== NUEVO SEGUIMIENTO (solo cuando está en Seguimiento) ===== -->
-  <ion-card class="section-card" *ngIf="referido?.estatusReferenciaEnum == estatusReferenciaEnum.Seguimiento">
+  <!-- ===== NUEVO SEGUIMIENTO ===== -->
+  <ion-card class="section-card" *ngIf="showSegForm">
     <ion-card-header>
       <ion-card-title class="section-title">Agregar seguimiento</ion-card-title>
     </ion-card-header>
@@ -103,19 +104,19 @@
           label-placement="floating"
           label="Seguimiento"
           class="inputForm"
-          [class.invalid]="getControl('comentario')?.invalid && getControl('comentario')?.touched"
+          [class.invalid]="comentarioCtrl.invalid && comentarioCtrl.touched"
           autoGrow="true"
           rows="4"
           maxlength="500"
           placeholder="Escribe tu seguimiento">
         </ion-textarea>
 
-        <ion-text color="danger" *ngIf="getControl('comentario')?.invalid && getControl('comentario')?.touched">
+        <ion-text color="danger" *ngIf="comentarioCtrl.invalid && comentarioCtrl.touched">
           Campo requerido
         </ion-text>
 
         <div class="actions-row">
-          <ion-button [disabled]="formEnviado" (click)="enviarFormulario()">
+          <ion-button [disabled]="formEnviado || formulario.invalid" (click)="enviarFormulario()">
             Enviar seguimiento
           </ion-button>
         </div>
@@ -123,7 +124,7 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- ===== HISTORIAL DE SEGUIMIENTOS ===== -->
+  <!-- ===== HISTORIAL ===== -->
   <ion-card class="section-card">
     <ion-card-header>
       <ion-card-title class="section-title">
@@ -132,8 +133,7 @@
     </ion-card-header>
     <ion-card-content>
       <div class="timeline" *ngIf="(seguimientos?.length ?? 0) > 0; else sinSeg">
-        <div class="tl-item"
-             *ngFor="let item of (mostrarTodos ? seguimientos : (seguimientos | slice:0:5)); trackBy: trackByIndex">
+        <div class="tl-item" *ngFor="let item of (mostrarTodos ? seguimientos : (seguimientos | slice:0:5)); trackBy: trackByIndex">
           <div class="tl-dot"></div>
           <div class="tl-card">
             <div class="tl-row">
