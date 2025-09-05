@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, LoadingController, ModalController, ToastController } from '@ionic/angular';
 import { finalize, firstValueFrom } from 'rxjs';
@@ -24,10 +24,19 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
 
   @Input() id?: number;
 
-  formulario: FormGroup;
-  formStatus: FormGroup;
+  // ====== Forms ======
+  formulario: FormGroup = this.fb.group({
+    comentario: ['', [Validators.required, sinEspaciosValidator()]],
+  });
+
+  // IonSelect trabaja con string; guardamos el status como string
+  formStatus: FormGroup = this.fb.group({
+    status: [null as string | null, Validators.required],
+  });
+
   formEnviado = false;
 
+  // ====== Datos ======
   numSeguimientos = 0;
   seguimientos: SeguimientoReferido[] = [];
   referido?: ReferidoDTO;
@@ -35,9 +44,8 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
   estatus = getEstatusReferenciaOptions();
   estatusReferenciaEnum = EstatusReferenciaEnum;
 
-  showSegForm = false; // controla “Agregar seguimiento”
-
-  compareNum = (a: any, b: any) => Number(a) === Number(b);
+  // controla “Agregar seguimiento”
+  showSegForm = false;
 
   constructor(
     private fb: FormBuilder,
@@ -45,55 +53,57 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
     private toastController: ToastController,
     private loadingCtrl: LoadingController,
     private referidoService: ReferidoService,
-    private seguimientoReferidoService: SeguimientoReferidoService
-  ) {
-    this.formulario = this.fb.group({
-      comentario: ['', [Validators.required, sinEspaciosValidator()]],
-    });
+    private seguimientoReferidoService: SeguimientoReferidoService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-    this.formStatus = this.fb.group({
-      status: [null as unknown as number, Validators.required],
-    });
-  }
-
-  get statusCtrl(): FormControl<number> {
-    return this.formStatus.get('status') as FormControl<number>;
+  // ====== Getters ======
+  get statusCtrl(): FormControl<string | null> {
+    return this.formStatus.get('status') as FormControl<string | null>;
   }
   get comentarioCtrl(): FormControl<string> {
     return this.formulario.get('comentario') as FormControl<string>;
   }
   getControl(name: string) { return this.formulario.get(name); }
 
+  // Helper: si el back manda raro, normalizamos
+  private toNumOrNull(v: any): number | null {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
   async ngOnInit() {
     const loading = await this.loadingCtrl.create({ message: 'Cargando datos...' });
     await loading.present();
 
     try {
+      // Cargar el referido por ID
       const refResponse = await firstValueFrom(this.referidoService.getByID(this.id!));
       this.referido = refResponse.data;
 
-      // 👇 LEE CON EL CASE CORRECTO (y alternativas) PARA NO QUEDAR EN BLANCO
-      const r = this.referido as any;
-      const currentStatus = Number(
-        r?.estatusReferenciaEnum ??
-        r?.EstatusReferenciaEnum ??
-        r?.estatusReferenciaID ??
-        r?.EstatusReferenciaID ??
-        null
-      );
+      // Detecta el estatus actual en cualquiera de los posibles campos
+      const r: any = this.referido ?? {};
+      const currentStatusNum =
+        this.toNumOrNull(r.estatusReferenciaID) ??
+        this.toNumOrNull(r.EstatusReferenciaID) ??
+        this.toNumOrNull(r.estatusReferenciaEnum) ??
+        this.toNumOrNull(r.EstatusReferenciaEnum);
 
-      if (Number.isFinite(currentStatus)) {
-        this.statusCtrl.setValue(currentStatus as number);
-      } else {
-        this.formStatus.reset();
-      }
+      // Preseleccionar en el ion-select (como string)
+      const statusStr = currentStatusNum != null ? String(currentStatusNum) : null;
+      this.formStatus.patchValue({ status: statusStr }, { emitEvent: false });
+      this.statusCtrl.updateValueAndValidity({ emitEvent: false });
 
-      // mostrar el bloque “Agregar seguimiento” si aplica
-      this.showSegForm = this.statusCtrl.value === EstatusReferenciaEnum.Seguimiento;
+      // Mostrar/ocultar el form de seguimiento según el estatus actual
+      this.showSegForm = String(this.statusCtrl.value) === String(EstatusReferenciaEnum.Seguimiento);
+      this.cdr.detectChanges();
+
+      // Reaccionar a cambios del select
       this.statusCtrl.valueChanges.subscribe(v => {
-        this.showSegForm = Number(v) === EstatusReferenciaEnum.Seguimiento;
+        this.showSegForm = String(v) === String(EstatusReferenciaEnum.Seguimiento);
       });
 
+      // Cargar historial
       this.getSeguimientos();
     } catch (e) {
       console.error('Error al cargar datos', e);
@@ -111,11 +121,13 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
     });
   }
 
+  // Deshabilita “Creado” cuando NO es el estatus actual (para no impedir ver el valor vigente)
   isCreadoDisabled(valor: number): boolean {
-    return valor === EstatusReferenciaEnum.Creado &&
-           this.statusCtrl.value !== EstatusReferenciaEnum.Creado;
+    return String(valor) === String(EstatusReferenciaEnum.Creado) &&
+           this.statusCtrl.value !== String(EstatusReferenciaEnum.Creado);
   }
 
+  // ====== Actualizar estatus ======
   enviarFormularioStatus() {
     if (this.formEnviado) return;
     this.formEnviado = true;
@@ -126,6 +138,7 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
       return;
     }
 
+    // Convertir a number para el backend
     const nuevo = Number(this.statusCtrl.value);
 
     const model: EstatusReferidoDTO = {
@@ -138,11 +151,12 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
     ).subscribe({
       next: (response: GenericResponseDTO<boolean>) => {
         if (response?.data) {
+          // Mantener el estado local coherente
           if (this.referido) {
             (this.referido as any).estatusReferenciaEnum = nuevo;
             (this.referido as any).EstatusReferenciaID   = nuevo;
           }
-          this.showSegForm = nuevo === EstatusReferenciaEnum.Seguimiento;
+          this.showSegForm = String(nuevo) === String(EstatusReferenciaEnum.Seguimiento);
 
           this.toastController.create({
             message: 'Estatus actualizado.',
@@ -151,12 +165,14 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
             position: 'top'
           }).then(t => t.present());
 
+          // Insert de seguimiento automático del back + recargar lista
           this.getSeguimientos();
         }
       }
     });
   }
 
+  // ====== Agregar seguimiento manual ======
   enviarFormulario() {
     if (this.formEnviado) return;
     this.formEnviado = true;
@@ -183,6 +199,7 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
             color: 'success',
             position: 'top'
           }).then(t => t.present());
+
           this.getSeguimientos();
           this.formulario.reset();
         }
@@ -192,6 +209,7 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
 
   close() { this.modalCtrl.dismiss(); }
 
+  // ====== Util ======
   formatFecha(fecha: Date): string {
     const f = new Date(fecha);
     const dia = f.getDate().toString().padStart(2, '0');

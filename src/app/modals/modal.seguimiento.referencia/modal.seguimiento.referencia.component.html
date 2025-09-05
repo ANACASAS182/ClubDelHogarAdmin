@@ -57,14 +57,14 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- ===== ESTATUS ===== -->
+    <!-- ===== ESTATUS ===== -->
   <ion-card class="section-card">
     <ion-card-header>
       <ion-card-title class="section-title">Estatus</ion-card-title>
     </ion-card-header>
 
     <ion-card-content>
-      <form [formGroup]="formStatus" class="status-form">
+      <form [formGroup]="formStatus" class="status-form" (ngSubmit)="enviarFormularioStatus()">
         <ion-select
           class="inputForm"
           okText="Ok"
@@ -72,57 +72,60 @@
           label-placement="floating"
           label="Estatus seguimiento"
           formControlName="status"
-          [compareWith]="compareNum"
           (ionBlur)="statusCtrl.markAsTouched()">
 
           <ion-select-option
             *ngFor="let item of estatus"
-            [value]="item.valor"
+            [value]="item.valor + ''"
             [disabled]="isCreadoDisabled(item.valor)">
             {{ item.nombre }}
           </ion-select-option>
+
         </ion-select>
 
         <div class="actions-row">
-          <ion-button [disabled]="formEnviado || formStatus.invalid" (click)="enviarFormularioStatus()">
+          <ion-button type="submit" [disabled]="formEnviado || formStatus.invalid">
             Actualizar estatus
           </ion-button>
         </div>
       </form>
     </ion-card-content>
-  </ion-card>
+  </ion-card>  <!-- 👈 ESTOS DOS CIERRES FALTABAN -->
+
 
   <!-- ===== NUEVO SEGUIMIENTO ===== -->
   <ion-card class="section-card" *ngIf="showSegForm">
-    <ion-card-header>
-      <ion-card-title class="section-title">Agregar seguimiento</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <form [formGroup]="formulario">
-        <ion-textarea
-          formControlName="comentario"
-          label-placement="floating"
-          label="Seguimiento"
-          class="inputForm"
-          [class.invalid]="comentarioCtrl.invalid && comentarioCtrl.touched"
-          autoGrow="true"
-          rows="4"
-          maxlength="500"
-          placeholder="Escribe tu seguimiento">
-        </ion-textarea>
+  <ion-card-header>
+    <ion-card-title class="section-title">Agregar seguimiento</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <!-- CONTENEDOR, NO FORM para evitar nesting -->
+    <div [formGroup]="formulario">
+      <ion-textarea
+        formControlName="comentario"
+        label-placement="floating"
+        label="Seguimiento"
+        class="inputForm"
+        [class.invalid]="comentarioCtrl.invalid && comentarioCtrl.touched"
+        autoGrow="true"
+        rows="4"
+        maxlength="500"
+        placeholder="Escribe tu seguimiento">
+      </ion-textarea>
 
-        <ion-text color="danger" *ngIf="comentarioCtrl.invalid && comentarioCtrl.touched">
-          Campo requerido
-        </ion-text>
+      <ion-text color="danger" *ngIf="comentarioCtrl.invalid && comentarioCtrl.touched">
+        Campo requerido
+      </ion-text>
 
-        <div class="actions-row">
-          <ion-button [disabled]="formEnviado || formulario.invalid" (click)="enviarFormulario()">
-            Enviar seguimiento
-          </ion-button>
-        </div>
-      </form>
-    </ion-card-content>
-  </ion-card>
+      <div class="actions-row">
+        <ion-button (click)="enviarFormulario()" [disabled]="formEnviado || formulario.invalid">
+          Enviar seguimiento
+        </ion-button>
+      </div>
+    </div>
+  </ion-card-content>
+</ion-card>
+
 
   <!-- ===== HISTORIAL ===== -->
   <ion-card class="section-card">
