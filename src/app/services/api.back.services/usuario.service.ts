@@ -11,6 +11,8 @@ import { UsuarioEditDTO } from 'src/app/models/DTOs/UsuarioEditDTO';
 import { Empresa } from 'src/app/models/Empresa';
 import { CelulaDisplay, CelulaNode } from 'src/app/pages/celulas/celulas.page';
 import { UsuarioDTO } from 'src/app/pages/registro/registro.page';
+import { HttpParams } from '@angular/common/http';
+import { catchError, throwError } from 'rxjs';
 
 type GetUsuariosParams = {
   page: number;
@@ -27,6 +29,7 @@ type GetUsuariosParams = {
 
 export class UsuarioService {
   private apiUrl = environment.apiUrl + "api/Usuario";
+  private apiUrlEmbajadores = `${environment.apiUrl}api/Embajadores`;
 
   constructor(private http: HttpClient) { }
 
@@ -43,9 +46,12 @@ export class UsuarioService {
     return this.http.post<GenericResponseDTO<string>>(url, user, options);
   }
 
-  GetDatosInvitacion(codigo: string): Observable<InvitacionDTO> {
-    return this.http.get<InvitacionDTO>(`${this.apiUrl}/GetDatosInvitacion?codigo=${codigo}`);
-  }
+  GetDatosInvitacion(codigo: string) {
+  return this.http.get<InvitacionDTO>(
+    `${this.apiUrlEmbajadores}/GetDatosInvitacion`,
+    { params: { codigo } as any }
+  );
+}
 
   RegistroUsuarioCodigoInvitacion(user: UsuarioDTO, skipErrorHandler = false): Observable<GenericResponseDTO<boolean>> {
     let headers = new HttpHeaders();

@@ -4,10 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { RegistroPage } from './registro.page';
 
 const routes: Routes = [
-  {
-    path: '',
-    component: RegistroPage
-  }
+  { path: '', component: RegistroPage } // <- sin AuthGuard ni NoAuthGuard
 ];
 
 @NgModule({
