@@ -6,12 +6,15 @@ import { IonicModule } from '@ionic/angular';
 import { VisualEmpresaViewPageRoutingModule } from './visual-empresa-view-routing.module';
 import { VisualEmpresaViewPage } from './visual-empresa-view.page';
 
+import { ReactiveFormsModule } from '@angular/forms';
+
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    VisualEmpresaViewPageRoutingModule
+    VisualEmpresaViewPageRoutingModule,
+    ReactiveFormsModule
   ],
   declarations: [VisualEmpresaViewPage]
 })

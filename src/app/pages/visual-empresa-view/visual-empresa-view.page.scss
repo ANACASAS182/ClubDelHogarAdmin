@@ -1,6 +1,5 @@
 :host {
   .panel {
-    /* más ancho visual: menos margen lateral y más presencia */
     margin: 16px 12px 20px;
     border-radius: 12px;
     background: #fff;
@@ -23,7 +22,6 @@
 
   .panel-body { padding: 18px 18px 20px; }
 
-  /* Encabezado con logo más grande */
   .empresa-head {
     display: grid;
     grid-template-columns: 72px 1fr;
@@ -55,14 +53,13 @@
 
   .mt { margin-top: 12px; }
 
-  /* Tabla 2 columnas más ancha y con filas más altas */
   .table-like {
     .row {
       display: grid;
-      grid-template-columns: 320px 1fr;   /* antes 230px */
+      grid-template-columns: 320px 1fr;
       align-items: start;
-      padding: 14px 8px;                  /* antes 12px 6px */
-      min-height: 46px;                   /* sube la altura mínima */
+      padding: 14px 8px;
+      min-height: 46px;
       border-bottom: 1px solid rgba(0,0,0,.06);
     }
     .row:last-child { border-bottom: none; }
@@ -72,14 +69,24 @@
     .pre { white-space: pre-line; }
   }
 
-  /* Full-bleed opcional: panel casi a todo lo ancho del contenedor */
-  :host-context(.pagesContent) .panel.panel-identificacion {
-    max-width: 1280px;     /* controla el ancho máximo “grande” */
+  /* Form fiscales */
+  .fiscales-grid {
+    display: grid;
+    gap: 10px;
+  }
+  .acciones {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+  }
+
+  :host-context(.pagesContent) .panel.panel-identificacion,
+  :host-context(.pagesContent) .panel.panel-fiscales {
+    max-width: 1280px;
     margin-left: auto;
     margin-right: auto;
   }
 
-  /* Responsive */
   @media (max-width: 1200px) {
     .table-like .row { grid-template-columns: 260px 1fr; }
   }

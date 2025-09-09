@@ -15,7 +15,7 @@
   </ion-refresher>
 
   <ng-container *ngIf="!cargando; else skeleton">
-    <!-- Panel: Identificación (ÚNICO) -->
+    <!-- Panel: Identificación -->
     <ion-card class="panel panel-identificacion">
       <ion-card-header class="panel-heading">
         <ion-card-title class="title">
@@ -46,7 +46,7 @@
           </div>
         </div>
 
-        <!-- Tabla 2 columnas (sin Estatus) -->
+        <!-- Tabla 2 columnas -->
         <div class="table-like mt">
           <div class="row">
             <div class="col col-h">Nombre comercial</div>
@@ -56,26 +56,107 @@
             <div class="col col-h">Descripción</div>
             <div class="col pre">{{ view.descripcion || '—' }}</div>
           </div>
+
+          <!-- Giro correctamente (muestra nombre si viene, si no el valor crudo) -->
           <div class="row">
             <div class="col col-h">Giro</div>
-            <div class="col">{{ view.giro ?? '—' }}</div>
+            <div class="col">
+              {{ view.giroNombre || view.giro || '—' }}
+            </div>
           </div>
+
+          <!-- Nombre de grupo además del ID si existiera -->
           <div class="row">
             <div class="col col-h">Grupo</div>
-            <div class="col">{{ view.grupo ?? '—' }}</div>
+            <div class="col">
+              <ng-container *ngIf="view.grupoNombre; else grupoCrudo">
+                {{ view.grupoNombre }}
+                <small *ngIf="view.grupo"> (ID: {{ view.grupo }})</small>
+              </ng-container>
+              <ng-template #grupoCrudo>
+                {{ view.grupo || '—' }}
+              </ng-template>
+            </div>
           </div>
+
+          <!-- Embajador: nombre + ID -->
           <div class="row">
-            <div class="col col-h">Embajador ID</div>
-            <div class="col">{{ view.embajadorId ?? '—' }}</div>
+            <div class="col col-h">Embajador</div>
+            <div class="col">
+              <ng-container *ngIf="view.embajadorNombre; else embajadorSoloId">
+                {{ view.embajadorNombre }}
+                <small *ngIf="view.embajadorId"> (ID: {{ view.embajadorId }})</small>
+              </ng-container>
+              <ng-template #embajadorSoloId>
+                {{ view.embajadorId || '—' }}
+              </ng-template>
+            </div>
           </div>
+
           <div class="row">
             <div class="col col-h">Fecha de creación</div>
             <div class="col">
               {{ view.fechaCreacion ? (view.fechaCreacion | date:'dd/MM/yyyy HH:mm') : '—' }}
             </div>
           </div>
-          <!-- 👇 Estatus eliminado -->
         </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Panel: Datos de facturación -->
+    <ion-card class="panel panel-fiscales">
+      <ion-card-header class="panel-heading">
+        <ion-card-title class="title">
+          <ion-icon name="document-text-outline"></ion-icon>
+          <span>Datos de facturación</span>
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content class="panel-body">
+        <form [formGroup]="formFiscales" (ngSubmit)="submitFiscales()" class="fiscales-grid">
+          <ion-item class="embassy_input" lines="full">
+            <ion-label position="floating">RFC*</ion-label>
+            <ion-input formControlName="rfc" maxlength="13" autocomplete="off"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="fc('rfc').invalid && fc('rfc').touched">RFC requerido y válido.</ion-text>
+
+          <ion-item class="embassy_input" lines="full">
+            <ion-label position="floating">Razón social*</ion-label>
+            <ion-input formControlName="razonSocial" autocomplete="off"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="fc('razonSocial').invalid && fc('razonSocial').touched">Campo requerido.</ion-text>
+
+          <ion-item class="embassy_input" lines="full">
+            <ion-label position="floating">Código Postal*</ion-label>
+            <ion-input formControlName="cp" type="tel" maxlength="5" autocomplete="off"></ion-input>
+          </ion-item>
+          <ion-text color="danger" *ngIf="fc('cp').invalid && fc('cp').touched">CP de 5 dígitos.</ion-text>
+
+          <ion-item class="embassy_input" lines="full">
+            <ion-label>Método de pago*</ion-label>
+            <ion-select interface="popover" formControlName="metodoPago">
+              <ion-select-option value="PUE">PUE - Pago en una sola exhibición</ion-select-option>
+              <ion-select-option value="PPD">PPD - Pago en parcialidades o diferido</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-text color="danger" *ngIf="fc('metodoPago').invalid && fc('metodoPago').touched">Selecciona un método.</ion-text>
+
+          <ion-item class="embassy_input" lines="full">
+            <ion-label>Uso de CFDI*</ion-label>
+            <ion-select interface="popover" formControlName="usoCfdi">
+              <!-- agrega tus claves reales del catálogo SAT -->
+              <ion-select-option value="G03">G03 - Gastos en general</ion-select-option>
+              <ion-select-option value="P01">P01 - Por definir</ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-text color="danger" *ngIf="fc('usoCfdi').invalid && fc('usoCfdi').touched">Selecciona un uso.</ion-text>
+
+          <div class="acciones">
+            <ion-button type="submit" [disabled]="formFiscales.invalid || guardando">
+              {{ guardando ? 'Guardando…' : 'Guardar datos' }}
+            </ion-button>
+          </div>
+        </form>
       </ion-card-content>
     </ion-card>
   </ng-container>

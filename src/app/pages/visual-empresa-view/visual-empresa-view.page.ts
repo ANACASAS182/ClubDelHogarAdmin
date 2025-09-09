@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuarioService } from 'src/app/services/api.back.services/usuario.service';
 import { Empresa } from 'src/app/models/Empresa';
 import { GenericResponseDTO } from 'src/app/models/DTOs/GenericResponseDTO';
@@ -11,21 +12,24 @@ type EmpresaView = {
   rfc?: string | null;
   razonSocial?: string | null;
   nombreComercial?: string | null;
-  estatus?: string | null;          // por si después lo llenan
+  estatus?: string | null;
   correo?: string | null;
   telefono?: string | null;
   domicilio?: string | null;
 
   descripcion?: string | null;
   giro?: string | number | null;
+  giroNombre?: string | null;          // 👈 nombre del giro si está disponible
   grupo?: string | number | null;
+  grupoNombre?: string | null;         // 👈 nombre del grupo si está disponible
   embajadorId?: number | null;
+  embajadorNombre?: string | null;     // 👈 nombre del embajador si está disponible
 
   fechaCreacion?: Date | null;
   eliminado?: boolean | null;
   fechaEliminacion?: Date | null;
 
-  logoSrc?: string | null;          // <- imagen final (base64 o url)
+  logoSrc?: string | null;
 };
 
 @Component({
@@ -36,18 +40,25 @@ type EmpresaView = {
 })
 export class VisualEmpresaViewPage implements OnInit {
   cargando = true;
+  guardando = false;
+
   empresa?: Empresa;
   view: EmpresaView = {};
 
+  formFiscales!: FormGroup;
+
   constructor(
     private usuarioSrv: UsuarioService,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.initForm();
     this.cargar();
   }
 
+  // ====== Helpers de respuesta
   private isOk<T>(resp: GenericResponseDTO<T>): boolean {
     const r: any = resp as any;
     return r?.estatus === 1 || r?.success === true || r?.ok === true;
@@ -62,7 +73,6 @@ export class VisualEmpresaViewPage implements OnInit {
     if (v instanceof Date) return v;
     if (typeof v === 'number') return new Date(v);
     if (typeof v === 'string') {
-      // tu SQL devuelve "YYYY-MM-DD HH:mm:ss.SSS" => lo normalizo a ISO
       const s = v.includes('T') ? v : v.replace(' ', 'T');
       const d = new Date(s);
       return isNaN(d.getTime()) ? null : d;
@@ -71,23 +81,15 @@ export class VisualEmpresaViewPage implements OnInit {
   }
 
   private buildLogoSrc(e: any): string | null {
-    // 1) si ya viene como data:image/...;base64, úsalo
     const b64: string | null = e?.logotipoBase64 ?? e?.LogotipoBase64 ?? null;
     if (b64 && /^data:image\/(png|jpeg|jpg|gif);base64,/i.test(b64)) return b64;
+    if (b64 && !b64.startsWith('data:image')) return `data:image/png;base64,${b64}`;
 
-    // 2) si viene base64 "pelón" sin prefijo (raro, pero por si acaso)
-    if (b64 && !b64.startsWith('data:image')) {
-      return `data:image/png;base64,${b64}`;
-    }
-
-    // 3) si hay path/URL
     const p: string | null = e?.logotipoPath ?? e?.LogotipoPath ?? null;
     if (p) {
-      if (/^https?:\/\//i.test(p)) return p;               // url absoluta
-      // relativo al API (ajústalo si tu backend sirve archivos en otro host)
+      if (/^https?:\/\//i.test(p)) return p;
       return `${environment.apiUrl}${p.startsWith('/') ? '' : '/'}${p}`;
     }
-
     return null;
   }
 
@@ -104,9 +106,18 @@ export class VisualEmpresaViewPage implements OnInit {
       domicilio: e?.domicilio ?? e?.Domicilio ?? e?.direccion ?? e?.Direccion ?? null,
 
       descripcion: e?.descripcion ?? e?.Descripcion ?? null,
+
+      // Giro: acepta nombre si viene, si no, valor crudo
       giro: e?.giro ?? e?.Giro ?? null,
+      giroNombre: e?.giroNombre ?? e?.GiroNombre ?? null,
+
+      // Grupo: nombre + id si existen
       grupo: e?.grupo ?? e?.Grupo ?? null,
-      embajadorId: e?.embajadorId ?? e?.EmbajadorId ?? null,
+      grupoNombre: e?.grupoNombre ?? e?.GrupoNombre ?? null,
+
+      // Embajador: nombre + id
+      embajadorId: e?.embajadorId ?? e?.EmbajadorId ?? e?.EmbajadorID ?? null,
+      embajadorNombre: e?.embajadorNombre ?? e?.EmbajadorNombre ?? null,
 
       fechaCreacion: this.toDate(e?.fechaCreacion ?? e?.FechaCreacion),
       eliminado: (e?.eliminado ?? e?.Eliminado) ? true : false,
@@ -114,6 +125,20 @@ export class VisualEmpresaViewPage implements OnInit {
 
       logoSrc: this.buildLogoSrc(e)
     };
+  }
+
+  private initForm() {
+    this.formFiscales = this.fb.group({
+      rfc: ['', [Validators.required, Validators.pattern(/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{2,3}$/i)]],
+      razonSocial: ['', [Validators.required]],
+      cp: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
+      metodoPago: ['', [Validators.required]],
+      usoCfdi: ['', [Validators.required]]
+    });
+  }
+
+  fc(name: string) {
+    return this.formFiscales.get(name)!;
   }
 
   private cargar() {
@@ -137,16 +162,58 @@ export class VisualEmpresaViewPage implements OnInit {
             if (this.isOk(respEmp)) {
               this.empresa = (respEmp as any).data as Empresa;
               this.view = this.normalizeEmpresa(this.empresa);
+
+              // Prellenar datos fiscales si ya existen
+              this.formFiscales.patchValue({
+                rfc: this.view.rfc || '',
+                razonSocial: this.view.razonSocial || '',
+                cp: (this.empresa as any)?.CP || (this.empresa as any)?.Cp || '',
+                metodoPago: (this.empresa as any)?.MetodoPago || '',
+                usoCfdi: (this.empresa as any)?.UsoCFDI || (this.empresa as any)?.UsoCfdi || ''
+              });
             } else {
               this.fail(this.getMsg(respEmp, 'No fue posible cargar la empresa.'));
             }
           },
           error: () => this.fail('Error al consultar la empresa.'),
-          complete: () => this.cargando = false
+          complete: () => (this.cargando = false)
         });
       },
       error: () => this.fail('Error al consultar el usuario.')
     });
+  }
+
+  async submitFiscales() {
+    if (this.formFiscales.invalid || !this.view.id) {
+      this.formFiscales.markAllAsTouched();
+      return;
+    }
+
+    const dto = {
+      empresaId: this.view.id,
+      rfc: this.fc('rfc').value?.toUpperCase(),
+      razonSocial: this.fc('razonSocial').value,
+      cp: this.fc('cp').value,
+      metodoPago: this.fc('metodoPago').value,
+      usoCfdi: this.fc('usoCfdi').value
+    };
+
+    this.guardando = true;
+    /*this.usuarioSrv.updateDatosFiscales(dto).subscribe({
+      next: async (resp: GenericResponseDTO<boolean>) => {
+        this.guardando = false;
+        if (this.isOk(resp)) {
+          const a = await this.alertCtrl.create({ header: 'Listo', message: 'Datos fiscales guardados.', buttons: ['OK'] });
+          a.present();
+        } else {
+          this.fail(this.getMsg(resp, 'No fue posible guardar los datos fiscales.'));
+        }
+      },
+      error: () => {
+        this.guardando = false;
+        this.fail('Error al guardar los datos fiscales.');
+      }
+    });*/
   }
 
   async fail(msg: string) {

@@ -349,4 +349,34 @@ export class ReferenciasPage implements OnInit, AfterViewInit, OnDestroy {
     const { data } = await modal.onDidDismiss();
   }
 
+  getFechaVigencia(element: any): Date | null {
+  if (!element || typeof element !== 'object') return null;
+
+  // posibles nombres que suelen venir del backend
+  const candidatos = [
+    'vigencia', 'fechaVigencia', 'vigenteHasta', 'vigenciaHasta',
+    'fechaFinVigencia', 'fechaVencimiento', 'finVigencia'
+  ];
+
+  for (const k of candidatos) {
+    const v = element[k];
+    if (v === null || v === undefined) continue;
+
+    // soporta Date, string ISO o ticks numéricos
+    if (v instanceof Date) return v;
+    if (typeof v === 'string' || typeof v === 'number') {
+      const d = new Date(v);
+      if (!isNaN(d.getTime())) return d;
+    }
+  }
+
+  // si tu backend realmente trae la fecha en element.vigente (raro), intenta parsearla:
+  if (element.vigente && (typeof element.vigente === 'string' || typeof element.vigente === 'number')) {
+    const d = new Date(element.vigente);
+    if (!isNaN(d.getTime())) return d;
+  }
+
+  return null;
+}
+
 }

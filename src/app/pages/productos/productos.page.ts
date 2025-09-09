@@ -66,8 +66,22 @@ export class ProductosPage implements OnInit, AfterViewInit, OnDestroy {
     private grupoService: GrupoService,
     private usuarioService: UsuarioService, private modalCtrl: ModalController, private route: ActivatedRoute) { }
 
-  ngAfterViewInit() {
-  }
+    ngAfterViewInit() {
+      this.dataSourceTable.sort = this.sort;
+      this.dataSourceTable.paginator = this.paginator;
+
+      this.dataSourceTable.sortingDataAccessor = (item: any, property: string) => {
+        if (property === 'Comision') {
+          const txt = this.formatComision(item); // "10%" o "$123.00"
+          const num = Number(String(txt).replace(/[^\d.-]/g, ''));
+          return isNaN(num) ? -Infinity : num;
+        }
+        if (property === 'Nombre') return item?.nombre ?? '';
+        if (property === 'FechaCaducidad') return new Date(item?.fechaCaducidad ?? 0).getTime();
+        if (property === 'Empresa') return item?.empresaRazonSocial ?? '';
+        return (item as any)[property];
+      };
+    }
 
   ngOnDestroy() {
     this.destroy$.next();
@@ -277,20 +291,43 @@ export class ProductosPage implements OnInit, AfterViewInit, OnDestroy {
     this.loadtable();
   }
 
+  formatComision(e: any): string {
+    // Intenta varios nombres comunes
+    const porcentaje =
+      e?.comision ?? e?.comisionPorcentaje ?? e?.porcentaje ?? e?.nivel_1 ?? e?.nivel1 ?? null;
+
+    const montoFijo =
+      e?.monto ?? e?.montoFijo ?? e?.comisionMonto ?? null;
+
+    const tipo = e?.comisionTipo ?? e?.tipoComision ?? (porcentaje != null ? 'P' : (montoFijo != null ? 'M' : null));
+
+    if (tipo === 'P' && porcentaje != null) {
+      return `${Number(porcentaje)}%`;
+    }
+    if (tipo === 'M' && montoFijo != null) {
+      return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' })
+        .format(Number(montoFijo));
+    }
+
+    if (porcentaje != null) return `${Number(porcentaje)}%`;
+    if (montoFijo != null) {
+      return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' })
+        .format(Number(montoFijo));
+    }
+    return '—';
+  }
 
   formatFecha(fecha?: Date): string {
-
-    if (fecha == undefined) {
-      return "No aplica";
-    }
+    if (fecha == undefined) return "No aplica";
 
     const f = new Date(fecha);
     const dia = f.getDate().toString().padStart(2, '0');
     let mes = f.toLocaleString('es-MX', { month: 'long' });
     mes = mes.charAt(0).toUpperCase() + mes.slice(1);
     const anio = f.getFullYear();
-    return `${dia} ${mes} ${anio}`;
+    return `${dia} ${mes} ${anio}`; // <-- usa backticks
   }
+
   getVigencia(fecha?: Date) {
     if (fecha == undefined) {
       return true;

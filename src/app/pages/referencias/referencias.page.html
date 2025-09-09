@@ -98,14 +98,22 @@
           <ng-container matColumnDef="Producto">
             <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Producto
             </th>
-            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.producto }}
-              <div *ngIf="element.vigente !== null">
-                <small [ngClass]="element.productoVigente ? 'text-success' : 'text-danger'">
-                  {{ element.productoVigente ? 'Vigente' : 'No vigente' }}
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element">
+              {{ element.producto }}
+
+              <div>
+                <small>
+                  <span [ngClass]="element.productoVigente ? 'vigencia-label' : 'text-danger'">
+                    {{ element.productoVigente ? 'Vigente' : 'No vigente' }}
+                  </span>
+                  <ng-container *ngIf="getFechaVigencia(element) as fv">
+                    <span class="vigencia-fecha"> • hasta {{ fv | date:'dd MMMM y':'':'es-MX' }}</span>
+                  </ng-container>
                 </small>
               </div>
             </td>
           </ng-container>
+
 
           <ng-container matColumnDef="Embajador">
             <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Embajador

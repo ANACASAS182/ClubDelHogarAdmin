@@ -1,6 +1,23 @@
-.text-success{
-    color: green;
+.text-success { 
+    color: #22c55e; 
+    font-weight: 600; 
 }
-.text-danger{
-    color:red;
+.text-danger  { 
+    color: #ef4444; 
+    font-weight: 600; 
+}
+td small { 
+    opacity: .9; 
+}
+
+/* Texto de vigencia */
+.vigencia-label {
+  font-weight: 600;
+  color: #16a34a; // verde fuerte
+}
+
+.vigencia-fecha {
+  font-weight: 600;
+  color: #2563eb; // azul intenso
+  margin-left: 4px;
 }
