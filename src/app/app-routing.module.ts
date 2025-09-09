@@ -5,38 +5,30 @@ import { AuthGuard } from './guards/auth.guard';
 import { DashboardResolver } from './resolvers/dashboard.resolver';
 
 const routes: Routes = [
-  {
-    path: '',
-    redirectTo: 'login',
-    pathMatch: 'full'
-  },
-  {
-    path: 'login',
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+
+  // 🔓 públicas
+  { path: 'login',
     loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule),
-    runGuardsAndResolvers: 'always',
     canActivate: [NoAuthGuard],
+    runGuardsAndResolvers: 'always'
   },
-  {
-    path: 'registro',
+  { path: 'registro',
     loadChildren: () => import('./pages/registro/registro.module').then(m => m.RegistroPageModule),
     runGuardsAndResolvers: 'always'
   },
-  {
-    path: 'registro/:codigo',
+  { path: 'registro/:codigo',
     loadChildren: () => import('./pages/registro/registro.module').then(m => m.RegistroPageModule),
     runGuardsAndResolvers: 'always'
   },
-  {
-    path: 'dashboard',
+
+  // 🔒 protegidas
+  { path: 'dashboard',
     loadChildren: () => import('./pages/dashboard/dashboard.module').then(m => m.DashboardPageModule),
     canActivate: [AuthGuard],
     runGuardsAndResolvers: 'always',
-    resolve: {
-      resolverData: DashboardResolver
-    }
+    resolve: { resolverData: DashboardResolver }
   },
-
-
 
 ];
 
@@ -44,7 +36,8 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes, {
       preloadingStrategy: PreloadAllModules,
-      onSameUrlNavigation: 'reload'
+      onSameUrlNavigation: 'reload',
+      enableTracing: true // 👈 temporal, verás logs en consola
     })
   ],
   exports: [RouterModule]

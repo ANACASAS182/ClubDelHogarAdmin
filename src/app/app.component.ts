@@ -17,15 +17,22 @@ export class AppComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    // Asegura storage listo
     await this.tokenService.init();
 
-    // Decide ruta inicial (sin dejar historial)
     const logged = await this.tokenService.isLoggedIn();
+
+    // 🔓 Si ya está logueado, siempre mándalo al dashboard
     if (logged) {
       await this.nav.navigateRoot('/dashboard');
-    } else {
-      await this.nav.navigateRoot('/login');
+    } 
+    else {
+      // ❗ Solo manda al login si la URL actual es raíz
+      const currentUrl = this.router.url;
+      if (currentUrl === '/' || currentUrl === '') {
+        await this.nav.navigateRoot('/login');
+      }
+      // Si está en /registro/:codigo o /registro, NO lo toques,
+      // deja que el router cargue la página de registro.
     }
   }
 }
