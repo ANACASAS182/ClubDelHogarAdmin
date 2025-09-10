@@ -1,11 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 import { UsuarioService } from 'src/app/services/api.back.services/usuario.service';
 import { Empresa } from 'src/app/models/Empresa';
 import { GenericResponseDTO } from 'src/app/models/DTOs/GenericResponseDTO';
 import { Usuario } from 'src/app/models/Usuario';
 import { environment } from 'src/environments/environment';
+
+// === NUEVO: servicio fiscal de empresa
+import {
+  EmpresaFiscalService,
+  EmpresaFiscalDTO
+} from 'src/app/services/api.back.services/empresa-fiscal.service';
 
 type EmpresaView = {
   id?: number | null;
@@ -19,11 +26,11 @@ type EmpresaView = {
 
   descripcion?: string | null;
   giro?: string | number | null;
-  giroNombre?: string | null;          // 👈 nombre del giro si está disponible
+  giroNombre?: string | null;
   grupo?: string | number | null;
-  grupoNombre?: string | null;         // 👈 nombre del grupo si está disponible
+  grupoNombre?: string | null;
   embajadorId?: number | null;
-  embajadorNombre?: string | null;     // 👈 nombre del embajador si está disponible
+  embajadorNombre?: string | null;
 
   fechaCreacion?: Date | null;
   eliminado?: boolean | null;
@@ -50,7 +57,8 @@ export class VisualEmpresaViewPage implements OnInit {
   constructor(
     private usuarioSrv: UsuarioService,
     private alertCtrl: AlertController,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private empFiscalSrv: EmpresaFiscalService // <-- NUEVO
   ) {}
 
   ngOnInit(): void {
@@ -107,15 +115,12 @@ export class VisualEmpresaViewPage implements OnInit {
 
       descripcion: e?.descripcion ?? e?.Descripcion ?? null,
 
-      // Giro: acepta nombre si viene, si no, valor crudo
       giro: e?.giro ?? e?.Giro ?? null,
       giroNombre: e?.giroNombre ?? e?.GiroNombre ?? null,
 
-      // Grupo: nombre + id si existen
       grupo: e?.grupo ?? e?.Grupo ?? null,
       grupoNombre: e?.grupoNombre ?? e?.GrupoNombre ?? null,
 
-      // Embajador: nombre + id
       embajadorId: e?.embajadorId ?? e?.EmbajadorId ?? e?.EmbajadorID ?? null,
       embajadorNombre: e?.embajadorNombre ?? e?.EmbajadorNombre ?? null,
 
@@ -129,17 +134,15 @@ export class VisualEmpresaViewPage implements OnInit {
 
   private initForm() {
     this.formFiscales = this.fb.group({
-      rfc: ['', [Validators.required, Validators.pattern(/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{2,3}$/i)]],
+      rfc: ['', [Validators.required, Validators.pattern(/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{2,3}$/i)]], // PM: 12 chars
       razonSocial: ['', [Validators.required]],
       cp: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
-      metodoPago: ['', [Validators.required]],
-      usoCfdi: ['', [Validators.required]]
+      metodoPago: ['', [Validators.required]], // PUE/PPD
+      usoCfdi: ['', [Validators.required]]     // G03/P01...
     });
   }
 
-  fc(name: string) {
-    return this.formFiscales.get(name)!;
-  }
+  fc(name: string) { return this.formFiscales.get(name)!; }
 
   private cargar() {
     this.cargando = true;
@@ -159,20 +162,36 @@ export class VisualEmpresaViewPage implements OnInit {
 
         this.usuarioSrv.getEmpresaByUsuario(usuarioId).subscribe({
           next: (respEmp: GenericResponseDTO<Empresa>) => {
-            if (this.isOk(respEmp)) {
-              this.empresa = (respEmp as any).data as Empresa;
-              this.view = this.normalizeEmpresa(this.empresa);
-
-              // Prellenar datos fiscales si ya existen
-              this.formFiscales.patchValue({
-                rfc: this.view.rfc || '',
-                razonSocial: this.view.razonSocial || '',
-                cp: (this.empresa as any)?.CP || (this.empresa as any)?.Cp || '',
-                metodoPago: (this.empresa as any)?.MetodoPago || '',
-                usoCfdi: (this.empresa as any)?.UsoCFDI || (this.empresa as any)?.UsoCfdi || ''
-              });
-            } else {
+            if (!this.isOk(respEmp)) {
               this.fail(this.getMsg(respEmp, 'No fue posible cargar la empresa.'));
+              return;
+            }
+
+            this.empresa = (respEmp as any).data as Empresa;
+            this.view = this.normalizeEmpresa(this.empresa);
+
+            // Prellenar base
+            this.formFiscales.patchValue({
+              rfc: this.view.rfc || '',
+              razonSocial: this.view.razonSocial || ''
+            });
+
+            // === Traer fiscales guardados (cp, metodo, uso)
+            if (this.view.id) {
+              this.empFiscalSrv.get(this.view.id).subscribe({
+                next: r => {
+                  const d = r.data;
+                  if (d) {
+                    this.formFiscales.patchValue({
+                      rfc: d.rfc || this.view.rfc || '',
+                      razonSocial: d.razonSocialSAT || this.view.razonSocial || '',
+                      cp: d.codigoPostal || '',
+                      metodoPago: d.metodoPago || '',
+                      usoCfdi: d.usoCFDI || ''
+                    });
+                  }
+                }
+              });
             }
           },
           error: () => this.fail('Error al consultar la empresa.'),
@@ -183,37 +202,42 @@ export class VisualEmpresaViewPage implements OnInit {
     });
   }
 
-  async submitFiscales() {
+  async submitFiscales(): Promise<void> {
     if (this.formFiscales.invalid || !this.view.id) {
       this.formFiscales.markAllAsTouched();
       return;
     }
 
-    const dto = {
-      empresaId: this.view.id,
+    const dto: EmpresaFiscalDTO = {
+      empresaID: this.view.id!,
       rfc: this.fc('rfc').value?.toUpperCase(),
-      razonSocial: this.fc('razonSocial').value,
-      cp: this.fc('cp').value,
+      razonSocialSAT: this.fc('razonSocial').value,
+      codigoPostal: this.fc('cp').value,
       metodoPago: this.fc('metodoPago').value,
-      usoCfdi: this.fc('usoCfdi').value
+      usoCFDI: this.fc('usoCfdi').value,
+      regimenClave: '601' // PM; si luego usas catálogo, cámbialo
     };
 
     this.guardando = true;
-    /*this.usuarioSrv.updateDatosFiscales(dto).subscribe({
-      next: async (resp: GenericResponseDTO<boolean>) => {
+    this.empFiscalSrv.guardar(dto).subscribe({
+      next: async (resp) => {
         this.guardando = false;
         if (this.isOk(resp)) {
-          const a = await this.alertCtrl.create({ header: 'Listo', message: 'Datos fiscales guardados.', buttons: ['OK'] });
+          const a = await this.alertCtrl.create({
+            header: 'Listo',
+            message: 'Datos de facturación guardados.',
+            buttons: ['OK']
+          });
           a.present();
         } else {
-          this.fail(this.getMsg(resp, 'No fue posible guardar los datos fiscales.'));
+          this.fail(this.getMsg(resp, 'No fue posible guardar los datos de facturación.'));
         }
       },
-      error: () => {
+      error: async () => {
         this.guardando = false;
-        this.fail('Error al guardar los datos fiscales.');
+        this.fail('Error al guardar los datos de facturación.');
       }
-    });*/
+    });
   }
 
   async fail(msg: string) {
