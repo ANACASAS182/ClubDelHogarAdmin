@@ -8,6 +8,8 @@ import { GenericResponseDTO } from 'src/app/models/DTOs/GenericResponseDTO';
 import { Usuario } from 'src/app/models/Usuario';
 import { environment } from 'src/environments/environment';
 
+import { GrupoService } from 'src/app/services/api.back.services/grupo.service';
+
 // === NUEVO: servicio fiscal de empresa
 import {
   EmpresaFiscalService,
@@ -39,6 +41,21 @@ type EmpresaView = {
   logoSrc?: string | null;
 };
 
+// Arriba del componente o como propiedad estática
+const GIROS_CATALOGO = new Map<number, string>([
+  [1, 'Alimentos y Bebidas'],
+  [2, 'Bienes Raíces'],
+  [3, 'Comercio'],
+  [4, 'Construcción'],
+  [5, 'Educación'],
+  [6, 'Finanzas'],
+  [7, 'Manufactura'],
+  [8, 'Salud'],
+  [9, 'Tecnología'],
+  [10, 'Transporte y Logística'],
+]);
+
+
 @Component({
   selector: 'app-visual-empresa-view',
   templateUrl: './visual-empresa-view.page.html',
@@ -54,16 +71,40 @@ export class VisualEmpresaViewPage implements OnInit {
 
   formFiscales!: FormGroup;
 
+  private grupoMap = new Map<number, string>();
+  private gruposCargados = false;
+
   constructor(
     private usuarioSrv: UsuarioService,
     private alertCtrl: AlertController,
     private fb: FormBuilder,
-    private empFiscalSrv: EmpresaFiscalService // <-- NUEVO
+    private empFiscalSrv: EmpresaFiscalService,
+    private grupoSrv: GrupoService
   ) {}
 
   ngOnInit(): void {
     this.initForm();
     this.cargar();
+  }
+
+  private cargarGruposSiHaceFalta(): void {
+    if (this.gruposCargados) return;
+    this.grupoSrv.getAllGrupos().subscribe({
+      next: (r: any) => {
+        const lista = r?.data ?? [];
+        for (const g of lista) {
+          const id = Number(g.id ?? g.ID);
+          const nombre = g.nombre ?? g.Nombre ?? '';
+          if (id && nombre) this.grupoMap.set(id, nombre);
+        }
+        this.gruposCargados = true;
+
+        // Si ya tenemos la empresa cargada y falta el nombre, resuélvelo
+        if (!this.view.grupoNombre && typeof this.view.grupo === 'number') {
+          this.view.grupoNombre = this.grupoMap.get(this.view.grupo) ?? null;
+        }
+      }
+    });
   }
 
   // ====== Helpers de respuesta
@@ -102,35 +143,40 @@ export class VisualEmpresaViewPage implements OnInit {
   }
 
   private normalizeEmpresa(e: any): EmpresaView {
-    return {
-      id: e?.id ?? e?.ID ?? null,
-      rfc: e?.rfc ?? e?.RFC ?? null,
-      razonSocial: e?.razonSocial ?? e?.RazonSocial ?? null,
-      nombreComercial: e?.nombreComercial ?? e?.NombreComercial ?? null,
-      estatus: e?.estatus ?? e?.Estatus ?? null,
+  const giroVal = e?.giro ?? e?.Giro ?? null;
+  const giroNum = typeof giroVal === 'number' ? giroVal : Number(giroVal);
+  const giroNombreCalc =
+    e?.giroNombre ?? e?.GiroNombre ?? (Number.isFinite(giroNum) ? GIROS_CATALOGO.get(giroNum) ?? null : null);
 
-      correo: e?.correo ?? e?.Correo ?? e?.email ?? e?.Email ?? null,
-      telefono: e?.telefono ?? e?.Telefono ?? e?.tel ?? null,
-      domicilio: e?.domicilio ?? e?.Domicilio ?? e?.direccion ?? e?.Direccion ?? null,
+  return {
+    id: e?.id ?? e?.ID ?? null,
+    rfc: e?.rfc ?? e?.RFC ?? null,
+    razonSocial: e?.razonSocial ?? e?.RazonSocial ?? null,
+    nombreComercial: e?.nombreComercial ?? e?.NombreComercial ?? null,
+    estatus: e?.estatus ?? e?.Estatus ?? null,
 
-      descripcion: e?.descripcion ?? e?.Descripcion ?? null,
+    correo: e?.correo ?? e?.Correo ?? e?.email ?? e?.Email ?? null,
+    telefono: e?.telefono ?? e?.Telefono ?? e?.tel ?? null,
+    domicilio: e?.domicilio ?? e?.Domicilio ?? e?.direccion ?? e?.Direccion ?? null,
 
-      giro: e?.giro ?? e?.Giro ?? null,
-      giroNombre: e?.giroNombre ?? e?.GiroNombre ?? null,
+    descripcion: e?.descripcion ?? e?.Descripcion ?? null,
 
-      grupo: e?.grupo ?? e?.Grupo ?? null,
-      grupoNombre: e?.grupoNombre ?? e?.GrupoNombre ?? null,
+    giro: giroVal,
+    giroNombre: giroNombreCalc,                            // ← ✅ aquí
 
-      embajadorId: e?.embajadorId ?? e?.EmbajadorId ?? e?.EmbajadorID ?? null,
-      embajadorNombre: e?.embajadorNombre ?? e?.EmbajadorNombre ?? null,
+    grupo: e?.grupo ?? e?.Grupo ?? null,
+    grupoNombre: e?.grupoNombre ?? e?.GrupoNombre ?? null,
 
-      fechaCreacion: this.toDate(e?.fechaCreacion ?? e?.FechaCreacion),
-      eliminado: (e?.eliminado ?? e?.Eliminado) ? true : false,
-      fechaEliminacion: this.toDate(e?.fechaEliminacion ?? e?.FechaEliminacion),
+    embajadorId: e?.embajadorId ?? e?.EmbajadorId ?? e?.EmbajadorID ?? null,
+    embajadorNombre: e?.embajadorNombre ?? e?.EmbajadorNombre ?? null,
 
-      logoSrc: this.buildLogoSrc(e)
-    };
-  }
+    fechaCreacion: this.toDate(e?.fechaCreacion ?? e?.FechaCreacion),
+    eliminado: (e?.eliminado ?? e?.Eliminado) ? true : false,
+    fechaEliminacion: this.toDate(e?.fechaEliminacion ?? e?.FechaEliminacion),
+
+    logoSrc: this.buildLogoSrc(e)
+  };
+}
 
   private initForm() {
     this.formFiscales = this.fb.group({
@@ -169,6 +215,23 @@ export class VisualEmpresaViewPage implements OnInit {
 
             this.empresa = (respEmp as any).data as Empresa;
             this.view = this.normalizeEmpresa(this.empresa);
+
+            // Fallback: si no viene el nombre del giro desde el backend
+            const grupoIdNum = typeof this.view.grupo === 'number'
+              ? this.view.grupo
+              : Number(this.view.grupo);
+
+            if (!this.view.grupoNombre && !Number.isNaN(grupoIdNum) && grupoIdNum > 0) {
+              // 1) si ya está en cache, úsalo
+              const nombre = this.grupoMap.get(grupoIdNum);
+              if (nombre) {
+                this.view.grupoNombre = nombre;
+              } else {
+                // 2) si no, asegúrate de cargar catálogo y luego asignar
+                this.cargarGruposSiHaceFalta();
+              }
+            }
+
 
             // Prellenar base
             this.formFiscales.patchValue({
