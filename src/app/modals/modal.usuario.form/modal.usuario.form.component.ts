@@ -21,18 +21,28 @@ import { GenericResponseDTO } from 'src/app/models/DTOs/GenericResponseDTO';
 import { UsuarioEditDTO } from 'src/app/models/DTOs/UsuarioEditDTO';
 import { cleanString } from 'src/app/classes/string-utils';
 import { sinEspaciosValidator } from 'src/app/classes/custom.validars';
+import { FormsModule } from '@angular/forms';
+import { UsuarioFiscalDTO } from 'src/app/models/DTOs/UsuarioFiscalDTO';
+import { BancoUsuarioDTO } from 'src/app/models/DTOs/BancoUsuarioDTO';
 
 @Component({
   selector: 'app-modal.usuario.form',
   templateUrl: './modal.usuario.form.component.html',
   styleUrls: ['./modal.usuario.form.component.scss'],
   standalone: true,
-  imports: [IonicModule, ReactiveFormsModule, CommonModule, IonicSelectableComponent, IonicSelectableMessageTemplateDirective],
+  imports: [IonicModule, ReactiveFormsModule, CommonModule, IonicSelectableComponent, IonicSelectableMessageTemplateDirective, FormsModule],
 
 })
 
 export class ModalUsuarioFormComponent implements OnInit {
   @ViewChild('selectableComponent') selectableComponent!: IonicSelectableComponent;
+
+  // ===== NUEVO: control del tab
+  tab: 'perfil' | 'fiscal' | 'bancos' = 'perfil';
+
+  // ===== NUEVO: modelos para fiscales y bancos
+  fiscal?: UsuarioFiscalDTO | null;
+  bancos: BancoUsuarioDTO[] = [];
 
   formulario: FormGroup;
   btnName: string = "AGREGAR";
@@ -61,7 +71,8 @@ export class ModalUsuarioFormComponent implements OnInit {
 
   @Input() id?: number = undefined;
 
-  constructor(private fb: FormBuilder,
+  constructor(
+    private fb: FormBuilder,
     private usuarioService: UsuarioService,
     private toastController: ToastController,
     private loadingCtrl: LoadingController,
@@ -69,8 +80,8 @@ export class ModalUsuarioFormComponent implements OnInit {
     private empresasService: EmpresaService,
     private fuenteOrigenService: FuenteOrigenService,
     private catalogosService: CatalogosService,
-    private modalCtrl: ModalController) {
-
+    private modalCtrl: ModalController
+  ) {
     this.formulario = this.fb.group({
       nombre: ['', [Validators.required, sinEspaciosValidator()]],
       apellido: ['', [Validators.required, sinEspaciosValidator()]],
@@ -91,28 +102,24 @@ export class ModalUsuarioFormComponent implements OnInit {
   }
 
   async ngOnInit() {
-
-    const loading = await this.loadingCtrl.create({
-      message: 'Cargando datos...'
-    });
+    const loading = await this.loadingCtrl.create({ message: 'Cargando datos...' });
     await loading.present();
     try {
       this.roles = getRolesOptions();
 
-      const responsegrupos = await firstValueFrom(this.gruposService.getAllGrupos());
-      this.grupos = responsegrupos?.data || [];
+      const [respGrupos, respEmpresas, respFuentes, respPaises, respEstados] = await Promise.all([
+        firstValueFrom(this.gruposService.getAllGrupos()),
+        firstValueFrom(this.empresasService.getAllEmpresas()),
+        firstValueFrom(this.fuenteOrigenService.getCatalogoFuentesOrigen()),
+        firstValueFrom(this.catalogosService.getCatalogoPaises()),
+        firstValueFrom(this.catalogosService.getCatalogoEstados())
+      ]);
 
-      const responseEmpresas = await firstValueFrom(this.empresasService.getAllEmpresas());
-      this.empresas = responseEmpresas?.data || [];
-
-      const responseFuentesOrigen = await firstValueFrom(this.fuenteOrigenService.getCatalogoFuentesOrigen());
-      this.fuentesOrigen = responseFuentesOrigen?.data || [];
-
-      const responseCatPaises = await firstValueFrom(this.catalogosService.getCatalogoPaises());
-      this.paises = responseCatPaises?.data || [];
-
-      const responseCatEstados = await firstValueFrom(this.catalogosService.getCatalogoEstados());
-      this.estados = responseCatEstados?.data || [];
+      this.grupos = respGrupos?.data || [];
+      this.empresas = respEmpresas?.data || [];
+      this.fuentesOrigen = respFuentes?.data || [];
+      this.paises = respPaises?.data || [];
+      this.estados = respEstados?.data || [];
 
       const passwordControl = this.formulario.get('password');
 
@@ -121,9 +128,10 @@ export class ModalUsuarioFormComponent implements OnInit {
         this.title = "MODIFICAR";
         this.textoPassword = "Capture contraseña solo si desea cambiarla.";
         this.ContrasenaLabel = "Nueva contraseña";
+
+        // ===== Perfil
         this.usuarioService.getUsuarioByID(this.id).subscribe({
           next: (response: GenericResponseDTO<UsuarioEditDTO>) => {
-            // Patch del resto de datos, sin 'parent'
             this.formulario.patchValue({
               nombre: response.data.nombres,
               apellido: response.data.apellidos,
@@ -140,44 +148,73 @@ export class ModalUsuarioFormComponent implements OnInit {
             });
 
             this.rolChange(response.data.rolesEnum!);
-
             this.isNacional = !!response.data.catalogoEstadoID;
 
-            if (response.data.usuarioParentID != undefined && response.data.usuarioParentID > 0) {
-              this.usuarioService.busquedaUsuario(response.data.usuarioParentNombreCompleto!.trim()).subscribe(responsebusqueda => {
-                this.usuarios = responsebusqueda.data;
-
-                this.formulario.patchValue({
-                  parent: this.usuarios.find(u => u.id === response.data.usuarioParentID)
+            if (response.data.usuarioParentID && response.data.usuarioParentID > 0) {
+              this.usuarioService.busquedaUsuario(response.data.usuarioParentNombreCompleto!.trim())
+                .subscribe(r => {
+                  this.usuarios = r.data;
+                  this.formulario.patchValue({
+                    parent: this.usuarios.find(u => u.id === response.data.usuarioParentID)
+                  });
                 });
-              });
             }
           }
         });
 
+        // ===== NUEVO: Datos fiscales
+        this.cargarFiscal(this.id);
+        // ===== NUEVO: Bancos
+        this.cargarBancos(this.id);
+
       } else {
-        //Mexico por default
-        var mexico = this.paises.find(t => t.codigo == "MEX");
-        this.formulario.patchValue({
-          pais: mexico?.id
-        });
+        // México default + password aleatoria
+        const mexico = this.paises.find(t => t.codigo == "MEX");
+        this.formulario.patchValue({ pais: mexico?.id, password: this.generateSecurePassword(8) });
         this.isNacional = true;
-
-        //
-        this.formulario.patchValue({
-          password: this.generateSecurePassword(8)
-        });
-
         passwordControl?.setValidators([Validators.required]);
         passwordControl?.updateValueAndValidity();
       }
-
-    } catch (error) {
-      console.error('Error al cargar datos', error);
+    } catch (e) {
+      console.error('Error al cargar datos', e);
     } finally {
       loading.dismiss();
     }
+  }
 
+  // ===== NUEVO: carga fiscal y bancos
+  private cargarFiscal(usuarioId: number) {
+    this.usuarioService.getUsuarioFiscal(usuarioId).subscribe({
+      next: (res) => this.fiscal = res?.data ?? null,
+      error: () => this.fiscal = null
+    });
+  }
+
+  private cargarBancos(usuarioId: number) {
+    this.usuarioService.getBancosUsuario(usuarioId).subscribe({
+      next: (res) => this.bancos = res?.data ?? [],
+      error: () => this.bancos = []
+    });
+  }
+
+  descargarConstancia() {
+  if (!this.id) return;
+  this.usuarioService.descargarConstanciaDeUsuario(this.id).subscribe({
+    next: (blob) => {
+      const a = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      a.href = url;
+      a.download = (this.fiscal?.constanciaPath?.split(/[\\/]/).pop() || 'constancia.pdf');
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  });
+}
+
+  mascaraCuenta(v: string) {
+    if (!v) return '';
+    const s = v.toString();
+    return s.length > 4 ? '••••' + s.slice(-4) : s;
   }
 
   enviarFormulario() {
@@ -242,6 +279,21 @@ export class ModalUsuarioFormComponent implements OnInit {
 
   getControl(name: string) {
     return this.formulario.get(name);
+  }
+
+  editarBanco(b: BancoUsuarioDTO) {
+  // TODO: abrir modal de edición o inline form
+  console.log('editarBanco', b);
+  }
+
+  eliminarBanco(b: BancoUsuarioDTO) {
+    // TODO: confirmar y llamar servicio para borrar
+    console.log('eliminarBanco', b);
+  }
+
+  agregarBanco() {
+    // TODO: abrir modal para crear un nuevo método de pago
+    console.log('agregarBanco');
   }
 
   close() {

@@ -129,10 +129,36 @@ ion-header.modalHeader {
     --width: 800px;
   }
   ion-modal.modal-usuario {
-    --border-radius: 12px;
-    --height: 420px;
-    --width: 950px;
-  }
+  /* ancho */
+  --width: clamp(1000px, 96vw, 1200px);
+  --max-width: 96vw;
+
+  /* alto */
+  --height: 80vh;
+  --max-height: 90vh;
+
+  /* estética */
+  --border-radius: 14px;
+  --box-shadow: 0 20px 40px rgba(0,0,0,.18);
+}
+
+ion-modal.modal-usuario::part(content) {
+  width: var(--width);
+  height: var(--height);
+}
+
+ion-modal.modal-usuario ion-header {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--ion-color-step-50, #fff);
+}
+ion-modal.modal-usuario ion-footer {
+  position: sticky; bottom: 0; z-index: 10;
+  background: var(--ion-color-step-50, #fff);
+  border-top: 1px solid rgba(0,0,0,.06);
+}
+ion-modal.modal-usuario ion-content {
+  height: 100%;
+}
   ion-modal.modal-periodo {
     --border-radius: 12px;
     --height: 420px;

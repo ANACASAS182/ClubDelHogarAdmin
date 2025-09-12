@@ -14,3 +14,35 @@
     min-width: 5px !important;
 
 }
+
+.btn-descargar {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* modal.usuario.form.component.scss */
+.modalHeader { --background: var(--ion-color-dark); color: #fff; }
+.modalform .inputForm.invalid { --highlight-color-focused: var(--ion-color-danger); }
+ion-card { border-radius: 14px; }
+
+::ng-deep .modal-wrapper {
+  max-width: 900px !important;   /* 👈 más ancho */
+  width: 90% !important;         /* 👈 aprovecha casi toda la pantalla */
+  height: auto !important;
+  border-radius: 12px !important;
+}
+
+@media (min-width: 1200px) {
+  ::ng-deep .modal-wrapper {
+    max-width: 1100px !important; /* 👈 todavía más grande en pantallas grandes */
+  }
+}
+
+ion-content {
+  padding: 20px !important;
+}
+
+ion-item {
+  margin-bottom: 12px;
+}

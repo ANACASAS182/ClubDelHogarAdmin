@@ -1,214 +1,304 @@
 <ion-header class="modalHeader">
   <ion-toolbar>
     <ion-title>{{title}} EMBAJADOR</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
-  <ion-buttons slot="end">
-    <ion-button (click)="close()">
-      <ion-icon name="close"></ion-icon>
-    </ion-button>
-  </ion-buttons>
 </ion-header>
 
 <ion-content class="ion-padding" [fullscreen]="false">
 
-  <form [formGroup]="formulario" class="modalform">
-    <ion-grid>
-      <ion-row>
+  <!-- ===== Tabs ===== -->
+  <ion-segment [(ngModel)]="tab" style="margin-bottom: 12px;">
+    <ion-segment-button value="perfil">
+      <ion-label>Perfil</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="fiscal">
+      <ion-label>Datos fiscales</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="bancos">
+      <ion-label>Métodos de pago</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 
-        <ion-col size="12" size-md="6">
-          <ion-input class="inputForm" label-placement="floating" label="Nombre"
-            [class.invalid]="getControl('nombre')?.invalid && getControl('nombre')?.touched" formControlName="nombre"
-            placeholder="Nombre(s)" type="text" (ionBlur)="getControl('nombre')?.markAsTouched()"></ion-input>
-          <ion-text color="danger" *ngIf="getControl('nombre')?.invalid && getControl('nombre')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
+  <!-- ===== PERFIL (lo que ya tenías) ===== -->
+  <ng-container *ngIf="tab==='perfil'">
+    <form [formGroup]="formulario" class="modalform">
+      <ion-grid>
+        <ion-row>
+          <!-- ***** todo tu formulario original ***** -->
+          <!-- (PEGUÉ íntegro tu bloque original de inputs) -->
+          <!-- INICIO: bloque original -->
+          <ion-col size="12" size-md="6">
+            <ion-input class="inputForm" label-placement="floating" label="Nombre"
+              [class.invalid]="getControl('nombre')?.invalid && getControl('nombre')?.touched" formControlName="nombre"
+              placeholder="Nombre(s)" type="text" (ionBlur)="getControl('nombre')?.markAsTouched()"></ion-input>
+            <ion-text color="danger" *ngIf="getControl('nombre')?.invalid && getControl('nombre')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
 
-        <ion-col size="12" size-md="6">
-          <ion-input class="inputForm" label-placement="floating" label="Apellido"
-            [class.invalid]="getControl('apellido')?.invalid && getControl('apellido')?.touched"
-            formControlName="apellido" placeholder="Apellido(s)" type="text"
-            (ionBlur)="getControl('apellido')?.markAsTouched()"></ion-input>
-          <ion-text color="danger" *ngIf="getControl('apellido')?.invalid && getControl('apellido')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-input class="inputForm" label-placement="floating" label="Apellido"
+              [class.invalid]="getControl('apellido')?.invalid && getControl('apellido')?.touched"
+              formControlName="apellido" placeholder="Apellido(s)" type="text"
+              (ionBlur)="getControl('apellido')?.markAsTouched()"></ion-input>
+            <ion-text color="danger" *ngIf="getControl('apellido')?.invalid && getControl('apellido')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
 
-        <ion-col size="12" size-md="6">
-          <ion-select [interfaceOptions]="{ header: 'Pais'}" class="inputForm" okText="Ok" cancelText="Cancelar"
-            label-placement="floating" label="Pais"
-            [class.invalid]="getControl('pais')?.invalid && getControl('pais')?.touched" formControlName="pais"
-            (ionChange)="onPaisChange($event)" (ionBlur)="getControl('pais')?.markAsTouched()">
-            <ion-select-option *ngFor="let pais of paises" [value]="pais.id">
-              {{ pais.descripcion }}
-            </ion-select-option>
-          </ion-select>
-          <ion-text color="danger" *ngIf="getControl('pais')?.invalid && getControl('pais')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-select [interfaceOptions]="{ header: 'Pais'}" class="inputForm" okText="Ok" cancelText="Cancelar"
+              label-placement="floating" label="Pais"
+              [class.invalid]="getControl('pais')?.invalid && getControl('pais')?.touched" formControlName="pais"
+              (ionChange)="onPaisChange($event)" (ionBlur)="getControl('pais')?.markAsTouched()">
+              <ion-select-option *ngFor="let pais of paises" [value]="pais.id">
+                {{ pais.descripcion }}
+              </ion-select-option>
+            </ion-select>
+            <ion-text color="danger" *ngIf="getControl('pais')?.invalid && getControl('pais')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
 
-        <ion-col size="12" size-md="6" *ngIf="isNacional">
-          <ion-select [interfaceOptions]="{ header: 'Estado'}" okText="Ok" cancelText="Cancelar" class="inputForm"
-            label-placement="floating" label="Estado"
-            [class.invalid]="getControl('estado')?.invalid && getControl('estado')?.touched" formControlName="estado"
-            class="inputForm" (ionBlur)="getControl('estado')?.markAsTouched()">
-            <ion-select-option *ngFor="let estad of estados" [value]="estad.id">
-              {{ estad.nombre }}
-            </ion-select-option>
-          </ion-select>
-          <ion-text color="danger" *ngIf="getControl('estado')?.invalid && getControl('estado')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
+          <ion-col size="12" size-md="6" *ngIf="isNacional">
+            <ion-select [interfaceOptions]="{ header: 'Estado'}" okText="Ok" cancelText="Cancelar" class="inputForm"
+              label-placement="floating" label="Estado"
+              [class.invalid]="getControl('estado')?.invalid && getControl('estado')?.touched" formControlName="estado"
+              class="inputForm" (ionBlur)="getControl('estado')?.markAsTouched()">
+              <ion-select-option *ngFor="let estad of estados" [value]="estad.id">
+                {{ estad.nombre }}
+              </ion-select-option>
+            </ion-select>
+            <ion-text color="danger" *ngIf="getControl('estado')?.invalid && getControl('estado')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
 
-        <ion-col size="12" size-md="6" *ngIf="!isNacional">
-          <ion-input class="inputForm" label-placement="floating" label="Estado"
-            [class.invalid]="getControl('estadoTexto')?.invalid && getControl('estadoTexto')?.touched"
-            formControlName="estadoTexto" placeholder="Estado" type="text"
-            (ionBlur)="getControl('estadoTexto')?.markAsTouched()">
-          </ion-input>
-          <ion-text color="danger" *ngIf="getControl('estadoTexto')?.invalid && getControl('estadoTexto')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
+          <ion-col size="12" size-md="6" *ngIf="!isNacional">
+            <ion-input class="inputForm" label-placement="floating" label="Estado"
+              [class.invalid]="getControl('estadoTexto')?.invalid && getControl('estadoTexto')?.touched"
+              formControlName="estadoTexto" placeholder="Estado" type="text"
+              (ionBlur)="getControl('estadoTexto')?.markAsTouched()">
+            </ion-input>
+            <ion-text color="danger" *ngIf="getControl('estadoTexto')?.invalid && getControl('estadoTexto')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
 
-        <ion-col size="12" size-md="6">
-          <ion-input class="inputForm" [class.invalid]="getControl('ciudad')?.invalid && getControl('ciudad')?.touched"
-            label-placement="floating" label="Ciudad" formControlName="ciudad" placeholder="Ciudad" type="text"
-            (ionBlur)="getControl('ciudad')?.markAsTouched()">
-          </ion-input>
-          <ion-text color="danger" *ngIf="getControl('ciudad')?.invalid && getControl('ciudad')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-input class="inputForm" [class.invalid]="getControl('ciudad')?.invalid && getControl('ciudad')?.touched"
+              label-placement="floating" label="Ciudad" formControlName="ciudad" placeholder="Ciudad" type="text"
+              (ionBlur)="getControl('ciudad')?.markAsTouched()">
+            </ion-input>
+            <ion-text color="danger" *ngIf="getControl('ciudad')?.invalid && getControl('ciudad')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
 
-        <ion-col size="12" size-md="6">
-          <ion-select class="inputForm" [interfaceOptions]="{ header: 'Fuente de origen del usuario'}" okText="Ok"
-            label-placement="floating" label="Fuente de origen" cancelText="Cancelar"
-            [class.invalid]="getControl('fuenteOrigen')?.invalid && getControl('fuenteOrigen')?.touched"
-            formControlName="fuenteOrigen" (ionBlur)="getControl('fuenteOrigen')?.markAsTouched()">
-            <ion-select-option *ngFor="let fuenteO of fuentesOrigen" [value]="fuenteO.id">
-              {{ fuenteO.nombre }}
-            </ion-select-option>
-          </ion-select>
-          <ion-text color="danger" *ngIf="getControl('fuenteOrigen')?.invalid && getControl('fuenteOrigen')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-select class="inputForm" [interfaceOptions]="{ header: 'Fuente de origen del usuario'}" okText="Ok"
+              label-placement="floating" label="Fuente de origen" cancelText="Cancelar"
+              [class.invalid]="getControl('fuenteOrigen')?.invalid && getControl('fuenteOrigen')?.touched"
+              formControlName="fuenteOrigen" (ionBlur)="getControl('fuenteOrigen')?.markAsTouched()">
+              <ion-select-option *ngFor="let fuenteO of fuentesOrigen" [value]="fuenteO.id">
+                {{ fuenteO.nombre }}
+              </ion-select-option>
+            </ion-select>
+            <ion-text color="danger" *ngIf="getControl('fuenteOrigen')?.invalid && getControl('fuenteOrigen')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
 
-        <ion-col size="12" size-md="12">
-          <ion-input class="inputForm" [class.invalid]="getControl('email')?.invalid && getControl('email')?.touched"
-            autocomplete="off" label-placement="floating" label="Correo electronico" formControlName="email"
-            placeholder="Correo de contacto (usuario)" type="text" (ionBlur)="getControl('email')?.markAsTouched()">
-          </ion-input>
-          <ion-text color="danger" *ngIf="getControl('email')?.invalid && getControl('email')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
+          <ion-col size="12" size-md="12">
+            <ion-input class="inputForm" [class.invalid]="getControl('email')?.invalid && getControl('email')?.touched"
+              autocomplete="off" label-placement="floating" label="Correo electronico" formControlName="email"
+              placeholder="Correo de contacto (usuario)" type="text" (ionBlur)="getControl('email')?.markAsTouched()">
+            </ion-input>
+            <ion-text color="danger" *ngIf="getControl('email')?.invalid && getControl('email')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
 
-        <ion-col size="12" size-md="6">
-          <ion-input class="inputForm"
-            [class.invalid]="getControl('telefono')?.invalid && getControl('telefono')?.touched"
-            label-placement="floating" label="Celular (WhatsApp)" formControlName="telefono" placeholder="WhatsApp"
-            type="text" (ionBlur)="getControl('telefono')?.markAsTouched()">
-          </ion-input>
-          <ion-text color="danger" *ngIf="getControl('telefono')?.invalid && getControl('telefono')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
+          <ion-col size="12" size-md="6">
+            <ion-input class="inputForm" label-placement="stacked" [label]="ContrasenaLabel" [placeholder]="textoPassword" autocomplete="new-password" 
+              [class.invalid]="getControl('password')?.invalid && getControl('password')?.touched"
+              formControlName="password" type="text"
+              (ionBlur)="getControl('password')?.markAsTouched()">
+              <ion-button class="input-icon-button" fill="clear" slot="end" aria-label="Show/hide"
+                (click)="refreshPassword()">
+                <ion-icon slot="icon-only" name="refresh" aria-hidden="true"></ion-icon>
+              </ion-button>
+            </ion-input>
 
+            <ion-text color="danger"
+              *ngIf="getControl('password')?.hasError('required') && getControl('password')?.touched">
+              Campo requerido
+            </ion-text>
+            <ion-text color="danger"
+              *ngIf="getControl('password')?.hasError('minlength') && getControl('password')?.touched">
+              La contraseña debe tener al menos 6 caracteres.
+            </ion-text>
+          </ion-col>
 
-        <ion-col size="12" size-md="6">
-          <ion-input class="inputForm" label-placement="stacked" [label]="ContrasenaLabel" [placeholder]="textoPassword" autocomplete="new-password" 
-            [class.invalid]="getControl('password')?.invalid && getControl('password')?.touched"
-            formControlName="password" type="text"
-            (ionBlur)="getControl('password')?.markAsTouched()">
-            <ion-button class="input-icon-button" fill="clear" slot="end" aria-label="Show/hide"
-              (click)="refreshPassword()">
-              <ion-icon slot="icon-only" name="refresh" aria-hidden="true"></ion-icon>
-            </ion-button>
-          </ion-input>
+          <ion-col size="12" size-md="6">
+            <ion-select [interfaceOptions]="{ header: 'Rol de usuario'}" class="inputForm" okText="Ok"
+              cancelText="Cancelar" label-placement="floating" label="Rol de usuario"
+              [class.invalid]="getControl('rol')?.invalid && getControl('rol')?.touched" formControlName="rol"
+              (ionChange)="onRolChange($event)" (ionBlur)="getControl('rol')?.markAsTouched()">
+              <ion-select-option *ngFor="let rol of roles" [value]="rol.valor">
+                {{ rol.nombre }}
+              </ion-select-option>
+            </ion-select>
+            <ion-text color="danger" *ngIf="getControl('rol')?.invalid && getControl('rol')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
 
-          <ion-text color="danger"
-            *ngIf="getControl('password')?.hasError('required') && getControl('password')?.touched">
-            Campo requerido
-          </ion-text>
-          <ion-text color="danger"
-            *ngIf="getControl('password')?.hasError('minlength') && getControl('password')?.touched">
-            La contraseña debe tener al menos 6 caracteres.
-          </ion-text>
-        </ion-col>
+          <ion-col size="12" size-md="6" *ngIf="mostrarGrupos">
+            <ion-select [interfaceOptions]="{ header: 'Selecciona grupo'}" okText="Ok" cancelText="Cancelar"
+              class="inputForm" label-placement="floating" label="Grupo"
+              [class.invalid]="getControl('grupo')?.invalid && getControl('grupo')?.touched" formControlName="grupo"
+              (ionBlur)="getControl('grupo')?.markAsTouched()">
+              <ion-select-option *ngFor="let item of grupos" [value]="item.id">
+                {{ item.nombre }}
+              </ion-select-option>
+            </ion-select>
+            <ion-text color="danger" *ngIf="getControl('grupo')?.invalid && getControl('grupo')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
 
-        <ion-col size="12" size-md="6">
-          <ion-select [interfaceOptions]="{ header: 'Rol de usuario'}" class="inputForm" okText="Ok"
-            cancelText="Cancelar" label-placement="floating" label="Rol de usuario"
-            [class.invalid]="getControl('rol')?.invalid && getControl('rol')?.touched" formControlName="rol"
-            (ionChange)="onRolChange($event)" (ionBlur)="getControl('rol')?.markAsTouched()">
-            <ion-select-option *ngFor="let rol of roles" [value]="rol.valor">
-              {{ rol.nombre }}
-            </ion-select-option>
-          </ion-select>
-          <ion-text color="danger" *ngIf="getControl('rol')?.invalid && getControl('rol')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
+          <ion-col size="12" size-md="6" *ngIf="mostrarEmpresas">
+            <ion-select [interfaceOptions]="{ header: 'Selecciona empresa'}" okText="Ok" cancelText="Cancelar"
+              class="inputForm" label-placement="floating" label="Empresa"
+              [class.invalid]="getControl('empresa')?.invalid && getControl('empresa')?.touched" formControlName="empresa"
+              (ionBlur)="getControl('empresa')?.markAsTouched()">
+              <ion-select-option *ngFor="let item of empresas" [value]="item.id">
+                {{ item.rfc }} - {{ item.razonSocial}}
+              </ion-select-option>
+            </ion-select>
+            <ion-text color="danger" *ngIf="getControl('empresa')?.invalid && getControl('empresa')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
 
-        <ion-col size="12" size-md="6" *ngIf="mostrarGrupos">
-          <ion-select [interfaceOptions]="{ header: 'Selecciona grupo'}" okText="Ok" cancelText="Cancelar"
-            class="inputForm" label-placement="floating" label="Grupo"
-            [class.invalid]="getControl('grupo')?.invalid && getControl('grupo')?.touched" formControlName="grupo"
-            (ionBlur)="getControl('grupo')?.markAsTouched()">
-            <ion-select-option *ngFor="let item of grupos" [value]="item.id">
-              {{ item.nombre }}
-            </ion-select-option>
-          </ion-select>
-          <ion-text color="danger" *ngIf="getControl('grupo')?.invalid && getControl('grupo')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
-
-        <ion-col size="12" size-md="6" *ngIf="mostrarEmpresas">
-          <ion-select [interfaceOptions]="{ header: 'Selecciona empresa'}" okText="Ok" cancelText="Cancelar"
-            class="inputForm" label-placement="floating" label="Empresa"
-            [class.invalid]="getControl('empresa')?.invalid && getControl('empresa')?.touched" formControlName="empresa"
-            (ionBlur)="getControl('empresa')?.markAsTouched()">
-            <ion-select-option *ngFor="let item of empresas" [value]="item.id">
-              {{ item.rfc }} - {{ item.razonSocial}}
-            </ion-select-option>
-          </ion-select>
-          <ion-text color="danger" *ngIf="getControl('empresa')?.invalid && getControl('empresa')?.touched">
-            Campo requerido
-          </ion-text>
-        </ion-col>
-
-        <ion-col size="12" size-md="6" *ngIf="mostrarParent">
-          <ion-item class="inputForm">
-            <ion-label position="floating">Usuario parent</ion-label>
-            <ionic-selectable #selectableComponent item-content formControlName="parent" [items]="usuarios"
-              itemValueField="id" closeButtonSlot="end" [searchFailText]="'No se encontraron usuarios.'"
-              itemTextField="nombreCompleto" closeButtonText="Cancelar" [canSearch]="true"
-              searchPlaceholder="Buscar usuario..." [canClear]="true" clearButtonText="Limpiar"
-              (onSearch)="onSearchChange($event)" (onOpen)="onOpen($event)">
-              <ng-template ionicSelectableMessageTemplate>
-                <ion-item text-wrap>
-                  <p style="color: grey; font-size: small;">
+          <ion-col size="12" size-md="6" *ngIf="mostrarParent">
+            <ion-item class="inputForm">
+              <ion-label position="floating">Usuario parent</ion-label>
+              <ionic-selectable #selectableComponent item-content formControlName="parent" [items]="usuarios"
+                itemValueField="id" closeButtonSlot="end" [searchFailText]="'No se encontraron usuarios.'"
+                itemTextField="nombreCompleto" closeButtonText="Cancelar" [canSearch]="true"
+                searchPlaceholder="Buscar usuario..." [canClear]="true" clearButtonText="Limpiar"
+                (onSearch)="onSearchChange($event)" (onOpen)="onOpen($event)">
+                <ng-template ionicSelectableMessageTemplate>
+                  <ion-item text-wrap>
+                    <p style="color: grey; font-size: small;">
                       Solo se muestran los primeros 30 usuarios encontrados. 
                       Si no encuentra el deseado, utilice el buscador para obtener un resultado más preciso.
-                  </p>
-                </ion-item>
+                    </p>
+                  </ion-item>
+                </ng-template>
+              </ionic-selectable>
+            </ion-item>
+          </ion-col>
+          <!-- FIN: bloque original -->
+        </ion-row>
+      </ion-grid>
+    </form>
+  </ng-container>
 
-              </ng-template>
-            </ionic-selectable>
-          </ion-item>
+  <!-- ===== DATOS FISCALES ===== -->
+  <ng-container *ngIf="tab==='fiscal'">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Datos fiscales</ion-card-title>
+      </ion-card-header>
+      <ion-card-content *ngIf="fiscal; else noFiscal">
+        <ion-item>
+          <ion-label>Nombre (SAT)</ion-label>
+          <ion-note slot="end">{{ fiscal?.nombreSAT }}</ion-note>
+        </ion-item>
+        <ion-item>
+          <ion-label>RFC</ion-label>
+          <ion-note slot="end">{{ fiscal?.rfc }}</ion-note>
+        </ion-item>
+        <ion-item>
+          <ion-label>CURP</ion-label>
+          <ion-note slot="end">{{ fiscal?.curp }}</ion-note>
+        </ion-item>
+        <ion-item>
+          <ion-label>Código Postal</ion-label>
+          <ion-note slot="end">{{ fiscal?.codigoPostal }}</ion-note>
+        </ion-item>
+        <ion-item>
+          <ion-label>Régimen</ion-label>
+          <ion-note slot="end">{{ fiscal?.regimenClave }}</ion-note>
+        </ion-item>
+
+        <div class="ion-text-center" style="margin-top:12px;">
+          <ion-button fill="outline" (click)="descargarConstancia()" [disabled]="!fiscal?.constanciaPath">
+            <ion-icon slot="start" name="download-outline"></ion-icon>
+            Descargar constancia
+          </ion-button>
+          <ion-badge [color]="fiscal?.verificadoSAT ? 'success' : 'medium'" style="margin-left:8px;">
+            {{ fiscal?.verificadoSAT ? 'Verificado SAT' : 'No verificado' }}
+          </ion-badge>
+        </div>
+      </ion-card-content>
+      <ng-template #noFiscal>
+        <ion-item lines="none" class="ion-text-center">Sin datos fiscales registrados.</ion-item>
+      </ng-template>
+    </ion-card>
+  </ng-container>
+
+  <!-- ===== MÉTODOS DE PAGO ===== -->
+  <ng-container *ngIf="tab==='bancos'">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6" size-lg="4" *ngFor="let b of bancos">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>{{ b.nombreBanco || 'Otro banco' }}</ion-card-title>
+              <ion-card-subtitle>{{ b.nombreTitular }}</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-item lines="none">
+                <ion-label>Cuenta</ion-label>
+                <ion-note slot="end">{{ mascaraCuenta(b.numeroCuenta) }}</ion-note>
+              </ion-item>
+              <ion-item lines="none">
+                <ion-label>Tipo</ion-label>
+                <ion-note slot="end">{{ b.tipoCuenta === 1 ? 'CLABE' : 'Tarjeta' }}</ion-note>
+              </ion-item>
+            </ion-card-content>
+            <ion-row class="ion-justify-content-between ion-padding">
+              <ion-button size="small" fill="clear" (click)="editarBanco(b)">
+                <ion-icon name="create-outline" slot="start"></ion-icon>Editar
+              </ion-button>
+              <ion-button size="small" fill="clear" color="danger" (click)="eliminarBanco(b)">
+                <ion-icon name="trash-outline" slot="start"></ion-icon>Eliminar
+              </ion-button>
+            </ion-row>
+          </ion-card>
         </ion-col>
-
       </ion-row>
+
+      <div class="ion-text-center">
+        <ion-button (click)="agregarBanco()">
+          <ion-icon name="add-outline" slot="start"></ion-icon>Agregar tarjeta
+        </ion-button>
+      </div>
     </ion-grid>
-  </form>
+  </ng-container>
+
 </ion-content>
 
-<ion-footer>
+<ion-footer *ngIf="tab==='perfil'">
   <ion-toolbar>
     <div style="width: 100%; text-align: center;">
       <ion-button class="customButton"  [disabled]="formEnviado" (click)="enviarFormulario()">

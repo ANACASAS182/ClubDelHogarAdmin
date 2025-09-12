@@ -7,6 +7,8 @@ import { LoginUsuarioDTO } from 'src/app/models/DTOs/LoginUsuarioDTO';
 import { Usuario, UsuarioBasico } from 'src/app/models/Usuario';
 import { PaginationModelDTO } from 'src/app/models/DTOs/PaginationModelDTO';
 import { UsuarioCatalogoDTO } from 'src/app/models/DTOs/UsuarioCatalogoDTO';
+import { BancoUsuarioDTO } from 'src/app/models/DTOs/BancoUsuarioDTO';
+import { UsuarioFiscalDTO } from 'src/app/models/DTOs/UsuarioFiscalDTO';
 import { UsuarioEditDTO } from 'src/app/models/DTOs/UsuarioEditDTO';
 import { Empresa } from 'src/app/models/Empresa';
 import { CelulaDisplay, CelulaNode } from 'src/app/pages/celulas/celulas.page';
@@ -142,6 +144,28 @@ getEmpresaByUsuario(id: number, skipErrorHandler = false): Observable<GenericRes
   getArbolEmbajadores(baseId: number): Observable<any> {
   return this.http.get<any>(`${environment.apiUrl}api/Embajadores/getArbolEmbajadores?baseId=${baseId}`);
 }
+
+  getUsuarioFiscal(usuarioId: number) {
+  return this.http.get<GenericResponseDTO<UsuarioFiscalDTO>>(
+    `${environment.apiUrl}api/usuario/${usuarioId}/fiscal`
+  );
+  }
+
+  getBancosUsuario(usuarioId: number) {
+    return this.http.get<GenericResponseDTO<BancoUsuarioDTO[]>>(
+      `${environment.apiUrl}api/usuario/${usuarioId}/bancos`
+    );
+  }
+
+    descargarConstanciaDeUsuario(usuarioId: number) {
+    return this.http.get(
+      `${environment.apiUrl}api/fiscal/constancia/usuario/${usuarioId}`,
+      { responseType: 'blob' }
+    );
+  }
+
+
+
 
 }
 
