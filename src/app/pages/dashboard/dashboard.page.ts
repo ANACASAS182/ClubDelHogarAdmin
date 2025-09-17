@@ -26,7 +26,8 @@ export class DashboardPage implements OnInit, OnDestroy {
     { enum: MenuPagesEnum.Referencias,   title: 'Referencias',   url: '/dashboard/referencias',  icon: 'star',      visible: false, access: [RolesEnum.Admin, RolesEnum.Socio] },
     { enum: MenuPagesEnum.Configuración, title: 'Periodos',      url: '/dashboard/periodos',     icon: 'calendar',  visible: false, access: [RolesEnum.Admin] },
     { enum: MenuPagesEnum.CorteMensual,  title: 'Corte mensual', url: '/dashboard/corte',        icon: 'calendar',  visible: false, access: [RolesEnum.Admin] },
-    { enum: MenuPagesEnum.Configuración, title: 'Configuración', url: '/dashboard/configuracion', icon: 'settings',  visible: false, access: [RolesEnum.Admin] }
+    { enum: MenuPagesEnum.Configuración, title: 'Configuración', url: '/dashboard/configuracion', icon: 'settings',  visible: false, access: [RolesEnum.Admin] },
+    { enum: MenuPagesEnum.PagosComisiones,   title: 'Pagos / Comisiones', url: '/dashboard/pagos-comisiones', icon: 'cash', visible: false, access: [RolesEnum.Socio] }
   ];
 
   public userName = '';

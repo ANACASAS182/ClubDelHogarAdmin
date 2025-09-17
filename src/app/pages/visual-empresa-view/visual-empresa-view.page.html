@@ -71,7 +71,7 @@
             <div class="col">
               <ng-container *ngIf="view.grupoNombre; else grupoCrudo">
                 {{ view.grupoNombre }}
-                <small *ngIf="view.grupo"> (ID: {{ view.grupo }})</small>
+              <!-- <small *ngIf="view.grupo"> (ID: {{ view.grupo }})</small>  -->
               </ng-container>
               <ng-template #grupoCrudo>
                 {{ view.grupo || '—' }}

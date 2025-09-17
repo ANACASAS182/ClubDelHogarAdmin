@@ -54,6 +54,12 @@ const routes: Routes = [
         }
       },
       {
+        path: 'pagos-comisiones',
+        loadComponent: () =>
+          import('../pagos-comisiones/pagos-comisiones.page')
+            .then(m => m.PagosComisionesPage),
+      },
+      {
         path: 'movimientos',
         loadChildren: () => import('../movimientos/movimientos.module').then(m => m.MovimientosPageModule),
         canActivate: [AdminGuard]

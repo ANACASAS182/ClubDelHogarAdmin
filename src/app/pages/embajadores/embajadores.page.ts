@@ -8,6 +8,7 @@ import { ModalUsuarioFormComponent } from 'src/app/modals/modal.usuario.form/mod
 import { UsuarioCatalogoDTO } from 'src/app/models/DTOs/UsuarioCatalogoDTO';
 import { Usuario } from 'src/app/models/Usuario';
 import { UsuarioService } from 'src/app/services/api.back.services/usuario.service';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-embajadores',

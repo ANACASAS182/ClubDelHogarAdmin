@@ -1,0 +1,118 @@
+<!-- FILTROS (solo visual) -->
+<div class="filters">
+  <ion-grid class="filters-grid">
+    <ion-row class="ion-align-items-center">
+      <ion-col size="12" size-md="6">
+        <ion-input
+          class="inputBusqueda"
+          [(ngModel)]="searchText"
+          placeholder="Buscar por producto o fecha">
+          <ion-icon slot="end" name="search" aria-hidden="true"></ion-icon>
+        </ion-input>
+      </ion-col>
+
+      <ion-col size="12" size-md="2">
+        <ion-item class="inputBusqueda">
+          <ion-label position="floating">Mes</ion-label>
+          <ion-select [(ngModel)]="mesSeleccionado" interface="popover">
+            <ion-select-option *ngFor="let m of meses" [value]="m">{{ m }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+
+      <ion-col size="12" size-md="2">
+        <ion-item class="inputBusqueda">
+          <ion-label position="floating">Estatus factura</ion-label>
+          <ion-select [(ngModel)]="estatusFacturaSel" interface="popover">
+            <ion-select-option *ngFor="let e of estatusFactura" [value]="e">{{ e }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+
+      <ion-col size="12" size-md="2">
+        <ion-item class="inputBusqueda">
+          <ion-label position="floating">Estatus pago</ion-label>
+          <ion-select [(ngModel)]="estatusPagoSel" interface="popover">
+            <ion-select-option *ngFor="let e of estatusPago" [value]="e">{{ e }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</div>
+
+<!-- TARJETA + TABLA -->
+<div class="table-card">
+  <div class="table-card__title">Pagos / Comisiones</div>
+
+  <div class="table-card__body">
+    <div class="table-scroll">
+      <table mat-table [dataSource]="data" class="embassy-table">
+
+        <!-- Cierres -->
+        <ng-container matColumnDef="totalCierres">
+          <th mat-header-cell *matHeaderCellDef> Cierres exitosos </th>
+          <td mat-cell *matCellDef="let r" class="text-center"> {{ r.totalCierres }} </td>
+        </ng-container>
+
+        <!-- Número -->
+        <ng-container matColumnDef="numero">
+          <th mat-header-cell *matHeaderCellDef> Número </th>
+          <td mat-cell *matCellDef="let r" class="text-center"> {{ r.numero }} </td>
+        </ng-container>
+
+        <!-- Producto -->
+        <ng-container matColumnDef="producto">
+          <th mat-header-cell *matHeaderCellDef class="col-wide"> Producto </th>
+          <td mat-cell *matCellDef="let r"> {{ r.producto }} </td>
+        </ng-container>
+
+        <!-- Fecha cierre -->
+        <ng-container matColumnDef="fechaCierre">
+          <th mat-header-cell *matHeaderCellDef class="col-wide"> Fecha cierre </th>
+          <td mat-cell *matCellDef="let r"> {{ r.fechaCierre }} </td>
+        </ng-container>
+
+        <!-- Monto -->
+        <ng-container matColumnDef="monto">
+          <th mat-header-cell *matHeaderCellDef class="col-money"> Monto </th>
+          <td mat-cell *matCellDef="let r" class="col-money">
+            {{ r.monto | currency:'MXN':'symbol':'1.0-0':'es-MX' }}
+          </td>
+        </ng-container>
+
+        <!-- Facturada -->
+        <ng-container matColumnDef="facturada">
+          <th mat-header-cell *matHeaderCellDef> Facturada (fecha) </th>
+          <td mat-cell *matCellDef="let r" class="muted text-center"> — </td>
+        </ng-container>
+
+        <!-- Pagada -->
+        <ng-container matColumnDef="pagada">
+          <th mat-header-cell *matHeaderCellDef> Pagada (fecha) </th>
+          <td mat-cell *matCellDef="let r" class="muted text-center"> — </td>
+        </ng-container>
+
+        <!-- Header sticky como en Referencias -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="embassy-table__header-row"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="embassy-table__data-row"></tr>
+
+        <!-- Vacío -->
+        <tr class="embassy-table__empty" *ngIf="!data?.length">
+          <td [attr.colspan]="displayedColumns.length">No se encontraron registros disponibles.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="table-card__footer">
+    <div class="footer-left"></div>
+    <div class="footer-right">
+      <span class="footer-label">Registros por página</span>
+      <button mat-icon-button disabled><mat-icon>first_page</mat-icon></button>
+      <button mat-icon-button disabled><mat-icon>chevron_left</mat-icon></button>
+      <button mat-icon-button disabled><mat-icon>chevron_right</mat-icon></button>
+      <button mat-icon-button disabled><mat-icon>last_page</mat-icon></button>
+    </div>
+  </div>
+</div>

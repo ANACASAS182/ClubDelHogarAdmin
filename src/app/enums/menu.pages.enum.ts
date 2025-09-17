@@ -8,5 +8,6 @@ export enum MenuPagesEnum {
     Movimientos = 7,
     Configuración = 8,
     CorteMensual = 9,
-    VisualizarEmpresa = 10
+    VisualizarEmpresa = 10,
+    PagosComisiones = 11
 }

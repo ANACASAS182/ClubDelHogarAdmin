@@ -1,0 +1,6 @@
+/* Que ocupe todo el ancho, sin límites */
+.page-wrap {
+  padding: 16px;
+  margin: 0;       /* sin centrado */
+  max-width: none; /* elimina límite */
+}
