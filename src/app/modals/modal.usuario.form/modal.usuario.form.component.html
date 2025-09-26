@@ -125,6 +125,24 @@
           </ion-col>
 
           <ion-col size="12" size-md="6">
+            <ion-input
+              class="inputForm"
+              label-placement="floating"
+              label="Celular"
+              formControlName="telefono"
+              type="tel"
+              inputmode="tel"
+              placeholder="10 dígitos"
+              [class.invalid]="getControl('telefono')?.invalid && getControl('telefono')?.touched"
+              (ionBlur)="getControl('telefono')?.markAsTouched()">
+            </ion-input>
+            <ion-text color="danger" *ngIf="getControl('telefono')?.hasError('required') && getControl('telefono')?.touched">
+              Campo requerido
+            </ion-text>
+          </ion-col>
+
+
+          <ion-col size="12" size-md="6">
             <ion-input class="inputForm" label-placement="stacked" [label]="ContrasenaLabel" [placeholder]="textoPassword" autocomplete="new-password" 
               [class.invalid]="getControl('password')?.invalid && getControl('password')?.touched"
               formControlName="password" type="text"

@@ -6,7 +6,6 @@ import { DashboardResolver } from './resolvers/dashboard.resolver';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-
   // 🔓 públicas
   { path: 'login',
     loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule),
@@ -21,7 +20,6 @@ const routes: Routes = [
     loadChildren: () => import('./pages/registro/registro.module').then(m => m.RegistroPageModule),
     runGuardsAndResolvers: 'always'
   },
-
   // 🔒 protegidas
   { path: 'dashboard',
     loadChildren: () => import('./pages/dashboard/dashboard.module').then(m => m.DashboardPageModule),
@@ -29,7 +27,11 @@ const routes: Routes = [
     runGuardsAndResolvers: 'always',
     resolve: { resolverData: DashboardResolver }
   },
-
+  {
+    path: 'password/reset/:token',
+    loadChildren: () => import('./pages/password-reset/password-reset.module')
+    .then(m => m.PasswordResetModule)
+  },
 ];
 
 @NgModule({

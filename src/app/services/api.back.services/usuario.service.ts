@@ -15,6 +15,9 @@ import { CelulaDisplay, CelulaNode } from 'src/app/pages/celulas/celulas.page';
 import { UsuarioDTO } from 'src/app/pages/registro/registro.page';
 import { HttpParams } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
+import { PasswordRecoveryDTO } from 'src/app/models/DTOs/PasswordRecoveryDTO';
+import { PasswordResetDTO }  from 'src/app/models/DTOs/PasswordResetDTO';
+import { InvitacionDTO } from 'src/app/models/DTOs/InvitacionDTO';
 
 type GetUsuariosParams = {
   page: number;
@@ -97,6 +100,13 @@ getEmpresaByUsuario(id: number, skipErrorHandler = false): Observable<GenericRes
   );
 }
 
+  passwordRecoveryVerify(token: string) {
+  const base = this.apiUrl.replace(/\/+$/,'');          // https://host/.../api/Usuario
+  const safe = encodeURIComponent(token);
+  return this.http.get<GenericResponseDTO<any>>(`${base}/PasswordRecovery/Verify/${safe}`);
+}
+
+
 
   getEmbajadorPorCorreo(correo: string): Observable<UsuarioBasico> {
     return this.http.get<UsuarioBasico>(`${this.apiUrl}/getEmbajadorPorCorreo?correo=` + correo);
@@ -164,15 +174,20 @@ getEmpresaByUsuario(id: number, skipErrorHandler = false): Observable<GenericRes
     );
   }
 
+    // Enviar correo de recuperación
+  passwordRecovery(dto: PasswordRecoveryDTO, skipErrorHandler = false) {
+    const url = `${this.apiUrl}/PasswordRecovery`;
+    let headers = new HttpHeaders();
+    if (skipErrorHandler) headers = headers.set('skipErrorHandler', 'true');
+    return this.http.post<GenericResponseDTO<boolean>>(url, dto, { headers });
+  }
 
+  // Cambiar contraseña con token
+  passwordReset(dto: PasswordResetDTO, skipErrorHandler = false) {
+    const url = `${this.apiUrl}/PasswordReset`;
+    let headers = new HttpHeaders();
+    if (skipErrorHandler) headers = headers.set('skipErrorHandler', 'true');
+    return this.http.post<GenericResponseDTO<boolean>>(url, dto, { headers });
+  }
 
-
-}
-
-export interface InvitacionDTO {
-  vigente: boolean;
-  codigo: string;
-  nombreInvitador: string;
-  correoElectronicoInvitacion: string;
-  embajadorReferenteId: number;
 }
