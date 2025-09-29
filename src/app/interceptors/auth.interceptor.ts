@@ -18,10 +18,14 @@ export class AuthInterceptor implements HttpInterceptor {
     // 🔓 Endpoints públicos (no deben llevar Authorization)
     // agrega aquí cualquier otro público: login, registro, recuperar, etc.
     const PUBLIC_PATHS = [
-      '/api/Embajadores/GetDatosInvitacion',
-      '/api/Usuario/Login',
-      '/api/Usuario/RegistroUsuarioCodigoInvitacion',
-    ];
+    '/api/Embajadores/GetDatosInvitacion',
+    '/api/Usuario/Login',
+    '/api/Usuario/RegistroUsuarioCodigoInvitacion',
+    // 👇 añade estas si no están
+    '/api/Usuario/PasswordRecovery',
+    '/api/Usuario/PasswordReset',
+    '/api/Usuario/PasswordRecovery/Verify'
+  ];
 
     // Evita pegar token a dominios externos que no sean tu API
     const isSameApi =

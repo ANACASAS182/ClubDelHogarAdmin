@@ -5,23 +5,30 @@ import { AuthGuard } from './guards/auth.guard';
 import { DashboardResolver } from './resolvers/dashboard.resolver';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  // 🔓 públicas
-  { path: 'login',
+  // ❌ quita esto:
+  // { path: '', redirectTo: 'login', pathMatch: 'full' },
+
+  // públicas
+  {
+    path: 'login',
     loadChildren: () => import('./pages/login/login.module').then(m => m.LoginPageModule),
     canActivate: [NoAuthGuard],
     runGuardsAndResolvers: 'always'
   },
-  { path: 'registro',
+  {
+    path: 'registro',
     loadChildren: () => import('./pages/registro/registro.module').then(m => m.RegistroPageModule),
     runGuardsAndResolvers: 'always'
   },
-  { path: 'registro/:codigo',
+  {
+    path: 'registro/:codigo',
     loadChildren: () => import('./pages/registro/registro.module').then(m => m.RegistroPageModule),
     runGuardsAndResolvers: 'always'
   },
-  // 🔒 protegidas
-  { path: 'dashboard',
+
+  // protegidas
+  {
+    path: 'dashboard',
     loadChildren: () => import('./pages/dashboard/dashboard.module').then(m => m.DashboardPageModule),
     canActivate: [AuthGuard],
     runGuardsAndResolvers: 'always',
@@ -30,16 +37,20 @@ const routes: Routes = [
   {
     path: 'password/reset/:token',
     loadChildren: () => import('./pages/password-reset/password-reset.module')
-    .then(m => m.PasswordResetModule)
+      .then(m => m.PasswordResetModule)
   },
+
+  // ✅ wildcard al final (si alguien pone una ruta rara, lo llevas a login)
+  { path: '**', redirectTo: 'login' }
 ];
+
 
 @NgModule({
   imports: [
     RouterModule.forRoot(routes, {
       preloadingStrategy: PreloadAllModules,
       onSameUrlNavigation: 'reload',
-      enableTracing: true // 👈 temporal, verás logs en consola
+      enableTracing: false // 👈 temporal, verás logs en consola
     })
   ],
   exports: [RouterModule]

@@ -21,18 +21,25 @@ export class AppComponent implements OnInit {
 
     const logged = await this.tokenService.isLoggedIn();
 
-    // 🔓 Si ya está logueado, siempre mándalo al dashboard
+    const path = (typeof window !== 'undefined' && window.location && window.location.pathname) 
+      ? window.location.pathname 
+      : '/';
+
+    const isPublicDeepLink =
+      path.startsWith('/password/reset/') ||
+      path.startsWith('/registro/') ||
+      path === '/registro';
+
     if (logged) {
-      await this.nav.navigateRoot('/dashboard');
-    } 
-    else {
-      // ❗ Solo manda al login si la URL actual es raíz
-      const currentUrl = this.router.url;
-      if (currentUrl === '/' || currentUrl === '') {
-        await this.nav.navigateRoot('/login');
+      if (path === '/' || path === '' || path === '/login') {
+        await this.nav.navigateRoot('/dashboard');
       }
-      // Si está en /registro/:codigo o /registro, NO lo toques,
-      // deja que el router cargue la página de registro.
+      return;
+    }
+
+    if (!isPublicDeepLink && (path === '/' || path === '')) {
+      await this.nav.navigateRoot('/login');
     }
   }
+
 }
