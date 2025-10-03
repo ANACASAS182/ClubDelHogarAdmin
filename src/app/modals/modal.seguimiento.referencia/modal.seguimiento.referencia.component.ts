@@ -24,6 +24,9 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
 
   @Input() id?: number;
 
+  private serverStatus: number | null = null;
+  private updatingStatus = false;
+
   // ====== Forms ======
   formulario: FormGroup = this.fb.group({
     comentario: ['', [Validators.required, sinEspaciosValidator()]],
@@ -64,6 +67,20 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
   get comentarioCtrl(): FormControl<string> {
     return this.formulario.get('comentario') as FormControl<string>;
   }
+  get isClosed(): boolean {
+    return String(this.serverStatus) === String(EstatusReferenciaEnum.Cerrado);
+  }
+
+  get serverStatusStr(): string | null {
+  return this.serverStatus == null ? null : String(this.serverStatus);
+  }
+  get seguimientoStr(): string {
+    return String(this.estatusReferenciaEnum.Seguimiento);
+  }
+  get isSelectedSeguimiento(): boolean {
+    return String(this.statusCtrl.value) === this.seguimientoStr;
+  }
+
   getControl(name: string) { return this.formulario.get(name); }
 
   // Helper: si el back manda raro, normalizamos
@@ -75,13 +92,10 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
   async ngOnInit() {
     const loading = await this.loadingCtrl.create({ message: 'Cargando datos...' });
     await loading.present();
-
     try {
-      // Cargar el referido por ID
       const refResponse = await firstValueFrom(this.referidoService.getByID(this.id!));
       this.referido = refResponse.data;
 
-      // Detecta el estatus actual en cualquiera de los posibles campos
       const r: any = this.referido ?? {};
       const currentStatusNum =
         this.toNumOrNull(r.estatusReferenciaID) ??
@@ -89,24 +103,20 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
         this.toNumOrNull(r.estatusReferenciaEnum) ??
         this.toNumOrNull(r.EstatusReferenciaEnum);
 
-      // Preseleccionar en el ion-select (como string)
+      this.serverStatus = currentStatusNum ?? null;                // 👈 guardamos el estatus confirmado
       const statusStr = currentStatusNum != null ? String(currentStatusNum) : null;
+
       this.formStatus.patchValue({ status: statusStr }, { emitEvent: false });
       this.statusCtrl.updateValueAndValidity({ emitEvent: false });
 
-      // Mostrar/ocultar el form de seguimiento según el estatus actual
       this.showSegForm = String(this.statusCtrl.value) === String(EstatusReferenciaEnum.Seguimiento);
-      this.cdr.detectChanges();
 
-      // Reaccionar a cambios del select
+      // si cambian el select, solo controlamos la UI (el back se actualiza en el botón)
       this.statusCtrl.valueChanges.subscribe(v => {
         this.showSegForm = String(v) === String(EstatusReferenciaEnum.Seguimiento);
       });
 
-      // Cargar historial
       this.getSeguimientos();
-    } catch (e) {
-      console.error('Error al cargar datos', e);
     } finally {
       loading.dismiss();
     }
@@ -129,9 +139,17 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
 
   // ====== Actualizar estatus ======
   enviarFormularioStatus() {
-    if (this.formEnviado) return;
-    this.formEnviado = true;
+    if (this.formEnviado || this.isClosed) {
+      if (this.isClosed) {
+        this.toastController.create({
+          message: 'La referencia está cerrada; no puede cambiarse el estatus.',
+          duration: 2200, color: 'warning', position: 'top'
+        }).then(t => t.present());
+      }
+      return;
+    }
 
+    this.formEnviado = true;
     if (this.formStatus.invalid) {
       this.formStatus.markAllAsTouched();
       this.formEnviado = false;
@@ -140,18 +158,14 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
 
     // Convertir a number para el backend
     const nuevo = Number(this.statusCtrl.value);
-
-    const model: EstatusReferidoDTO = {
-      id: this.id!,
-      estatusReferenciaEnum: nuevo
-    };
+    const model: EstatusReferidoDTO = { id: this.id!, estatusReferenciaEnum: nuevo };
 
     this.referidoService.updateEstatus(model).pipe(
       finalize(() => this.formEnviado = false)
     ).subscribe({
       next: (response: GenericResponseDTO<boolean>) => {
         if (response?.data) {
-          // Mantener el estado local coherente
+          this.serverStatus = nuevo;                             // 👈 ahora el servidor ya quedó así
           if (this.referido) {
             (this.referido as any).estatusReferenciaEnum = nuevo;
             (this.referido as any).EstatusReferenciaID   = nuevo;
@@ -160,12 +174,9 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
 
           this.toastController.create({
             message: 'Estatus actualizado.',
-            duration: 2200,
-            color: 'success',
-            position: 'top'
+            duration: 2200, color: 'success', position: 'top'
           }).then(t => t.present());
 
-          // Insert de seguimiento automático del back + recargar lista
           this.getSeguimientos();
         }
       }
@@ -173,38 +184,69 @@ export class ModalSeguimientoReferenciaComponent implements OnInit {
   }
 
   // ====== Agregar seguimiento manual ======
-  enviarFormulario() {
-    if (this.formEnviado) return;
-    this.formEnviado = true;
-
-    if (this.formulario.invalid) {
-      this.formulario.markAllAsTouched();
-      this.formEnviado = false;
+  async enviarFormulario() {
+    if (this.formEnviado || this.isClosed) {
+      if (this.isClosed) {
+        this.toastController.create({
+          message: 'La referencia está cerrada; no se pueden agregar seguimientos.',
+          duration: 2200, color: 'warning', position: 'top'
+        }).then(t => t.present());
+      }
       return;
     }
 
-    const model: SeguimientoReferido = {
-      comentario: cleanString(this.comentarioCtrl.value)!,
-      referidoID: this.id!,
-    };
+    if (this.formulario.invalid) {
+      this.formulario.markAllAsTouched();
+      return;
+    }
 
-    this.seguimientoReferidoService.save(model).pipe(
-      finalize(() => this.formEnviado = false)
-    ).subscribe({
-      next: (response: GenericResponseDTO<boolean>) => {
-        if (response?.data) {
-          this.toastController.create({
-            message: 'Seguimiento guardado.',
-            duration: 2200,
-            color: 'success',
-            position: 'top'
-          }).then(t => t.present());
+    const selected = Number(this.statusCtrl.value);
+    const server   = Number(this.serverStatus);
 
-          this.getSeguimientos();
-          this.formulario.reset();
+    try {
+      this.formEnviado = true;
+
+      // 1) Si el usuario eligió "Seguimiento" pero el servidor sigue en "Creado",
+      //    primero actualizamos el estatus en el back y luego guardamos el seguimiento.
+      if (String(selected) === String(EstatusReferenciaEnum.Seguimiento) &&
+          String(server)   !== String(EstatusReferenciaEnum.Seguimiento)) {
+
+        if (!this.updatingStatus) {
+          this.updatingStatus = true;
+          const model: EstatusReferidoDTO = { id: this.id!, estatusReferenciaEnum: selected };
+          const ok = await firstValueFrom(this.referidoService.updateEstatus(model));
+          this.updatingStatus = false;
+
+          if (!ok?.data) throw new Error('No se pudo actualizar el estatus.');
+          this.serverStatus = selected;
         }
       }
-    });
+
+      // 2) Guardar el seguimiento
+      const modelSeg: SeguimientoReferido = {
+        comentario: cleanString(this.comentarioCtrl.value)!,
+        referidoID: this.id!,
+      };
+
+      const resp = await firstValueFrom(this.seguimientoReferidoService.save(modelSeg));
+      if (resp?.data) {
+        this.toastController.create({
+          message: 'Seguimiento guardado.',
+          duration: 2200, color: 'success', position: 'top'
+        }).then(t => t.present());
+
+        this.getSeguimientos();
+        this.formulario.reset();
+      }
+    } catch (err) {
+      console.error(err);
+      this.toastController.create({
+        message: 'Error: intenta actualizar el estatus y vuelve a enviar.',
+        duration: 2500, color: 'danger', position: 'top'
+      }).then(t => t.present());
+    } finally {
+      this.formEnviado = false;
+    }
   }
 
   close() { this.modalCtrl.dismiss(); }

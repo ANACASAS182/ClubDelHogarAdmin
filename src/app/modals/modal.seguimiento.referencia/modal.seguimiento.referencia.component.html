@@ -72,19 +72,18 @@
           label-placement="floating"
           label="Estatus seguimiento"
           formControlName="status"
-          (ionBlur)="statusCtrl.markAsTouched()">
-
+          (ionBlur)="statusCtrl.markAsTouched()"
+          [disabled]="isClosed">   <!-- 👈 bloquea si Cerrado -->
           <ion-select-option
             *ngFor="let item of estatus"
             [value]="item.valor + ''"
             [disabled]="isCreadoDisabled(item.valor)">
             {{ item.nombre }}
           </ion-select-option>
-
         </ion-select>
 
         <div class="actions-row">
-          <ion-button type="submit" [disabled]="formEnviado || formStatus.invalid">
+          <ion-button type="submit" [disabled]="formEnviado || formStatus.invalid || isClosed">
             Actualizar estatus
           </ion-button>
         </div>
@@ -93,13 +92,12 @@
   </ion-card>  <!-- 👈 ESTOS DOS CIERRES FALTABAN -->
 
 
-  <!-- ===== NUEVO SEGUIMIENTO ===== -->
-  <ion-card class="section-card" *ngIf="showSegForm">
+  <!-- Form de seguimiento -->
+<ion-card class="section-card" *ngIf="showSegForm && !isClosed">
   <ion-card-header>
     <ion-card-title class="section-title">Agregar seguimiento</ion-card-title>
   </ion-card-header>
   <ion-card-content>
-    <!-- CONTENEDOR, NO FORM para evitar nesting -->
     <div [formGroup]="formulario">
       <ion-textarea
         formControlName="comentario"
@@ -107,18 +105,24 @@
         label="Seguimiento"
         class="inputForm"
         [class.invalid]="comentarioCtrl.invalid && comentarioCtrl.touched"
-        autoGrow="true"
-        rows="4"
-        maxlength="500"
+        autoGrow="true" rows="4" maxlength="500"
         placeholder="Escribe tu seguimiento">
       </ion-textarea>
+
+      <!-- Hint si aún no se ha sincronizado el estatus con el back -->
+      <ion-text color="medium"
+        *ngIf="isSelectedSeguimiento && serverStatusStr !== seguimientoStr">
+        Al enviar, primero se actualizará el estatus a “Seguimiento”.
+      </ion-text>
 
       <ion-text color="danger" *ngIf="comentarioCtrl.invalid && comentarioCtrl.touched">
         Campo requerido
       </ion-text>
 
       <div class="actions-row">
-        <ion-button (click)="enviarFormulario()" [disabled]="formEnviado || formulario.invalid">
+        <!-- Ya no bloqueamos por la desincronización: el click hace el auto-sync -->
+        <ion-button (click)="enviarFormulario()"
+                    [disabled]="formEnviado || formulario.invalid">
           Enviar seguimiento
         </ion-button>
       </div>
