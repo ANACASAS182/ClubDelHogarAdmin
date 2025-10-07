@@ -48,6 +48,26 @@ export class PeriodoService {
     return this.http.post<GenericResponseDTO<boolean>>(`${this.apiUrl}/Save`, model);
   }
 
+  getCorteMensualEmbajadores(periodoId: number, empresaId?: number, embajadorId?: number) {
+  const params = new HttpParams()
+    .set('periodoId', periodoId)
+    .set('tipo', 'embajadores') // opcional si así lo mapeas en el back
+    .set('empresaId', (empresaId ?? '').toString())
+    .set('embajadorId', (embajadorId ?? '').toString());
+
+  return this.http.get<CorteMensual>(`${this.apiUrl}/getCorteMensual`, { params });
+}
+
+getCorteMensualEmpresas(periodoId: number, empresaId?: number) {
+  const params = new HttpParams()
+    .set('periodoId', periodoId)
+    .set('tipo', 'empresas') // opcional si así lo mapeas
+    .set('empresaId', (empresaId ?? '').toString());
+
+  // si tienes endpoint separado, cambia la URL a /getCorteMensualEmpresas
+  return this.http.get<CorteMensualEmpresas>(`${this.apiUrl}/getCorteMensual`, { params });
+}
+
 
 
 }
@@ -96,4 +116,19 @@ export interface DetalleEmbajadorCorteMensualReferencia{
   importeDirecto:number;
   importeIndirecto:number;
   producto:string;
+}
+
+export interface CorteMensualEmpresas {
+  empresasMes: number;          // opcional (puedes usarlo o no)
+  importeTotal: number;         // total de ventas/ingresos del periodo
+  importeEmbassy: number;       // lo que queda para Embassy
+  renglones: Array<{
+    empresaId: number;
+    empresa: string;
+    productoId: number;
+    producto: string;
+    ventas: number;             // # de ventas/ref. convertidas
+    comisionEmbajadores: number;// suma a pagar a embajadores
+    importeEmbassy: number;     // lo que queda para Embassy por ese producto
+  }>;
 }

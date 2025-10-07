@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PeriodoDTO } from '../../models/DTOs/PeriodoDTO';
-import { CorteMensual, DetalleEmbajadorCorteMensual, PeriodoService } from '../../services/api.back.services/periodo.service';
+import { CorteMensual, DetalleEmbajadorCorteMensual, PeriodoService, CorteMensualEmpresas } from '../../services/api.back.services/periodo.service';
 import { ModalCorteembajadorComponent } from 'src/app/modals/modal.corteembajador/modal.corteembajador.component';
 import { ModalController } from '@ionic/angular';
 import * as XLSX from 'xlsx';
@@ -16,37 +16,94 @@ type Cell = string | number | boolean | Date | null;
 })
 export class CorteMensualPage implements OnInit {
 
+  // Filtros
+  tipoCorteMensual: number = 1;       // 1=Embajadores, 2=Empresas
+  empresaId?: number | null = null;   // "Todas" = null
+  embajadorId?: number | null = null; // "Todos" = null
+
+  empresas: Array<{id:number; nombre:string}> = [];
+  embajadores: Array<{id:number; nombre:string}> = [];
+
+  corteMensualEmbajadores?: CorteMensual;
+  corteMensualEmpresas?: CorteMensualEmpresas;
+
   periodos: PeriodoDTO[] = [];
   periodoSeleccionado?: PeriodoDTO = undefined;
-  tipoCorteMensual: number = 1;
+
+    // ===== Bonos locales (por ahora en front; luego los traemos del back) =====
+  bonos: Record<number, number> = {};
 
   constructor(private periodoService: PeriodoService, private modalCtrl: ModalController) {}
 
   ngOnInit() {
     this.periodoSeleccionado = undefined;
+
+    // 1) cargar periodos
     this.periodoService.getPeriodos().subscribe({
       next: (data) => {
         this.periodos = data;
         this.periodos.forEach(p => {
-          if (this.periodoSeleccionado == undefined) {
-            if (new Date(p.fechaFin) < new Date()) {
-              this.periodoSeleccionado = p;
-              this.getCorteMensual();
-            }
+          if (!this.periodoSeleccionado && new Date(p.fechaFin) < new Date()) {
+            this.periodoSeleccionado = p;
           }
         });
       }
     });
+
+     // 2) cargar catálogos (simulado; conecta a tus services reales)
+    // TODO: reemplaza por tus servicios reales de empresas/embajadores
+    this.empresas = [{id: 0, nombre:'Todas las empresas'}]; // placeholder
+    this.embajadores = [{id: 0, nombre:'Todos los embajadores'}]; // placeholder
   }
 
   corteMensual?: CorteMensual;
 
+  // ===== KPIs solo para vista Embajadores (calculados en front) =====
+  get embajadoresActivos(): number {
+    const lista = this.corteMensualEmbajadores?.embajadores ?? [];
+    return lista.filter(e => (e.referenciasDirectas + e.referenciasIndirectas) > 0
+                           || (e.importeDirecto + e.importeIndirecto) > 0).length;
+  }
+
+  get referenciasConvertidas(): number {
+    const lista = this.corteMensualEmbajadores?.embajadores ?? [];
+    return lista.reduce((acc, e) => acc + (e.referenciasDirectas + e.referenciasIndirectas), 0);
+  }
+
+  bonoDe(embajadorId: number): number {
+    return this.bonos[embajadorId] ?? 0;
+  }
+
+  totalAPagar(emb: { importeDirecto:number; importeIndirecto:number; id:number }): number {
+    return (emb.importeDirecto || 0) + (emb.importeIndirecto || 0) + this.bonoDe(emb.id);
+  }
+
   getCorteMensual() {
-    this.periodoService.getCorteMensual(this.periodoSeleccionado?.id!).subscribe({
-      next: (data) => {
-        this.corteMensual = data;
-      }
-    });
+    if (!this.periodoSeleccionado?.id) return;
+
+    // normaliza filtros (0 => null)
+    const empresa = !this.empresaId || this.empresaId === 0 ? null : this.empresaId;
+    const embajador = !this.embajadorId || this.embajadorId === 0 ? null : this.embajadorId;
+
+    if (this.tipoCorteMensual === 1) {
+      this.periodoService
+        .getCorteMensualEmbajadores(this.periodoSeleccionado.id, empresa ?? undefined, embajador ?? undefined)
+        .subscribe({
+          next: (data) => {
+            this.corteMensualEmbajadores = data;
+            this.corteMensualEmpresas = undefined;
+          }
+        });
+    } else {
+      this.periodoService
+        .getCorteMensualEmpresas(this.periodoSeleccionado.id, empresa ?? undefined)
+        .subscribe({
+          next: (data) => {
+            this.corteMensualEmpresas = data;
+            this.corteMensualEmbajadores = undefined;
+          }
+        });
+    }
   }
 
   detalleEmbajadorSeleccionado?: DetalleEmbajadorCorteMensual;

@@ -9,79 +9,194 @@
   </ion-toolbar>
 </ion-header>
 
-
 <ion-content [fullscreen]="true">
   <ion-grid>
+
+    <!-- ====== FILTROS ====== -->
     <ion-row>
-      <ion-col size="4">
+      <ion-col size="3">
         <ion-select [(ngModel)]="periodoSeleccionado" label="Periodo" label-placement="stacked">
-          <ion-select-option *ngFor="let periodo of periodos" [value]="periodo">{{ periodo.mesLetra }} {{ periodo.anio
-            }}</ion-select-option>
+          <ion-select-option *ngFor="let periodo of periodos" [value]="periodo">
+            {{ periodo.mesLetra }} {{ periodo.anio }}
+          </ion-select-option>
         </ion-select>
       </ion-col>
-      <ion-col size="4">
+
+      <ion-col size="3">
+        <ion-select [(ngModel)]="empresaId" label="Empresa" label-placement="stacked">
+          <ion-select-option [value]="0">Todas</ion-select-option>
+          <ion-select-option *ngFor="let e of empresas" [value]="e.id">{{ e.nombre }}</ion-select-option>
+        </ion-select>
+      </ion-col>
+
+      <ion-col size="3">
+        <ion-select [(ngModel)]="embajadorId" [disabled]="tipoCorteMensual === 2" label="Embajador" label-placement="stacked">
+          <ion-select-option [value]="0">Todos</ion-select-option>
+          <ion-select-option *ngFor="let u of embajadores" [value]="u.id">{{ u.nombre }}</ion-select-option>
+        </ion-select>
+      </ion-col>
+
+      <ion-col size="3">
         <ion-select [(ngModel)]="tipoCorteMensual" label="Tipo de corte" label-placement="stacked">
           <ion-select-option [value]="1">Embajadores</ion-select-option>
-          <ion-select-option [value]="2">Empresas</ion-select-option>
+          <ion-select-option [value]="2">Empresas / Producto</ion-select-option>
         </ion-select>
       </ion-col>
-      <ion-col size="4" style="text-align: end;">
-        <ion-button (click)="getCorteMensual()">Calcular</ion-button>
+    </ion-row>
 
-            <ion-button color="success" fill="outline"
+    <ion-row class="ion-align-items-end">
+      <ion-col size="6">
+        <ion-button (click)="getCorteMensual()">Calcular</ion-button>
+        <ion-button color="success" fill="outline"
                     (click)="exportarExcel()"
-                    [disabled]="!corteMensual">
+                    [disabled]="!(corteMensualEmbajadores || corteMensualEmpresas)">
           <ion-icon slot="start" name="download-outline"></ion-icon>
           EXPORTAR A EXCEL
         </ion-button>
       </ion-col>
     </ion-row>
-    <ion-row>
-      <ion-col size="4" style="text-align: center;">
-        <div style="padding:4px; border-radius: 6px; border: 1px solid #666;">
-          <span>Embajadores / Mes</span><br />
-          <strong>{{corteMensual?.embajadoresMes}}</strong>
+
+    <!-- ====== TARJETAS KPI PARA EMBASAJADORES ====== -->
+    <ion-row *ngIf="tipoCorteMensual === 1">
+      <ion-col size="3" style="text-align: center;">
+        <div style="padding:4px; border-radius:6px; border:1px solid #666;">
+          <span>Embajadores activos</span><br />
+          <strong>{{ embajadoresActivos }}</strong>
         </div>
       </ion-col>
-      <ion-col size="4" style="text-align: center;">
-        <div style="padding:4px; border-radius: 6px; border: 1px solid #666;">
+
+      <ion-col size="3" style="text-align: center;">
+        <div style="padding:4px; border-radius:6px; border:1px solid #666;">
+          <span>Referencias convertidas</span><br />
+          <strong>{{ referenciasConvertidas }}</strong>
+        </div>
+      </ion-col>
+
+      <ion-col size="3" style="text-align: center;">
+        <div style="padding:4px; border-radius:6px; border:1px solid #666;">
           <span>Importe Total Mes</span><br />
-          <strong>${{corteMensual?.importeTotal | number:'1.2'}} MXN</strong>
+          <strong>${{ (corteMensualEmbajadores?.importeTotal ?? 0) | number:'1.2' }} MXN</strong>
         </div>
       </ion-col>
-      <ion-col size="4" style="text-align: center;">
-        <div style="padding:4px; border-radius: 6px; border: 1px solid #666;">
+
+      <ion-col size="3" style="text-align: center;">
+        <div style="padding:4px; border-radius:6px; border:1px solid #666;">
           <span>Importe acumulado Embassy</span><br />
-          <strong>${{corteMensual?.importeEmbassy | number:'1.2'}} MXN</strong>
+          <strong>${{ (corteMensualEmbajadores?.importeEmbassy ?? 0) | number:'1.2' }} MXN</strong>
         </div>
       </ion-col>
     </ion-row>
+
+    <!-- ====== TARJETAS KPI PARA EMPRESAS/PRODUCTO ====== -->
+    <ion-row *ngIf="tipoCorteMensual === 2">
+      <ion-col size="4" style="text-align: center;">
+        <div style="padding:4px; border-radius: 6px; border: 1px solid #666;">
+          <span>Empresas / Mes</span><br />
+          <strong>{{ corteMensualEmpresas?.empresasMes ?? 0 }}</strong>
+        </div>
+      </ion-col>
+
+      <ion-col size="4" style="text-align: center;">
+        <div style="padding:4px; border-radius: 6px; border: 1px solid #666;">
+          <span>Importe Total Mes</span><br />
+          <strong>${{ (corteMensualEmpresas?.importeTotal ?? 0) | number:'1.2' }} MXN</strong>
+        </div>
+      </ion-col>
+
+      <ion-col size="4" style="text-align: center;">
+        <div style="padding:4px; border-radius: 6px; border: 1px solid #666;">
+          <span>Importe acumulado Embassy</span><br />
+          <strong>${{ (corteMensualEmpresas?.importeEmbassy ?? 0) | number:'1.2' }} MXN</strong>
+        </div>
+      </ion-col>
+    </ion-row>
+
   </ion-grid>
 
-  <ion-card>
+  <!-- ====== VISTA 1: CORTE POR EMBAJADOR ====== -->
+  <ion-card *ngIf="tipoCorteMensual === 1">
     <ion-item>
       <ion-grid>
         <ion-row>
-          <ion-col size="4"><strong>Embajador</strong></ion-col>
-          <ion-col size="2" style="text-align: end;"><strong>Referencias<br />Directas</strong></ion-col>
-          <ion-col size="2" style="text-align: end;"><strong>Ganancias<br />Directas</strong></ion-col>
-          <ion-col size="2" style="text-align: end;"><strong>Referencias<br />Indirectas</strong></ion-col>
-          <ion-col size="2" style="text-align: end;"><strong>Ganancias<br />Indirectas</strong></ion-col>
+          <ion-col size="3"><strong>Embajador</strong></ion-col>
+
+          <ion-col size="2" style="text-align:end;">
+            <strong>Directas</strong><br/>
+            <small>(# | $)</small>
+          </ion-col>
+
+          <ion-col size="2" style="text-align:end;">
+            <strong>Indirectas</strong><br/>
+            <small>(# | $)</small>
+          </ion-col>
+
+          <ion-col size="2" style="text-align:end;"><strong>Bonos</strong></ion-col>
+          <ion-col size="2" style="text-align:end;"><strong>Total a pagar</strong></ion-col>
+          <ion-col size="1" style="text-align:center;"><strong>Acción</strong></ion-col>
         </ion-row>
       </ion-grid>
     </ion-item>
-    <ion-item *ngFor="let embajador of corteMensual?.embajadores!">
-      <ion-grid class="row_clickable" (click)="mostrarDetalleEmbajadorMes(embajador.id)">
-        <ion-row>
-          <ion-col size="4">{{embajador.nombre}}</ion-col>
-          <ion-col size="2" style="text-align: end;">{{embajador.referenciasDirectas | number:'1.0'}}</ion-col>
-          <ion-col size="2" style="text-align: end;">${{embajador.importeDirecto | number:'1.2'}} MXN</ion-col>
-          <ion-col size="2" style="text-align: end;">{{embajador.referenciasIndirectas | number:'1.0'}}</ion-col>
-          <ion-col size="2" style="text-align: end;">${{embajador.importeIndirecto | number:'1.2'}} MXN</ion-col>
+
+    <ion-item *ngFor="let emb of corteMensualEmbajadores?.embajadores">
+      <ion-grid>
+        <ion-row class="row_clickable">
+          <ion-col size="3">{{ emb.nombre }}</ion-col>
+
+          <ion-col size="2" style="text-align:end;">
+            {{ emb.referenciasDirectas | number:'1.0' }}
+            &nbsp;|&nbsp;
+            ${{ (emb.importeDirecto || 0) | number:'1.2' }} MXN
+          </ion-col>
+
+          <ion-col size="2" style="text-align:end;">
+            {{ emb.referenciasIndirectas | number:'1.0' }}
+            &nbsp;|&nbsp;
+            ${{ (emb.importeIndirecto || 0) | number:'1.2' }} MXN
+          </ion-col>
+
+          <ion-col size="2" style="text-align:end;">
+            ${{ bonoDe(emb.id) | number:'1.2' }} MXN
+          </ion-col>
+
+          <ion-col size="2" style="text-align:end;">
+            <b>${{ totalAPagar(emb) | number:'1.2' }} MXN</b>
+          </ion-col>
+
+          <ion-col size="1" style="text-align:center;">
+            <ion-button size="small" fill="clear" (click)="mostrarDetalleEmbajadorMes(emb.id)">
+              Ver desglose
+            </ion-button>
+          </ion-col>
         </ion-row>
       </ion-grid>
     </ion-item>
   </ion-card>
 
+  <!-- ====== VISTA 2: CORTE POR EMPRESA / PRODUCTO ====== -->
+  <ion-card *ngIf="tipoCorteMensual === 2">
+    <ion-item>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="3"><strong>Empresa</strong></ion-col>
+          <ion-col size="4"><strong>Producto</strong></ion-col>
+          <ion-col size="1.5" style="text-align:end;"><strong>Ventas</strong></ion-col>
+          <ion-col size="1.5" style="text-align:end;"><strong>Comisión<br/>Embajadores</strong></ion-col>
+          <ion-col size="2" style="text-align:end;"><strong>Importe<br/>Embassy</strong></ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+
+    <ion-item *ngFor="let r of corteMensualEmpresas?.renglones">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="3">{{ r.empresa }}</ion-col>
+          <ion-col size="4">{{ r.producto }}</ion-col>
+          <ion-col size="1.5" style="text-align:end;">{{ r.ventas | number:'1.0' }}</ion-col>
+          <ion-col size="1.5" style="text-align:end;">${{ r.comisionEmbajadores | number:'1.2' }} MXN</ion-col>
+          <ion-col size="2" style="text-align:end;">${{ r.importeEmbassy | number:'1.2' }} MXN</ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+  </ion-card>
 
 </ion-content>

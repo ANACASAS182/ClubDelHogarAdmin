@@ -1,67 +1,171 @@
-<div class="producto-modal-content" *ngIf="producto">
+<form *ngIf="form" [formGroup]="form" class="producto-modal-content">
+
+  <!-- Banner / chips -->
+  <div class="top-row" *ngIf="roleLoaded">
+    <ion-chip [color]="isReadOnly ? 'medium' : 'warning'" outline="true">
+      <ion-icon [name]="isReadOnly ? 'eye-outline' : 'create-outline'"></ion-icon>
+      <ion-label>{{ isReadOnly ? 'Modo lectura' : 'Modo edición' }}</ion-label>
+    </ion-chip>
+
+    <div class="spacer"></div>
+
+    <!-- Toggle solo Admin -->
+    <ion-item class="toggle-item" lines="none" *ngIf="!isSocio">
+      <ion-label>{{ isReadOnly ? 'Ver' : 'Editar' }}</ion-label>
+      <ion-toggle [checked]="!isReadOnly" (ionChange)="onToggleChange($event)"></ion-toggle>
+    </ion-item>
+  </div>
+
+  <!-- Hints -->
+  <ion-note class="hint" color="medium" *ngIf="isReadOnly && !isSocio">
+    <ion-icon name="information-circle-outline"></ion-icon>
+    Activa <strong>“Editar”</strong> para modificar el nombre, la descripción, los precios y la vigencia.
+  </ion-note>
+
+  <ion-note class="hint" color="medium" *ngIf="isSocio">
+    <ion-icon name="lock-closed-outline"></ion-icon>
+    Estás viendo la información del producto. Si necesitas cambios, contacta a un administrador.
+  </ion-note>
+
+  <ion-note class="hint warn" color="warning" *ngIf="!isReadOnly && !isSocio">
+    Estás en <strong>modo edición</strong>. Recuerda <strong>Guardar cambios</strong> o
+    <button type="button" class="link" (click)="reset()">Descartar</button>.
+  </ion-note>
+
   <div class="modal-body">
+    <!-- IZQUIERDA -->
     <div class="modal-info">
-      <h2>{{producto!.nombre}}</h2>
-      <p class="modal-descripcion">{{producto!.descripcion}}</p>
+      <!-- Nombre -->
+      <h2 *ngIf="isReadOnly" class="title">{{ form.value.nombre }}</h2>
+      <ion-item *ngIf="!isReadOnly" class="editable-field" lines="none">
+        <ion-label position="stacked">Nombre del producto</ion-label>
+        <ion-input formControlName="nombre" placeholder="Nombre"></ion-input>
+      </ion-item>
+
+      <!-- Descripción -->
+      <p *ngIf="isReadOnly" class="modal-descripcion">{{ form.value.descripcion }}</p>
+      <ion-item *ngIf="!isReadOnly" class="editable-field" lines="none">
+        <ion-label position="stacked">Descripción</ion-label>
+        <ion-textarea formControlName="descripcion" autoGrow="true" rows="4" placeholder="Descripción"></ion-textarea>
+      </ion-item>
+
+      <!-- Fechas -->
       <div class="modal-fechas">
-        <p><strong>Fecha de creación:</strong> {{producto!.creacionLetra}}</p>
-        <p><strong>Vigencia:</strong> {{producto!.vigenciaLetra}}</p>
+        <p class="sutil"><strong>Fecha de creación:</strong> {{ form.value.creacionLetra }}</p>
+
+        <div class="vigencia-row">
+          <p class="sutil" *ngIf="isReadOnly">
+            <strong>Vigencia:</strong> {{ form.value.vigenciaLetra || 'No aplica' }}
+          </p>
+          <ion-chip [color]="estaVigente ? 'success' : 'danger'" outline>{{ estaVigente ? 'Vigente' : 'No vigente' }}</ion-chip>
+        </div>
+
+        <!-- Editar vigencia (solo admin editando) -->
+        <div *ngIf="!isReadOnly && !isSocio" class="editable-field">
+          <ion-label class="stacked-label">Vigencia</ion-label>
+          <div class="date-inline">
+            <ion-datetime-button datetime="vigenciaPicker" class="dt-btn"></ion-datetime-button>
+          </div>
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime
+                id="vigenciaPicker"
+                formControlName="fechaCaducidad"
+                presentation="date"
+                locale="es-MX"
+                first-day-of-week="1"
+                [preferWheel]="false"
+                [min]="minVigencia"
+                [max]="maxVigencia"
+                [showDefaultButtons]="true"
+                cancelText="Cancelar"
+                doneText="Aceptar">
+              </ion-datetime>
+            </ng-template>
+          </ion-modal>
+        </div>
       </div>
     </div>
 
+    <!-- DERECHA: Precios -->
     <div class="modal-comisiones">
-      <h2>Precio</h2>
-      <table class="comisiones-table">
-        <tbody>
+      <h3 class="section-title">Precio</h3>
 
-          <!-- 🔒 Ocultar niveles si es Socio -->
-          <tr *ngIf="!isSocio">
-            <td><strong>Nivel 1</strong></td>
-            <td class="monto">
-              {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivel1 | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
-            </td>
-          </tr>
-          <tr *ngIf="!isSocio">
-            <td><strong>Nivel 2</strong></td>
-            <td class="monto">
-              {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivel2 | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
-            </td>
-          </tr>
-          <tr *ngIf="!isSocio">
-            <td><strong>Nivel 3</strong></td>
-            <td class="monto">
-              {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivel3 | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
-            </td>
-          </tr>
-          <tr *ngIf="!isSocio">
-            <td><strong>Nivel 4</strong></td>
-            <td class="monto">
-              {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivel4 | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
-            </td>
-          </tr>
-          <tr *ngIf="!isSocio">
-            <td><strong>Invitación</strong></td>
-            <td class="monto">
-              {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivelInvitacion | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
-            </td>
-          </tr>
-          <tr *ngIf="!isSocio">
-            <td><strong>Master</strong></td>
-            <td class="monto">
-              {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.nivelMaster | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
-            </td>
-          </tr>
+      <!-- Detalle por niveles SOLO admin -->
+      <ion-list lines="full" class="price-list" *ngIf="!isSocio">
+        <ion-item>
+          <ion-label>Nivel 1</ion-label>
+          <div slot="end" *ngIf="isReadOnly">{{ formatMonto(form.value.nivel1) }}</div>
+          <div slot="end" class="input-wrap" *ngIf="!isReadOnly">
+            <ion-input type="number" inputmode="decimal" step="0.01" formControlName="nivel1"></ion-input>
+            <ion-note class="suffix">{{ unidad }}</ion-note>
+          </div>
+        </ion-item>
 
-          <!-- ✅ Total siempre visible -->
-          <tr class="comision-total">
-            <td><strong>Total</strong></td>
-            <td class="monto">
-              {{ producto.tipoComision === 1 ? '' : '$' }}{{ producto!.totalComision | number:'1.2-2' }}{{ producto.tipoComision === 1 ? '%' : '' }}
-            </td>
-          </tr>
+        <ion-item>
+          <ion-label>Nivel 2</ion-label>
+          <div slot="end" *ngIf="isReadOnly">{{ formatMonto(form.value.nivel2) }}</div>
+          <div slot="end" class="input-wrap" *ngIf="!isReadOnly">
+            <ion-input type="number" inputmode="decimal" step="0.01" formControlName="nivel2"></ion-input>
+            <ion-note class="suffix">{{ unidad }}</ion-note>
+          </div>
+        </ion-item>
 
-        </tbody>
-      </table>
+        <ion-item>
+          <ion-label>Nivel 3</ion-label>
+          <div slot="end" *ngIf="isReadOnly">{{ formatMonto(form.value.nivel3) }}</div>
+          <div slot="end" class="input-wrap" *ngIf="!isReadOnly">
+            <ion-input type="number" inputmode="decimal" step="0.01" formControlName="nivel3"></ion-input>
+            <ion-note class="suffix">{{ unidad }}</ion-note>
+          </div>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Nivel 4</ion-label>
+          <div slot="end" *ngIf="isReadOnly">{{ formatMonto(form.value.nivel4) }}</div>
+          <div slot="end" class="input-wrap" *ngIf="!isReadOnly">
+            <ion-input type="number" inputmode="decimal" step="0.01" formControlName="nivel4"></ion-input>
+            <ion-note class="suffix">{{ unidad }}</ion-note>
+          </div>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Invitación</ion-label>
+          <div slot="end" *ngIf="isReadOnly">{{ formatMonto(form.value.nivelInvitacion) }}</div>
+          <div slot="end" class="input-wrap" *ngIf="!isReadOnly">
+            <ion-input type="number" inputmode="decimal" step="0.01" formControlName="nivelInvitacion"></ion-input>
+            <ion-note class="suffix">{{ unidad }}</ion-note>
+          </div>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Master</ion-label>
+          <div slot="end" *ngIf="isReadOnly">{{ formatMonto(form.value.nivelMaster) }}</div>
+          <div slot="end" class="input-wrap" *ngIf="!isReadOnly">
+            <ion-input type="number" inputmode="decimal" step="0.01" formControlName="nivelMaster"></ion-input>
+            <ion-note class="suffix">{{ unidad }}</ion-note>
+          </div>
+        </ion-item>
+      </ion-list>
+
+      <!-- Total visible para todos -->
+      <div class="total-row">
+        <span>Total</span>
+        <strong>
+          {{ form.value.tipoComision === 1
+              ? (totalCalculado | number:'1.2-2') + '%'
+              : (totalCalculado | currency:'MXN':'symbol':'1.2-2') }}
+        </strong>
+      </div>
     </div>
   </div>
-</div>
+
+  <!-- Barra de acciones SOLO admin editando -->
+  <div class="sticky-actions" *ngIf="!isSocio && !isReadOnly">
+    <ion-button fill="clear" (click)="reset()">Descartar</ion-button>
+    <div class="spacer"></div>
+    <ion-button color="primary" (click)="guardar()" [disabled]="saving || form.pristine || form.invalid">
+      {{ saving ? 'Guardando…' : 'Guardar cambios' }}
+    </ion-button>
+  </div>
+</form>

@@ -123,11 +123,12 @@ ion-header.modalHeader {
     --height: 350px;
   }
 
-  ion-modal.modal-empresa {
+  /*ion-modal.modal-empresa {
     --border-radius: 12px;
     --height: 420px;
     --width: 800px;
-  }
+  }*/
+
   ion-modal.modal-usuario {
   /* ancho */
   --width: clamp(1000px, 96vw, 1200px);
@@ -339,29 +340,27 @@ ion-modal.modal-xl ion-grid {
   width: 100%;
 }
 
-/* ====== Tamaño del modal de seguimiento ====== */
+/* ✅ Modal amplio y flexible */
 ion-modal.modal-empresa {
   /* ancho */
-  --width: 1000px;       /* tamaño “cómodo” en desktop */
-  --max-width: 95vw;     /* no desbordar pantallas más angostas */
+  --width: clamp(960px, 96vw, 1200px); /* más ancho, tope 1200px */
+  --max-width: 96vw;
 
   /* alto */
-  --height: 85vh;        /* ocupa el 85% de la altura de la ventana */
-  --max-height: 90vh;
+  --height: 88vh;        /* un poco más alto */
+  --max-height: 92vh;
 
   /* estética */
   --border-radius: 16px;
   --box-shadow: 0 20px 40px rgba(0,0,0,.18);
 }
 
-/* Laptops/entre 768–1200px: que use más ancho disponible */
+/* Laptops/entre 768–1200px: usar casi todo el ancho */
 @media (max-width: 1200px) {
-  ion-modal.modal-empresa {
-    --width: 90vw;
-  }
+  ion-modal.modal-empresa { --width: 94vw; }
 }
 
-/* Móvil: fullscreen, sin bordes redondeados */
+/* Móvil: fullscreen, sin bordes */
 @media (max-width: 640px) {
   ion-modal.modal-empresa {
     --width: 100vw;
@@ -370,7 +369,53 @@ ion-modal.modal-empresa {
   }
 }
 
-/* (opcional) quitar padding interno del contenedor del modal */
+/* IMPORTANTE: aplicar el tamaño al “content” del modal */
 ion-modal.modal-empresa::part(content) {
-  padding: 0;
+  width: var(--width);
+  height: var(--height);
+  padding: 0;         /* sin relleno */
+}
+
+/* === Modal ancho para ficha de producto (admin y socio) === */
+ion-modal.modal-empresa,
+ion-modal.modal-empresa--wide {
+  /* ancho y alto “grandes” por defecto */
+  --width: clamp(900px, 92vw, 1200px);
+  --max-width: 92vw;
+  --height: 85vh;
+  --max-height: 90vh;
+
+  --border-radius: 16px;
+  --box-shadow: 0 20px 40px rgba(0,0,0,.18);
+}
+
+/* Forzar que el host interno del modal use nuestras vars */
+ion-modal.modal-empresa::part(content),
+ion-modal.modal-empresa--wide::part(content) {
+  width: var(--width) !important;
+  max-width: var(--max-width) !important;
+  height: var(--height) !important;
+  max-height: var(--max-height) !important;
+  padding: 0; /* opcional: sin padding interno */
+}
+
+/* Laptops entre 768–1200px: aprovecha más ancho */
+@media (max-width: 1200px) {
+  ion-modal.modal-empresa,
+  ion-modal.modal-empresa--wide {
+    --width: 95vw;
+    --max-width: 95vw;
+  }
+}
+
+/* Móvil: pantalla completa */
+@media (max-width: 640px) {
+  ion-modal.modal-empresa,
+  ion-modal.modal-empresa--wide {
+    --width: 100vw;
+    --max-width: 100vw;
+    --height: 100vh;
+    --max-height: 100vh;
+    --border-radius: 0;
+  }
 }

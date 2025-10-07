@@ -3,10 +3,11 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title><h1><ion-icon name="archive" color="white"></ion-icon> Productos a promocionar</h1></ion-title>
+    <ion-title>
+      <h1><ion-icon name="archive" color="white"></ion-icon> Productos a promocionar</h1>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
-
 
 <ion-content class="pagesContent">
 
@@ -15,7 +16,9 @@
       <ion-row class="ion-align-items-center">
 
         <ion-col size="12" size-md="9" class="ion-text-center">
-          <ion-input class="inputBusqueda" (ionInput)="inputBuscar.next($event.detail.value || '')"
+          <ion-input
+            class="inputBusqueda"
+            (ionInput)="inputBuscar.next($event.detail.value || '')"
             [placeholder]="inputBusquedaText">
             <ion-icon slot="end" name="search" aria-hidden="true"></ion-icon>
           </ion-input>
@@ -23,21 +26,29 @@
 
         <!-- Botón a la derecha -->
         <ion-col size="12" size-md="2" class="ion-text-center">
-          <ion-button expand="block"  class="customGreenButton" (click)="addModal()"><ion-icon name="add"
-              color="white"></ion-icon> AGREGAR</ion-button>
+          <ion-button expand="block" class="customGreenButton" (click)="addModal()">
+            <ion-icon name="add" color="white"></ion-icon> AGREGAR
+          </ion-button>
         </ion-col>
       </ion-row>
-
-
 
       <ion-row class="ion-align-items-center">
 
         <ion-col size="12" size-md="4" class="ion-text-center">
           <ion-item class="inputBusqueda">
             <ion-label position="floating">Filtro por vigencia</ion-label>
-            <ionic-selectable item-content [items]="vigencia" itemValueField="valor" closeButtonSlot="end"
-              itemTextField="nombre" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
-              clearButtonText="Limpiar" (onChange)="onVigenciaSelect($event)" (onClear)="onVigenciaClear($event)">
+            <ionic-selectable
+              item-content
+              [items]="vigencia"
+              itemValueField="valor"
+              itemTextField="nombre"
+              closeButtonSlot="end"
+              closeButtonText="Cancelar"
+              [canSearch]="true"
+              [canClear]="true"
+              clearButtonText="Limpiar"
+              (onChange)="onVigenciaSelect($event)"
+              (onClear)="onVigenciaClear($event)">
             </ionic-selectable>
           </ion-item>
         </ion-col>
@@ -45,9 +56,18 @@
         <ion-col size="12" size-md="4" class="ion-text-center" *ngIf="rolUsuario == RolesEnum.Admin">
           <ion-item class="inputBusqueda">
             <ion-label position="floating">Filtro por grupo</ion-label>
-            <ionic-selectable item-content [items]="grupos" itemValueField="id" closeButtonSlot="end"
-              itemTextField="nombre" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
-              clearButtonText="Limpiar" (onChange)="onGrupoSelect($event)" (onClear)="onGrupoClear($event)">
+            <ionic-selectable
+              item-content
+              [items]="grupos"
+              itemValueField="id"
+              itemTextField="nombre"
+              closeButtonSlot="end"
+              closeButtonText="Cancelar"
+              [canSearch]="true"
+              [canClear]="true"
+              clearButtonText="Limpiar"
+              (onChange)="onGrupoSelect($event)"
+              (onClear)="onGrupoClear($event)">
             </ionic-selectable>
           </ion-item>
         </ion-col>
@@ -55,9 +75,18 @@
         <ion-col size="12" size-md="4" class="ion-text-center" *ngIf="rolUsuario == RolesEnum.Admin">
           <ion-item class="inputBusqueda">
             <ion-label position="floating">Filtro por empresa</ion-label>
-            <ionic-selectable item-content [items]="empresas" itemValueField="id" closeButtonSlot="end"
-              itemTextField="razonSocial" closeButtonText="Cancelar" [canSearch]="true" [canClear]="true"
-              clearButtonText="Limpiar" (onChange)="onEmpresaSelect($event)" (onClear)="onEmpresaClear($event)">
+            <ionic-selectable
+              item-content
+              [items]="empresas"
+              itemValueField="id"
+              itemTextField="razonSocial"
+              closeButtonSlot="end"
+              closeButtonText="Cancelar"
+              [canSearch]="true"
+              [canClear]="true"
+              clearButtonText="Limpiar"
+              (onChange)="onEmpresaSelect($event)"
+              (onClear)="onEmpresaClear($event)">
             </ionic-selectable>
           </ion-item>
         </ion-col>
@@ -77,41 +106,73 @@
       <div style="overflow-x: auto;">
         <table mat-table [dataSource]="dataSourceTable" matSort>
 
+          <!-- Nombre -->
           <ng-container matColumnDef="Nombre">
-            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Nombre/Descripción
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header>
+              Nombre/Descripción
             </th>
-            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.nombre }} </td>
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element">
+              {{ element.nombre }}
+            </td>
           </ng-container>
 
+          <!-- Empresa (solo se inyecta en displayedColumns si es Admin) -->
           <ng-container matColumnDef="Empresa">
-            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header> Empresa
+            <th mat-header-cell style="padding-left: 1rem;" *matHeaderCellDef mat-sort-header>
+              Empresa
             </th>
-            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element"> {{ element.empresaRazonSocial }} </td>
+            <td mat-cell style="padding-left: 1rem;" *matCellDef="let element">
+              {{ element.empresaRazonSocial }}
+            </td>
           </ng-container>
 
-          
+          <!-- Comisión -->
           <ng-container matColumnDef="Comision">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Comisión </th>
-            <td mat-cell *matCellDef="let element"> {{ element.comision }} </td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Comisión</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.comision }}
+            </td>
           </ng-container>
 
+          <!-- Caducidad -->
           <ng-container matColumnDef="FechaCaducidad">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Caducidad </th>
-            <td mat-cell *matCellDef="let element"> {{ formatFecha(element.fechaCaducidad) }}
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Caducidad</th>
+            <td mat-cell *matCellDef="let element">
+              {{ formatFecha(element.fechaCaducidad) }}
               <div>
                 <small [ngClass]="getVigencia(element.fechaCaducidad) ? 'text-success' : 'text-danger'">
                   {{ getVigencia(element.fechaCaducidad) ? 'Vigente' : 'No vigente' }}
                 </small>
               </div>
-
             </td>
           </ng-container>
 
-
+          <!-- Acciones (solo Admin) -->
+          <ng-container matColumnDef="Acciones">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let element">
+              <ion-button
+                fill="clear"
+                size="small"
+                *ngIf="rolUsuario === RolesEnum.Admin"
+                (click)="visualizarModal(element.id!)">
+                <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+              </ion-button>
+            </td>
+          </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="mydivoutermulti elemento-renglon row_clickable" (dblclick)="visualizarModal(element.id!)">
+
+          <!-- Doble clic solo abre para Admin -->
+          <tr
+            mat-row
+            *matRowDef="let element; columns: displayedColumns;"
+            class="mydivoutermulti elemento-renglon row_clickable"
+            (dblclick)="rolUsuario === RolesEnum.Admin && visualizarModal(element.id!)"
+            (click)="rolUsuario === RolesEnum.Socio && verDetalle(element.id!)">
           </tr>
+
+
           <tr class="mat-row" *matNoDataRow>
             <td [attr.colspan]="displayedColumns.length" style="text-align: center; padding: 1rem;">
               No se encontraron registros disponibles.
@@ -120,7 +181,11 @@
         </table>
       </div>
 
-      <mat-paginator [length]="total" [pageSizeOptions]="[20, 50, 100]" showFirstLastButtons [pageSize]="50">
+      <mat-paginator
+        [length]="total"
+        [pageSizeOptions]="[20, 50, 100]"
+        showFirstLastButtons
+        [pageSize]="50">
       </mat-paginator>
 
     </ion-card-content>
